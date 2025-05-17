@@ -1,0 +1,223 @@
+@import '../../../styles/mixins';
+@import '../../../styles/variables';
+
+.wrapper {
+	width: 100%;
+	background: url('../../../assets/images/footer-background.png') center/cover;
+	color: var(--black);
+	border-top: 3px solid var(--secondary);
+	margin-top: 60px;
+
+	.inner {
+		display: flex;
+		justify-content: space-between;
+		max-width: 1200px;
+		margin: 0 auto;
+		padding: 40px 20px;
+
+		@include respond-to(md) {
+			display: grid;
+			grid-template-columns: repeat(2, 1fr);
+			gap: 20px;
+		}
+
+		@include respond-to(sm) {
+			display: grid;
+			grid-template-columns: repeat(1, 1fr);
+		}
+
+		.footerColumn {
+			flex: calc(20% - 20px);
+			margin-right: 20px;
+
+			&:last-child {
+				margin-right: 0;
+			}
+		}
+
+		.footerColumnWide {
+			flex: calc(40% - 20px);
+		}
+
+		.logo {
+			width: 220px;
+			height: auto;
+
+			@include respond-to(sm) {
+				width: 160px;
+			}
+		}
+
+		h5 {
+			font-size: 1.6rem;
+			margin: 10px 0;
+
+			@include respond-to(sm) {
+				font-size: 1.8rem;
+			}
+		}
+
+		p {
+			color: var(--black);
+			font-size: 1.4rem;
+			max-width: 300px;
+			line-height: 1.6;
+
+			@include respond-to(sm) {
+				font-size: 1.8rem;
+			}
+		}
+
+		.onlineStatus {
+			margin-top: 10px;
+			font-size: 14px;
+			color: var(--black);
+
+			.footer-icon-dot {
+				color: green;
+				font-size: 8px;
+				margin-right: 8px;
+			}
+
+			.online-number,
+			.online-access {
+				color: var(--secondary);
+			}
+		}
+
+		.boCongThuong {
+			margin-top: 10px;
+
+			img {
+				width: 160px;
+				height: auto;
+			}
+		}
+
+		.contactInfo {
+			margin-top: 10px;
+
+			.contactItem {
+				display: flex;
+				align-items: center;
+				margin-bottom: 10px;
+				font-size: 1.4rem;
+
+				@include respond-to(sm) {
+					font-size: 1.8rem;
+				}
+
+				svg {
+					margin-right: 10px;
+					font-size: 16px;
+					color: var(--black);
+
+					@include respond-to(sm) {
+						font-size: 2rem;
+					}
+				}
+			}
+		}
+
+		.socialIcons {
+			margin-top: 20px;
+
+			a {
+				color: var(--black);
+				font-size: 2rem;
+				margin-right: 10px;
+			 transition: color 0.3s ease;
+
+				@include respond-to(sm) {
+					font-size: 2.4rem;
+					margin-right: 20px;
+				}
+
+				&:hover {
+					color: var(--primary);
+				}
+			}
+		}
+
+		h4 {
+			color: var(--black);
+			font-size: 1.6rem;
+			margin: 40px 0 20px;
+
+			@include respond-to(sm) {
+				font-size: 2rem;
+			}
+		}
+
+		ul {
+			display: flex;
+			flex-direction: column;
+			gap: 12px;
+			list-style: none;
+
+			li {
+				margin-bottom: 10px;
+
+				a {
+					color: var(--black);
+					text-decoration: none;
+					transition: color 0.3s ease;
+
+					@include respond-to(sm) {
+						font-size: 1.8rem;
+					}
+
+					.footer-chevon-icon {
+						font-size: 1.2rem;
+						color: var(--secondary);
+						margin-right: 8px;
+
+						@include respond-to(sm) {
+							font-size: 1.8rem;
+						}
+					}
+
+					&:hover {
+						color: var(--primary);
+					}
+				}
+			}
+		}
+	}
+
+	.bottomBar {
+		background-color: var(--primary);
+		border-top: 2px solid var(--secondary);
+		padding: 10px 0;
+		text-align: center;
+		font-size: 14px;
+
+		p {
+			font-size: 1.4rem;
+			margin: 5px 0;
+			color: var(--white);
+			font-size: 16px;
+			font-weight: 600;
+
+			@include respond-to(sm) {
+				font-size: 1.3rem;
+			}
+		}
+
+		.company-name {
+			color: var(--white);
+
+			&:hover {
+				text-decoration: underline;
+			}
+		}
+
+		.company-design-name {
+			color: var(--secondary);
+
+			&:hover {
+				text-decoration: underline;
+			}
+		}
+	}
+}
