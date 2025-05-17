@@ -10,4 +10,8 @@
     { "src": "/manifest.json", "dest": "/manifest.json" },
     { "src": "/(.*)", "dest": "/index.html" }
   ]
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> ed3ea92a089d69b8749d6e7a06a984a85f3b5f38

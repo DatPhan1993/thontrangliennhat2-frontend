@@ -1,0 +1,92 @@
+.partnerContainer {
+    padding: 20px;
+}
+
+.pageTitle {
+    margin-bottom: 20px;
+}
+
+.actionsContainer {
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.addButton {
+    background-color: #4caf50;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 4px;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+
+    &:hover {
+        background-color: #45a049;
+    }
+}
+
+.partnerList {
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+}
+
+.table {
+    width: 100%;
+    border-collapse: collapse;
+
+    th, td {
+        padding: 12px;
+        text-align: left;
+        border-bottom: 1px solid #ddd;
+    }
+
+    th {
+        background-color: #f5f5f5;
+        font-weight: 600;
+    }
+
+    tr:hover {
+        background-color: #f9f9f9;
+    }
+}
+
+.partnerLogo {
+    max-width: 100px;
+    max-height: 50px;
+    object-fit: contain;
+}
+
+.editButton, .deleteButton {
+    padding: 6px 12px;
+    border-radius: 4px;
+    border: none;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    margin-right: 8px;
+    text-decoration: none;
+    font-size: 14px;
+}
+
+.editButton {
+    background-color: #2196f3;
+    color: white;
+
+    &:hover {
+        background-color: #1976d2;
+    }
+}
+
+.deleteButton {
+    background-color: #f44336;
+    color: white;
+
+    &:hover {
+        background-color: #d32f2f;
+    }
+} 

@@ -1,0 +1,103 @@
+.navigationContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    width: 100%;
+    padding: 20px;
+
+    .pageTitle {
+        font-size: 2.5rem;
+        color: #333;
+        margin-bottom: 10px;
+        text-align: left;
+    }
+
+    .breadcrumb {
+        font-size: 1.2rem;
+        color: #777;
+        margin-bottom: 20px;
+    }
+
+    .formContainer {
+        background-color: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        padding: 20px;
+
+        .form {
+            display: flex;
+            flex-direction: column;
+            margin-top: 40px;
+
+            .formItem {
+                margin-bottom: 20px;
+
+                label {
+                    display: block;
+                    margin-bottom: 5px;
+                }
+
+                input,
+                select {
+                    width: 100%;
+                    padding: 10px;
+                    border: 1px solid #ccc;
+                    border-radius: 4px;
+                }
+            }
+
+            .errorMessage {
+                margin-top: 4px;
+                color: red;
+                font-size: 1.2rem;
+            }
+
+            .buttonContainer {
+                display: flex;
+                gap: 20px;
+
+                .cancelButton {
+                    padding: 10px 20px;
+                    border: none;
+                    border-radius: 4px;
+                    cursor: pointer;
+                    transition: background-color 0.3s;
+
+                    &:hover {
+                        opacity: 0.9;
+                    }
+                }
+
+                .submitButton {
+                    padding: 10px 15px;
+                    background-color: var(--primary);
+                    color: white;
+                    border: none;
+                    border-radius: 4px;
+                    cursor: pointer;
+                    width: 160px;
+                    min-width: 160px;
+                    border: 1px solid transparent;
+                    transition: all 0.3s ease-in-out;
+
+                    &:hover {
+                        background-color: transparent;
+                        border: 1px solid var(--primary);
+                        color: var(--primary);
+                    }
+
+                    &:disabled {
+                        background-color: transparent;
+                        border: 1px solid var(--primary);
+                        cursor: default;
+                    }
+                }
+
+                .cancelButton {
+                    background-color: var(--secondary);
+                    color: white;
+                }
+            }
+        }
+    }
+}

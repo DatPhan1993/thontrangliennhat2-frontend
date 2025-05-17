@@ -1,0 +1,54 @@
+.button-group {
+    display: flex;
+    gap: 10px;
+}
+
+@media (max-width: 768px) {
+    .button-group {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+.button {
+    min-width: 120px;
+    padding: 8px 16px;
+    font-size: 1.6rem;
+    border: 1px solid var(--primary);
+    border-radius: 20px;
+    border-width: 100%;
+    color: var(--primary);
+    margin-right: 4px;
+    background: white;
+    overflow: hidden;
+    -webkit-background-clip: text;
+    background-clip: text;
+    text-transform: uppercase;
+    transition: all 0.3s ease-in-out;
+    cursor: pointer;
+}
+
+@media (max-width: 768px) {
+    .button {
+        padding: 6px 4px;
+        font-size: 1.2rem;
+        min-height: 40px;
+        min-width: 20px;
+    }
+}
+
+.button.active {
+    background: var(--primary);
+    color: var(--white);
+    font-weight: 500;
+    border-color: transparent;
+}
+
+.button:hover {
+    background: var(--primary);
+    color: var(--white);
+    font-weight: 500;
+    border-top-right-radius: 20px;
+    border-bottom-left-radius: 20px;
+    border-color: transparent;
+}

@@ -1,0 +1,136 @@
+@import '../../styles/mixins';
+@import '../../styles/variables';
+
+.wrapper {
+  width: auto;
+  margin: 0 auto;
+
+  @include respond-to(sm) {
+    display: block;
+  }
+}
+
+.container {
+  width: auto;
+  max-width: 100%;
+
+  @include respond-to(lg) {
+    display: block;
+  }
+}
+
+.content {
+  margin: 0 auto;
+  overflow: hidden;
+
+  @include respond-to(lg) {
+    display: block;
+  }
+}
+
+.contact-buttons {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  z-index: 9998;
+
+  @include respond-to(sm) {
+    bottom: 10px;
+    right: 10px;
+  }
+
+  .button {
+    width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background-color: var(--primary);
+    color: white;
+    font-size: 24px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+
+    &:hover {
+      opacity: 1;
+    }
+  }
+
+  .hotline {
+    background-color: #ff5722;
+    animation: shake 3s infinite;
+
+    &:hover {
+      background-color: darken(#ff5722, 10%);
+    }
+  }
+
+  .zalo {
+    background-image: url(../../assets/images/zalo-icon-circle-1.png);
+    background-size: cover;
+    animation: shake 3s infinite;
+
+    &:hover {
+      background-color: darken(#0084ff, 10%);
+    }
+  }
+
+  .facebook {
+    background-color: #0866ff;
+    animation: shake 3s infinite;
+
+    &:hover {
+      background-color: darken(rgb(51, 83, 154), 10%);
+    }
+  }
+}
+
+.scroll-to-top {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  position: fixed;
+  left: 20px;
+  bottom: 30px;
+  color: var(--primary);
+  border-radius: 50%;
+  padding: 10px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 9998;
+
+  .icon {
+    padding: 8px;
+    background-color: var(--primary);
+    border-radius: 4px;
+    color: var(--white);
+    border: 2px solid var(--white);
+  }
+}
+
+@keyframes shake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  10%,
+  30%,
+  50%,
+  70%,
+  90% {
+    transform: translateX(-5px);
+  }
+  20%,
+  40%,
+  60%,
+  80% {
+    transform: translateX(5px);
+  }
+}
