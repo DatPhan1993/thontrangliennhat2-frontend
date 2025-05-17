@@ -46,7 +46,7 @@
   },
   "scripts": {
     "start": "craco start",
-    "build": "chmod +x ./vercel.build.sh && ./vercel.build.sh",
+    "build": "craco build",
     "build:react": "craco build && ./fix-build.sh",
     "test": "craco test",
     "eject": "react-scripts eject"
