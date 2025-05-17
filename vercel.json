@@ -1,19 +1,18 @@
 {
   "version": 2,
   "routes": [
-    { "src": "/api/(.*)", "dest": "/api/$1" },
     { "handle": "filesystem" },
-    { "src": "/manifest.json", "dest": "/manifest.json" },
+    { "src": "/assets/(.*)", "dest": "/assets/$1" },
     { "src": "/static/(.*)", "dest": "/static/$1" },
     { "src": "/favicon.ico", "dest": "/favicon.ico" },
     { "src": "/logo192.png", "dest": "/logo192.png" },
     { "src": "/logo512.png", "dest": "/logo512.png" },
+    { "src": "/manifest.json", "dest": "/manifest.json" },
     { "src": "/(.*)", "dest": "/index.html" }
   ],
-  "functions": {
-    "api/**/*.js": {
-      "memory": 1024,
-      "maxDuration": 10
+  "build": {
+    "env": {
+      "REACT_APP_API_URL": "@api_url"
     }
   }
 }
