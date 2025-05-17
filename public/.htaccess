@@ -1,0 +1,30 @@
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteBase /
+  
+  # Phục vụ manifest.json trực tiếp
+  RewriteRule ^manifest\.json$ - [L]
+  
+  # Phục vụ các file static trực tiếp
+  RewriteRule ^static/(.*)$ static/$1 [L]
+  
+  # Phục vụ các file asset trực tiếp
+  RewriteRule ^(.+\.[a-zA-Z0-9]{5,}\.(js|css))$ $1 [L]
+  RewriteRule ^(.*\.(js|css|json|png|jpg|jpeg|gif|ico|svg|webp))$ $1 [L]
+  
+  # Các request còn lại chuyển về index.html
+  RewriteRule ^index\.html$ - [L]
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteCond %{REQUEST_FILENAME} !-l
+  RewriteRule . /index.html [L]
+</IfModule>
+
+# Đặt các header bảo mật
+<IfModule mod_headers.c>
+  Header set X-Content-Type-Options "nosniff"
+  Header set X-Frame-Options "DENY"
+  Header set X-XSS-Protection "1; mode=block"
+  Header set Strict-Transport-Security "max-age=31536000; includeSubDomains"
+  Header set Access-Control-Allow-Origin "*"
+</IfModule>

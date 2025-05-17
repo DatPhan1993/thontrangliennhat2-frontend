@@ -1,0 +1,107 @@
+.updateCategory {
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    margin: 20px;
+
+    .updateForm {
+        margin-top: 40px;
+    }
+
+    .formGroup {
+        margin-bottom: 15px;
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        .input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        .error {
+            color: red;
+            margin-top: 5px;
+        }
+    }
+
+    .imagePreview {
+        display: flex;
+        flex-wrap: wrap;
+        margin-top: 10px;
+
+        .productImage {
+            width: 100px;
+            height: 100px;
+            margin-right: 10px;
+            margin-bottom: 10px;
+            border-radius: 4px;
+            object-fit: cover;
+        }
+    }
+
+    .submitButton {
+        padding: 10px 15px;
+        background-color: var(--primary);
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+
+        &:disabled {
+            background-color: #ccc;
+        }
+    }
+
+    .formGroup {
+        &.checkboxGroup {
+            display: flex;
+            align-items: center;
+
+            label {
+                display: inline-flex;
+                align-items: center;
+                margin-bottom: 0;
+            }
+
+            input[type='checkbox'] {
+                margin-right: 8px;
+            }
+        }
+    }
+
+    .removeButton {
+        padding: 4px 8px;
+        border: none;
+        border-radius: 4px;
+        background-color: var(--secondary);
+        color: var(--white);
+        margin: 8px 0 8px 80px;
+        cursor: pointer;
+
+        &:hover {
+            opacity: 0.8;
+        }
+    }
+
+    .addButton {
+        margin: 8px 0;
+        font-weight: 400;
+    }
+
+    .subcategoryItem {
+        width: 40%;
+        display: flex;
+        justify-content: space-between;
+    }
+
+    .currentImage {
+        width: 300px;
+        border-radius: 8px;
+    }
+}
