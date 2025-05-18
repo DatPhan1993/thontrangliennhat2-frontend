@@ -1,0 +1,11 @@
+# www.robotstxt.org
+# Cho phép tất cả các robot
+User-agent: *
+Allow: /
+
+# Không cho phép truy cập vào thư mục admin nếu có
+Disallow: /admin/
+Disallow: /admin
+
+# Sitemap
+Sitemap: https://thontrangliennhat.com/sitemap.xml 

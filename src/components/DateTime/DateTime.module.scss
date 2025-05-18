@@ -1,0 +1,39 @@
+@import '../../styles/mixins';
+@import '../../styles/variables';
+
+.info {
+	display: flex;
+	align-items: center;
+	font-weight: 400;
+	font-size: 1.2rem;
+	color: #a9a9a9;
+
+	@include respond-to(lg) {
+		font-size: 1.1rem;
+	}
+
+	@include respond-to(sm) {
+		font-size: 1.6rem;
+	}
+
+	.icon {
+		color: var(--primary);
+		margin: 0 8px 3px 0;
+	}
+
+	.views {
+		padding: 2px 4px;
+		border-radius: 20px;
+		color: transparent;
+		margin-right: 4px;
+		background: white;
+		overflow: hidden;
+		background: linear-gradient(90deg, rgb(57, 126, 149) 0%, rgba(255, 165, 0, 1) 100%);
+		-webkit-background-clip: text;
+		background-clip: text;
+
+		@include respond-to(sm) {
+			font-size: 1.4rem;
+		}
+	}
+}

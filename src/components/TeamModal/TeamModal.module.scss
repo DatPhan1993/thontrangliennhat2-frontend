@@ -1,0 +1,152 @@
+@import '../../styles/mixins';
+@import '../../styles/variables';
+
+.modal-overlay {
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	background: rgba(0, 0, 0, 0.5);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	z-index: 9999;
+}
+
+.modal {
+	background: #fff;
+	border-radius: 8px;
+	padding: 20px;
+	position: relative;
+	width: auto;
+	height: auto;
+	max-height: 90vh;
+	max-width: 80vw;
+	box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+	display: flex;
+	flex-direction: row;
+
+	@include respond-to(lg) {
+		max-width: 90vw;
+		min-height: 50vw;
+		margin: 0 20px;
+	}
+
+	@include respond-to(sm) {
+		width: 100%;
+		margin: 0 10px;
+		max-width: 95vw;
+		max-height: 80vh;
+	}
+}
+
+.modal-close {
+	position: absolute;
+	top: 10px;
+	right: 10px;
+	background: none;
+	border: none;
+	font-size: 24px;
+	cursor: pointer;
+	color: #333;
+	z-index: 1001;
+}
+
+.team-detail {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	width: 100%;
+
+	@include respond-to(sm) {
+		flex-direction: column;
+		align-items: flex-start;
+	}
+}
+
+.team-info {
+	flex: 1;
+	padding-left: 20px;
+	display: flex;
+	flex-direction: column;
+	gap: 20px;
+
+	@include respond-to(lg) {
+		gap: 10px;
+	}
+
+	@include respond-to(sm) {
+		padding-left: 0px;
+		gap: 4px;
+	}
+}
+
+.team-image-container {
+	flex-shrink: 0;
+}
+
+.team-image {
+	width: 400px;
+	height: auto;
+	max-height: 80vh;
+	max-width: 50vw;
+	object-fit: cover;
+	border-radius: 8px;
+
+	@include respond-to(lg) {
+		width: 300px;
+	}
+
+	@include respond-to(sm) {
+		width: 100%;
+		min-width: 90%;
+		max-width: 100%;
+	}
+}
+
+.team-name {
+	font-size: 3.2rem;
+	margin: 0;
+	margin-bottom: 10px;
+
+	@include respond-to(lg) {
+		font-size: 2.8rem;
+	}
+
+	@include respond-to(sm) {
+		font-size: 2rem;
+		margin-bottom: 0px;
+	}
+}
+
+.team-position {
+	font-size: 1.6em;
+	color: #666;
+	margin: 0;
+	margin-bottom: 10px;
+
+	@include respond-to(lg) {
+		font-size: 2rem;
+	}
+
+	@include respond-to(sm) {
+		font-size: 1.6rem;
+		margin-bottom: 0px;
+	}
+}
+
+.team-seniority,
+.team-yearOfBirth {
+	font-size: 2rem;
+	color: #888;
+	margin: 5px 0;
+
+	@include respond-to(lg) {
+		font-size: 1.8rem;
+	}
+
+	@include respond-to(sm) {
+		font-size: 1.4rem;
+	}
+}

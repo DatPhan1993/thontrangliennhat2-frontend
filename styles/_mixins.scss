@@ -1,0 +1,73 @@
+@use 'variables' as var;
+@forward 'variables';
+
+@mixin respond-to($breakpoint) {
+    @if $breakpoint == xs {
+        @media (max-width: var.$breakpoint-xs) {
+            @content;
+        }
+    } @else if $breakpoint == sm {
+        @media (max-width: var.$breakpoint-sm) {
+            @content;
+        }
+    } @else if $breakpoint == md {
+        @media (max-width: var.$breakpoint-md) {
+            @content;
+        }
+    } @else if $breakpoint == lg {
+        @media (max-width: var.$breakpoint-lg) {
+            @content;
+        }
+    } @else if $breakpoint == xl {
+        @media (max-width: var.$breakpoint-xl) {
+            @content;
+        }
+    } @else if $breakpoint == 2xl {
+        @media (max-width: var.$breakpoint-2xl) {
+            @content;
+        }
+    } @else if $breakpoint == 3xl {
+        @media (max-width: var.$breakpoint-3xl) {
+            @content;
+        }
+    }
+}
+
+@mixin flex($direction: row, $justify: flex-start, $align: flex-start, $wrap: nowrap) {
+    display: flex;
+    flex-direction: $direction;
+    justify-content: $justify;
+    align-items: $align;
+    flex-wrap: $wrap;
+}
+
+@mixin grid($columns: 1fr, $rows: auto, $gap: 0) {
+    display: grid;
+    grid-template-columns: $columns;
+    grid-template-rows: $rows;
+    gap: $gap;
+}
+
+@mixin truncate($lines: 1) {
+    @if $lines == 1 {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    } @else {
+        display: -webkit-box;
+        -webkit-line-clamp: $lines;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+}
+
+@mixin absolute-center {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+@mixin transition($property: all, $duration: 0.3s, $timing: ease) {
+    transition: $property $duration $timing;
+} 

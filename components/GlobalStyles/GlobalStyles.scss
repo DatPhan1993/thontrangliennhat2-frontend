@@ -1,0 +1,61 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap');
+@import '../../styles/_variables';
+@import '../../styles/_mixins';
+
+:root {
+  --primary: #{$primary-color};
+  --secondary: #{$secondary-color};
+  --white: #{$white-color};
+  --black: #{$black-color};
+  --text-color: #{$text-color};
+  
+  // Gradient colors
+  --gradient-start: #{$gradient-start};
+  --gradient-middle1: #{$gradient-middle1};
+  --gradient-middle2: #{$gradient-middle2};
+  --gradient-middle3: #{$gradient-middle3};
+  --gradient-end: #{$gradient-end};
+  
+  --font-family: 'Roboto', sans-serif;
+  --default-layout-header-height: 200px;
+  --default-layout-width: 1200px;
+  --default-layout-horizontal-spacer: 20px;
+  --tophead-height: 40px;
+  --banner-height: 100px;
+  --slider-height: 300px;
+  --slider-height-lg: 400;
+  --slider-height-md: 300px;
+  --slider-height-sm: 200px;
+  --nav-height: 80px;
+  --slides-per-view: 4;
+  --admin--background: #eff3f9;
+
+  @include respond-to(lg) {
+    --slides-per-view: 3;
+  }
+
+  @include respond-to(md) {
+    --slides-per-view: 2;
+  }
+
+  @include respond-to(sm) {
+    --slides-per-view: 1;
+  }
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  font-size: 62.5%;
+}
+
+body {
+  font-family: "Roboto", sans-serif;
+  font-size: 1.6rem;
+  line-height: 1.5;
+  text-rendering: optimizeSpeed;
+}

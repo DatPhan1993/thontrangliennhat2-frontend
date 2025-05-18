@@ -33,29 +33,70 @@ console.log('API Service using baseURL:', baseURL);
 // Create axios instance with custom config
 const api = axios.create({
     baseURL,
-    timeout: 15000, // 15 seconds timeout
-    withCredentials: false // Don't send cookies
+    timeout: 30000, // 30 seconds timeout
+    headers: {
+        'Content-Type': 'application/json',
+        'Cache-Control': 'no-cache, no-store, must-revalidate',
+        'Pragma': 'no-cache',
+        'Expires': '0',
+        'X-Requested-With': 'XMLHttpRequest'
+    }
 });
 
 // Add a timestamp to GET requests to prevent caching
 api.interceptors.request.use(config => {
+    // Add timestamp for all requests to prevent caching
+    const timestamp = Date.now();
+    
     if (config.method === 'get') {
         config.params = config.params || {};
-        config.params.nocache = Date.now();
+        // Add timestamp to prevent caching
+        config.params._ = timestamp;
+        config.params.nocache = timestamp;
     }
+    
+    // Log all API requests in development
+    if (process.env.NODE_ENV === 'development') {
+        console.log(`API Request: ${config.method.toUpperCase()} ${config.baseURL}${config.url}`);
+    }
+    
     return config;
 }, error => {
     return Promise.reject(error);
 });
 
-// Data transformation for responses
+// Response interceptor
 api.interceptors.response.use(
     response => {
-        // Return only the data for convenience
+        // Handle successful responses
+        if (response.data && response.data.data) {
+            if (process.env.NODE_ENV === 'development') {
+                console.log(`Got data from API for ${response.config.url}:`, 
+                    Array.isArray(response.data.data) 
+                        ? `Array with ${response.data.data.length} items` 
+                        : typeof response.data.data);
+            }
+            return response.data;
+        }
+        
         return response.data;
     },
     error => {
-        console.error('API Error:', error);
+        // Handle errors
+        console.error('API request failed:', error);
+        
+        if (error.response) {
+            // Server responded with a status code outside of 2xx range
+            console.error('Status:', error.response.status);
+            console.error('Data:', error.response.data);
+        } else if (error.request) {
+            // The request was made but no response was received
+            console.error('No response received');
+        } else {
+            // Something happened in setting up the request
+            console.error('Error setting up request:', error.message);
+        }
+        
         return Promise.reject(error);
     }
 );
@@ -102,7 +143,20 @@ const apiService = {
         }
     },
     
-    getApiUrl: () => baseURL
+    getApiUrl: () => baseURL,
+    
+    // Test the API connection
+    testApiConnection: () => {
+        return api.get('/products')
+            .then(response => {
+                console.log('API Connection Test Successful:', response);
+                return true;
+            })
+            .catch(error => {
+                console.error('API Connection Test Failed:', error.message);
+                return false;
+            });
+    }
 };
 
-export default apiService; 
+export default apiService;
