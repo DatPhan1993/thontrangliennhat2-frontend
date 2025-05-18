@@ -9,8 +9,9 @@ if (process.env.NODE_ENV === 'development') {
 } 
 // Production environment
 else {
-    // Use the official API domain
-    baseURL = 'https://api.thontrangliennhat.com';
+    // Use direct API URL for production environment
+    baseURL = 'https://thontrangliennhat2-api-phan-dats-projects-d067d5c1.vercel.app/api';
+    console.log('Using direct API URL in httpRequest for production');
 }
 
 console.log('Using API baseURL:', baseURL);
@@ -30,7 +31,7 @@ try {
 
 const instance = axios.create({
     baseURL,
-    timeout: 15000, // 15 seconds timeout
+    timeout: 30000, // 30 seconds timeout (increased from 15)
     headers: {
         'Cache-Control': 'no-cache, no-store, must-revalidate',
         'Pragma': 'no-cache',
@@ -87,7 +88,7 @@ instance.interceptors.request.use(config => {
         config.headers['Content-Type'] = config.headers['Content-Type'] || 'application/json';
     }
     
-    console.log(`${config.method.toUpperCase()} request to ${config.url} with timestamp ${timestamp}`);
+    console.log(`HttpRequest: ${config.method.toUpperCase()} request to ${baseURL}${config.url} with timestamp ${timestamp}`);
     return config;
 }, error => {
     console.error('Request intercept error:', error);
@@ -97,10 +98,22 @@ instance.interceptors.request.use(config => {
 // Handle response
 instance.interceptors.response.use(
     response => {
-        // If this is product data, clear any cached data
+        // Log successful responses
+        console.log(`HttpRequest response success: ${response.config.url}`);
+        
+        // If this is product data, log details
         const url = response.config.url || '';
         if (url.includes('/products')) {
-            console.log('Request to product endpoint successful:', url);
+            console.log('Product data received:', 
+                response.data && response.data.data ? 
+                    `Found ${Array.isArray(response.data.data) ? response.data.data.length : 0} products` : 
+                    'No product data in response');
+            
+            // Log the structure of the response
+            console.log('Response structure:', 
+                response.data ? 
+                    Object.keys(response.data).join(', ') : 
+                    'No data');
         }
         
         // Return data directly for convenience
@@ -117,7 +130,7 @@ instance.interceptors.response.use(
             // Log request details for debugging
             if (error.config) {
                 console.error('Request details:', {
-                    url: error.config.url,
+                    url: error.config.baseURL + error.config.url,
                     method: error.config.method,
                     headers: error.config.headers
                 });
@@ -127,7 +140,11 @@ instance.interceptors.response.use(
                 }
             }
         } else if (error.request) {
-            console.error('No response received from API:', error.request);
+            console.error('No response received from API:', error.config?.url);
+            console.error('Request details:', {
+                url: error.config?.baseURL + error.config?.url,
+                method: error.config?.method
+            });
         } else {
             console.error('Error setting up request:', error.message);
         }
@@ -135,5 +152,16 @@ instance.interceptors.response.use(
     }
 );
 
+// Test the API connection immediately
+instance.get('/products')
+    .then(response => {
+        console.log('HttpRequest API Test - Products:', 
+            response.data && response.data.data ? 
+                `Found ${Array.isArray(response.data.data) ? response.data.data.length : 0} products` : 
+                'No product data');
+    })
+    .catch(error => {
+        console.error('HttpRequest API Test Failed:', error.message);
+    });
+
 export default instance;
-console.log('test');
