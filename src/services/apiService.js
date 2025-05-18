@@ -10,7 +10,7 @@ if (process.env.NODE_ENV === 'development') {
 // Production environment
 else {
     // Use the Vercel deployment URL
-    baseURL = 'https://thontrangliennhat2-api-phan-dats-projects-d067d5c1.vercel.app';
+    baseURL = 'https://thontrangliennhat2-4srlwehcl-phan-dats-projects-d067d5c1.vercel.app';
     
     // Fallback URLs if the main one doesn't work
     try {
