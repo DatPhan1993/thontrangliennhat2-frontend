@@ -22,7 +22,7 @@ const CustomEditor = ({ onChange, initialValue }) => {
         if (initialValue && initialValue !== editorData) {
             setEditorData(initialValue);
         }
-    }, [initialValue]);
+    }, [initialValue, editorData]);
 
     // Enhanced toolbar configuration
     const editorConfiguration = {

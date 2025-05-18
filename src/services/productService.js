@@ -175,12 +175,11 @@ export const getProductById = async (id) => {
             }
         });
         
-        const product = response.data.data;
+        let product = response.data.data;
 
         // Chuẩn hóa trường images thành mảng
         if (!product) {
-            let productObj = { images: [] };
-            product = productObj;
+            product = { images: [] };
         }
 
         if (typeof product.images === 'string' && product.images.trim() !== '') {
@@ -276,12 +275,11 @@ export const getProductBySlug = async (slug) => {
 
     try {
         const response = await httpRequest.get(`/products/slug/${slug}`);
-        const product = response.data.data;
+        let product = response.data.data;
 
         // Chuẩn hóa trường images thành mảng
         if (!product) {
-            let productObj = { images: [] };
-            product = productObj;
+            product = { images: [] };
         }
 
         if (typeof product.images === 'string' && product.images.trim() !== '') {
@@ -395,12 +393,9 @@ export const updateProduct = async (id, productData) => {
             url: `${apiUrl}/products/${id}`,
             data: productData,
             headers: {
-                // Don't set Content-Type for FormData - let browser handle it
-                // 'Content-Type': 'multipart/form-data', 
                 'Accept': 'application/json',
                 'Cache-Control': 'no-cache',
             },
-            // Ensure credentials are included (for CORS)
             withCredentials: false
         });
         
@@ -424,7 +419,10 @@ export const updateProduct = async (id, productData) => {
             // Try to update sessionStorage with the new product data
             const updatedProducts = await getProducts();
             saveToSessionStorage('allProducts', updatedProducts);
-            saveToSessionStorage(`product_${id}`, response.data.data);
+            
+            // Store the updated product data
+            const updatedProductData = response.data.data;
+            saveToSessionStorage(`product_${id}`, updatedProductData);
         } catch (error) {
             console.warn('Failed to update cache after product update:', error);
             // Continue since the update was successful

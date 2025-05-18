@@ -236,7 +236,7 @@ const AddService = () => {
                                 )}
                                 {categories.length > serviceCategories.length && 
                                     categories
-                                        .filter(cat => !serviceCategories.some(sc => sc.id == cat.id))
+                                        .filter(cat => !serviceCategories.some(sc => sc.id === cat.id))
                                         .map((category) => (
                                             <option key={category.id} value={category.id}>
                                                 {category.title || category.name}

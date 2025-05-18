@@ -101,7 +101,7 @@ const UpdateExperience = () => {
 
         fetchCategories();
         fetchExperienceData();
-    }, [id]);
+    }, [id, fetchExperienceData]);
 
     const handleImageUpload = (event, setFieldValue) => {
         const file = event.target.files[0];
