@@ -136,3 +136,4 @@ instance.interceptors.response.use(
 );
 
 export default instance;
+console.log('test');
