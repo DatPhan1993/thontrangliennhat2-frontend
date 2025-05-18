@@ -9,8 +9,8 @@ if (process.env.NODE_ENV === 'development') {
 } 
 // Production environment
 else {
-    // Use the official API domain
-    baseURL = 'https://api.thontrangliennhat.com';
+    // Use relative path to leverage Vercel rewrites instead of absolute URL
+    baseURL = '/api';
 }
 
 console.log('API Service using baseURL:', baseURL);
