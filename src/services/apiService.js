@@ -9,14 +9,8 @@ if (process.env.NODE_ENV === 'development') {
 } 
 // Production environment
 else {
-    // Check if we're running on Vercel
-    if (process.env.VERCEL_URL) {
-        baseURL = `https://${process.env.VERCEL_URL}/api`;
-    } 
-    // For other production environments
-    else {
-        baseURL = 'https://thontrangliennhat.com/api';
-    }
+    // Use the official API domain
+    baseURL = 'https://api.thontrangliennhat.com';
 }
 
 console.log('API Service using baseURL:', baseURL);
