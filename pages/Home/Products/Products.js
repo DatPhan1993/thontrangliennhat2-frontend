@@ -1,6 +1,6 @@
-import classNames from 'classnames/bind';
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import classNames from 'classnames/bind';
 import Product from '~/components/Product/Product';
 import { getProducts } from '~/services/productService';
 import { getCategoriesBySlug } from '~/services/categoryService';
@@ -27,18 +27,7 @@ function Products() {
 
     // Function to properly process image URLs
     const processImageUrl = (imageUrl) => {
-        if (!imageUrl || typeof imageUrl !== 'string' || imageUrl.trim() === '') {
-            console.log('[Home/Products] Invalid image URL, using default');
-            return DEFAULT_IMAGE;
-        }
-        
-        // First try using the normalizeImageUrl function
-        const normalized = normalizeImageUrl(imageUrl);
-        console.log(`[Home/Products] Normalized image URL: ${normalized}`);
-        
-        // Add timestamp to prevent caching issues
-        const finalUrl = `${normalized}?t=${Date.now()}`;
-        return finalUrl;
+        return normalizeImageUrl(imageUrl);
     };
 
     useEffect(() => {
@@ -49,44 +38,29 @@ function Products() {
                     getProducts(),
                 ]);
 
-                // Process products before setting state
+                // Products are already processed by productService, just normalize image URLs
                 const processedProducts = productsData.map(product => {
-                    // Log each product for debugging
-                    console.log(`[Home/Products] Processing product: ${product.id} - ${product.name}`, product);
+                    console.log(`[Home/Products] Processing product: ${product.id} - ${product.name}`);
                     
-                    // Ensure images is always an array
-                    let processedImages = [];
-                    
-                    if (!product.images) {
-                        console.log(`[Home/Products] Product ${product.id} has no images, setting empty array`);
-                    } else if (typeof product.images === 'string') {
-                        console.log(`[Home/Products] Product ${product.id} has string image, converting to array:`, product.images);
-                        if (product.images.trim() !== '') {
-                            processedImages = [processImageUrl(product.images)];
-                        }
-                    } else if (Array.isArray(product.images)) {
-                        // Filter out empty image entries and process each valid URL
-                        processedImages = product.images
-                            .filter(img => img && typeof img === 'string' && img.trim() !== '')
-                            .map(img => processImageUrl(img));
-                        
-                        console.log(`[Home/Products] Product ${product.id} has ${processedImages.length} valid processed images:`, processedImages);
-                    } else {
-                        console.log(`[Home/Products] Product ${product.id} has invalid images format:`, typeof product.images);
+                    // Use the first image if available, or fallback to default
+                    let displayImage = DEFAULT_IMAGE;
+                    if (product.images && Array.isArray(product.images) && product.images.length > 0) {
+                        displayImage = normalizeImageUrl(product.images[0]);
+                    } else if (typeof product.images === 'string' && product.images.trim() !== '') {
+                        displayImage = normalizeImageUrl(product.images);
                     }
                     
-                    // Return product with processed images
+                    console.log(`[Home/Products] Product ${product.id} final image URL:`, displayImage);
+                    
                     return {
                         ...product,
-                        images: processedImages,
-                        // Also save a pre-processed imageUrl ready to use
-                        displayImageUrl: processedImages.length > 0 ? processedImages[0] : DEFAULT_IMAGE
+                        displayImageUrl: displayImage
                     };
                 });
 
                 setCategories(categoriesData);
                 setProducts(processedProducts);
-                console.log(`[Home/Products] Set ${processedProducts.length} products in state with processed images`);
+                console.log(`[Home/Products] Set ${processedProducts.length} products in state`);
             } catch (err) {
                 setError(err);
                 console.error('Error fetching data:', err);

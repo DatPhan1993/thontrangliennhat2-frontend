@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useState, useMemo } from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames/bind';
 import styles from './Product.module.scss';
@@ -6,110 +6,52 @@ import { Link } from 'react-router-dom';
 import Button from '~/components/Button/Button';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChevronRight, faImage } from '@fortawesome/free-solid-svg-icons';
-import { DEFAULT_IMAGE } from '~/utils/imageUtils';
-import config from '~/config';
+import { normalizeImageUrl, DEFAULT_IMAGE } from '~/utils/imageUtils';
 import routes from '~/config/routes';
 
 const cx = classNames.bind(styles);
 
 function Product({ image, name, link, productId, category }) {
     const [imageError, setImageError] = useState(false);
-    const imgRef = useRef(null);
     
     // Ensure we have a valid link
     const productLink = link || `${routes.products}/san-pham/${productId}`;
     
-    // Try to load image with multiple fallback sources
-    useEffect(() => {
-        let attemptedUrls = [];
-        let isComponentMounted = true;
-        const apiBaseUrl = config.apiUrl || 'https://api.thontrangliennhat.com';
-
-        // Reset error state on new image prop
-        setImageError(false);
+    // Process image URL using the standardized function
+    const processedImageUrl = useMemo(() => {
+        if (!image) {
+            console.log(`[Product] No image provided for "${name}"`);
+            return DEFAULT_IMAGE;
+        }
         
-        // Function to attempt loading an image URL
-        const tryLoadImage = (url) => {
-            // Skip if already attempted this URL
-            if (attemptedUrls.includes(url)) return false;
-            
-            console.log(`[Product] Trying image URL for "${name}":`, url);
-            attemptedUrls.push(url);
-            
-            if (imgRef.current) {
-                imgRef.current.src = url;
-                return true;
-            }
-            return false;
-        };
+        // Handle array of images - use first one
+        if (Array.isArray(image) && image.length > 0) {
+            const firstImage = image[0];
+            const url = normalizeImageUrl(firstImage);
+            console.log(`[Product] Processed image array for "${name}":`, firstImage, '->', url);
+            return url;
+        }
         
-        // Function to try all possible paths
-        const tryAllPaths = () => {
-            if (!isComponentMounted) return;
-            
-            // 1. Original image prop if it's a full URL
-            if (typeof image === 'string' && (image.startsWith('http://') || image.startsWith('https://'))) {
-                if (tryLoadImage(image)) return;
-            }
-            
-            // 2. Extract filename if possible from the original path
-            if (typeof image === 'string' && image.includes('/')) {
-                const filename = image.split('/').pop();
-                if (filename) {
-                    // Try standard paths with this filename
-                    tryLoadImage(`${apiBaseUrl}/images/uploads/${filename}`);
-                    return;
-                }
-            }
-            
-            // 3. Try original image as a relative path
-            if (typeof image === 'string' && image.trim() !== '') {
-                // Try with API base URL if it's a relative path
-                if (image.startsWith('/')) {
-                    tryLoadImage(`${apiBaseUrl}${image}`);
-                } else {
-                    tryLoadImage(`${apiBaseUrl}/images/uploads/${image}`);
-                }
-                return;
-            }
-            
-            // 4. If image is an array, try the first item
-            if (Array.isArray(image) && image.length > 0) {
-                const firstImage = image[0];
-                if (typeof firstImage === 'string' && firstImage.trim() !== '') {
-                    if (firstImage.startsWith('http')) {
-                        tryLoadImage(firstImage);
-                    } else if (firstImage.startsWith('/')) {
-                        tryLoadImage(`${apiBaseUrl}${firstImage}`);
-                    } else {
-                        tryLoadImage(`${apiBaseUrl}/images/uploads/${firstImage}`);
-                    }
-                    return;
-                }
-            }
-            
-            // 5. Fallback to default image if nothing else works
-            setImageError(true);
-        };
+        // Handle single image string
+        if (typeof image === 'string') {
+            const url = normalizeImageUrl(image);
+            console.log(`[Product] Processed image string for "${name}":`, image, '->', url);
+            return url;
+        }
         
-        // Start trying all paths
-        tryAllPaths();
-        
-        // Cleanup
-        return () => {
-            isComponentMounted = false;
-        };
+        console.log(`[Product] Invalid image format for "${name}":`, typeof image, image);
+        return DEFAULT_IMAGE;
     }, [image, name]);
-    
+
     // Error handler for image load failures
     const handleImageError = (e) => {
-        console.error(`[Product] Image failed to load for "${name}"`);
+        console.error(`[Product] Image failed to load for "${name}":`, processedImageUrl);
         e.target.onerror = null; // Prevent infinite loop
         setImageError(true);
     };
 
     return (
-            <div className={cx('product-item')}>
+        <div className={cx('product-item')}>
             <div className={cx('product-image-container')}>
                 {imageError ? (
                     <div className={cx('product-image-error')}>
@@ -118,16 +60,15 @@ function Product({ image, name, link, productId, category }) {
                     </div>
                 ) : (
                     <img 
-                        ref={imgRef}
                         className={cx('product-item-image')} 
-                        src={DEFAULT_IMAGE} // Initial source, will be replaced in useEffect
+                        src={processedImageUrl}
                         alt={name} 
                         onError={handleImageError}
                     />
                 )}
             </div>
-                <div className={cx('product-item-details')}>
-                    <h2 className={cx('product-item-name')}>{name}</h2>
+            <div className={cx('product-item-details')}>
+                <h2 className={cx('product-item-name')}>{name}</h2>
 
                 <Link to={productLink} className={cx('detail-button-link')}>
                     <Button rounded outline rightIcon={<FontAwesomeIcon icon={faChevronRight}/>} className={cx('product-item-button')}>

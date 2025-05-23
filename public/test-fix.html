@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Image Fix Logic</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }
+        .test-case { border: 1px solid #ddd; margin: 10px 0; padding: 15px; border-radius: 8px; }
+        .test-case.success { border-color: #4CAF50; background: #f8fff8; }
+        .test-case.error { border-color: #f44336; background: #fff8f8; }
+        .url { font-family: monospace; background: #f5f5f5; padding: 2px 4px; border-radius: 3px; }
+        img { max-width: 200px; margin: 10px 0; border: 1px solid #ddd; }
+    </style>
+</head>
+<body>
+    <h1>🔧 Test Image URL Fix Logic</h1>
+    
+    <div id="results">Testing...</div>
+    
+    <script>
+        // Simulate the imageUtils logic
+        const config = {
+            apiUrl: 'https://api.thontrangliennhat.com'
+        };
+        
+        const normalizeImageUrl = (imageUrl, defaultImage = 'https://via.placeholder.com/300x200?text=No+Image+Available') => {
+            if (!imageUrl || typeof imageUrl !== 'string' || imageUrl.trim() === '') {
+                console.log('[ImageUtil] Invalid or empty image URL, using default');
+                return defaultImage;
+            }
+            
+            imageUrl = imageUrl.split('?')[0];
+            console.log('[ImageUtil] Processing image URL:', imageUrl);
+
+            if (imageUrl.startsWith('http://') || imageUrl.startsWith('https://')) {
+                console.log('[ImageUtil] Using existing full URL:', imageUrl);
+                return imageUrl;
+            }
+            
+            const apiBaseUrl = config.apiUrl || 'https://api.thontrangliennhat.com';
+            console.log('[ImageUtil] API Base URL:', apiBaseUrl);
+            
+            imageUrl = imageUrl.replace(/\\/g, '/');
+            
+            if (imageUrl.startsWith('/')) {
+                const fullUrl = `${apiBaseUrl}${imageUrl}`;
+                console.log('[ImageUtil] Converting relative path to full URL:', fullUrl);
+                return fullUrl;
+            }
+            
+            const filename = imageUrl.split('/').pop();
+            const fullUrl = `${apiBaseUrl}/images/uploads/${filename}`;
+            console.log('[ImageUtil] Created full URL with uploads path:', fullUrl);
+            return fullUrl;
+        };
+        
+        // Test cases from real API data
+        const testCases = [
+            {
+                name: 'Relative path with leading slash',
+                input: '/images/uploads/1747304857516-52837735.jpg',
+                expected: 'https://api.thontrangliennhat.com/images/uploads/1747304857516-52837735.jpg'
+            },
+            {
+                name: 'Relative path without leading slash',
+                input: 'images/uploads/1747307205185-546664124.jpg',
+                expected: 'https://api.thontrangliennhat.com/images/uploads/1747307205185-546664124.jpg'
+            },
+            {
+                name: 'Just filename',
+                input: '1747307338648-246991835.jpg',
+                expected: 'https://api.thontrangliennhat.com/images/uploads/1747307338648-246991835.jpg'
+            },
+            {
+                name: 'Already full URL',
+                input: 'https://api.thontrangliennhat.com/images/uploads/1747307757557-427334220.jpg',
+                expected: 'https://api.thontrangliennhat.com/images/uploads/1747307757557-427334220.jpg'
+            },
+            {
+                name: 'Empty string',
+                input: '',
+                expected: 'https://via.placeholder.com/300x200?text=No+Image+Available'
+            },
+            {
+                name: 'Null value',
+                input: null,
+                expected: 'https://via.placeholder.com/300x200?text=No+Image+Available'
+            }
+        ];
+        
+        function testImageLoading(url) {
+            return new Promise((resolve) => {
+                const img = new Image();
+                img.onload = () => resolve({ status: 'success', error: null });
+                img.onerror = (e) => resolve({ status: 'error', error: e.type });
+                setTimeout(() => resolve({ status: 'timeout', error: 'timeout' }), 5000);
+                img.src = url;
+            });
+        }
+        
+        async function runTests() {
+            const resultsDiv = document.getElementById('results');
+            resultsDiv.innerHTML = '<h3>Running tests...</h3>';
+            
+            for (const testCase of testCases) {
+                const result = normalizeImageUrl(testCase.input);
+                const isCorrect = result === testCase.expected;
+                
+                console.log(`Test: ${testCase.name}`);
+                console.log(`Input: ${testCase.input}`);
+                console.log(`Expected: ${testCase.expected}`);
+                console.log(`Result: ${result}`);
+                console.log(`Correct: ${isCorrect}`);
+                console.log('---');
+                
+                // Test if the image actually loads (for valid URLs)
+                let loadResult = null;
+                if (result.startsWith('https://api.thontrangliennhat.com/images/')) {
+                    loadResult = await testImageLoading(result);
+                }
+                
+                const div = document.createElement('div');
+                div.className = `test-case ${isCorrect ? 'success' : 'error'}`;
+                div.innerHTML = `
+                    <h4>${testCase.name} ${isCorrect ? '✅' : '❌'}</h4>
+                    <p><strong>Input:</strong> <span class="url">${testCase.input || '(null/empty)'}</span></p>
+                    <p><strong>Expected:</strong> <span class="url">${testCase.expected}</span></p>
+                    <p><strong>Result:</strong> <span class="url">${result}</span></p>
+                    ${loadResult ? `<p><strong>Load Test:</strong> ${loadResult.status} ${loadResult.error ? `(${loadResult.error})` : ''}</p>` : ''}
+                    ${loadResult && loadResult.status === 'success' ? `<img src="${result}" alt="Test image">` : ''}
+                `;
+                resultsDiv.appendChild(div);
+            }
+            
+            const summary = document.createElement('div');
+            const passedTests = testCases.filter((testCase, index) => 
+                normalizeImageUrl(testCase.input) === testCase.expected
+            ).length;
+            
+            summary.innerHTML = `
+                <h3>📊 Summary</h3>
+                <p>Passed: ${passedTests}/${testCases.length}</p>
+                <p>Failed: ${testCases.length - passedTests}/${testCases.length}</p>
+            `;
+            resultsDiv.insertBefore(summary, resultsDiv.firstChild);
+        }
+        
+        runTests();
+    </script>
+</body>
+</html> 

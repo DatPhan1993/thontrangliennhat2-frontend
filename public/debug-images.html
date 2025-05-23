@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug Image Loading - Thôn Trang Liên Nhất</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .test-image {
+            border: 2px solid #ccc;
+            margin: 10px;
+            padding: 10px;
+            background: white;
+            border-radius: 8px;
+        }
+        .test-image img {
+            max-width: 300px;
+            height: auto;
+        }
+        .test-image.success {
+            border-color: #4CAF50;
+        }
+        .test-image.error {
+            border-color: #f44336;
+        }
+        .url-info {
+            font-size: 12px;
+            color: #666;
+            word-break: break-all;
+            margin: 5px 0;
+        }
+        .status {
+            font-weight: bold;
+            padding: 2px 8px;
+            border-radius: 4px;
+            color: white;
+            display: inline-block;
+            margin: 5px 0;
+        }
+        .status.success { background: #4CAF50; }
+        .status.error { background: #f44336; }
+        .loading { color: #2196F3; }
+    </style>
+</head>
+<body>
+    <h1>🖼️ Debug Image Loading</h1>
+    <p>Testing direct image loading from API...</p>
+    
+    <div id="results">
+        <div class="loading">Loading test images...</div>
+    </div>
+
+    <script>
+        // Test URLs based on API response
+        const testImages = [
+            "/images/uploads/1747304857516-52837735.jpg",
+            "/images/uploads/1747307205185-546664124.jpg",
+            "/images/uploads/1747307338648-246991835.jpg",
+            "/images/uploads/1747307757557-427334220.jpg",
+            "/images/uploads/1747307840829-516832872.jpg"
+        ];
+
+        const API_BASE = 'https://api.thontrangliennhat.com';
+
+        function testImage(imagePath, index) {
+            const fullUrl = API_BASE + imagePath;
+            
+            return new Promise((resolve) => {
+                const img = new Image();
+                const startTime = Date.now();
+                
+                img.onload = () => {
+                    const loadTime = Date.now() - startTime;
+                    resolve({
+                        url: fullUrl,
+                        originalPath: imagePath,
+                        status: 'success',
+                        loadTime: loadTime,
+                        dimensions: `${img.naturalWidth}x${img.naturalHeight}`,
+                        error: null,
+                        element: img
+                    });
+                };
+                
+                img.onerror = (e) => {
+                    resolve({
+                        url: fullUrl,
+                        originalPath: imagePath,
+                        status: 'error',
+                        loadTime: Date.now() - startTime,
+                        error: e.type || 'load error',
+                        element: null
+                    });
+                };
+                
+                // Set timeout
+                setTimeout(() => {
+                    resolve({
+                        url: fullUrl,
+                        originalPath: imagePath,
+                        status: 'timeout',
+                        loadTime: Date.now() - startTime,
+                        error: 'Timeout after 10s',
+                        element: null
+                    });
+                }, 10000);
+                
+                img.src = fullUrl;
+            });
+        }
+
+        async function runTests() {
+            const results = document.getElementById('results');
+            results.innerHTML = '<h3>Running tests...</h3>';
+            
+            let successCount = 0;
+            let errorCount = 0;
+            
+            for (let i = 0; i < testImages.length; i++) {
+                const imagePath = testImages[i];
+                console.log(`Testing image ${i + 1}/${testImages.length}: ${imagePath}`);
+                
+                try {
+                    const result = await testImage(imagePath, i);
+                    
+                    const div = document.createElement('div');
+                    div.className = `test-image ${result.status}`;
+                    
+                    div.innerHTML = `
+                        <div class="status ${result.status}">${result.status.toUpperCase()}</div>
+                        <div class="url-info"><strong>Original:</strong> ${result.originalPath}</div>
+                        <div class="url-info"><strong>Full URL:</strong> ${result.url}</div>
+                        <div class="url-info"><strong>Load Time:</strong> ${result.loadTime}ms</div>
+                        ${result.dimensions ? `<div class="url-info"><strong>Dimensions:</strong> ${result.dimensions}</div>` : ''}
+                        ${result.error ? `<div class="url-info" style="color: red;"><strong>Error:</strong> ${result.error}</div>` : ''}
+                        ${result.element ? `<br><img src="${result.url}" alt="Test image ${i + 1}" />` : ''}
+                    `;
+                    
+                    results.appendChild(div);
+                    
+                    if (result.status === 'success') {
+                        successCount++;
+                    } else {
+                        errorCount++;
+                    }
+                    
+                } catch (err) {
+                    console.error('Error testing image:', err);
+                    errorCount++;
+                }
+            }
+            
+            // Add summary
+            const summary = document.createElement('div');
+            summary.innerHTML = `
+                <h3>📊 Test Summary</h3>
+                <p>✅ Success: ${successCount}/${testImages.length}</p>
+                <p>❌ Failed: ${errorCount}/${testImages.length}</p>
+                <p>📡 API Base: ${API_BASE}</p>
+            `;
+            results.insertBefore(summary, results.firstChild);
+        }
+
+        // Run tests when page loads
+        document.addEventListener('DOMContentLoaded', runTests);
+    </script>
+</body>
+</html> 
