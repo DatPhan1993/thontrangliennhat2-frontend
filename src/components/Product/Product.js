@@ -23,7 +23,7 @@ function Product({ image, name, link, productId, category }) {
     useEffect(() => {
         let attemptedUrls = [];
         let isComponentMounted = true;
-        const apiBaseUrl = config.apiUrl || 'http://localhost:3001';
+        const apiBaseUrl = config.apiUrl || 'https://thontrangliennhat.com/api';
 
         // Reset error state on new image prop
         setImageError(false);

@@ -52,7 +52,7 @@ export const normalizeImageUrl = (imageUrl, defaultImage = DEFAULT_IMAGE) => {
     }
     
     // Get base API URL from config
-    const apiBaseUrl = config.apiUrl || 'http://localhost:3001';
+    const apiBaseUrl = config.apiUrl || 'https://thontrangliennhat.com/api';
     console.log('[ImageUtil] API Base URL:', apiBaseUrl);
     
     // Nếu là đường dẫn tương đối (bắt đầu bằng /)

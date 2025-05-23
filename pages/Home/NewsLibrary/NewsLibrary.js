@@ -24,6 +24,18 @@ function NewsLibrary() {
     const [error, setError] = useState(null);
     const [activeTab, setActiveTab] = useState("newest");
 
+    // Helper function to get full image URL
+    const getFullImageUrl = (imagePath) => {
+        if (!imagePath) return '/images/placeholder.jpg';
+        
+        if (imagePath.startsWith('http://') || imagePath.startsWith('https://')) {
+            return imagePath;
+        }
+        
+        const API_URL = process.env.REACT_APP_API_URL || process.env.REACT_APP_BASE_URL || 'https://thontrangliennhat.com/api';
+        return `${API_URL}${imagePath}`;
+    };
+
     // Function to correctly handle image paths
     const getCorrectImagePath = (imagePath) => {
         if (!imagePath) return "/images/default-news.jpg";
@@ -45,7 +57,8 @@ function NewsLibrary() {
             
             // Handle relative paths from /images/uploads for admin uploads
             if (imagePath.includes('/uploads/')) {
-                return `http://localhost:3001${imagePath}`; 
+                const API_URL = process.env.REACT_APP_API_URL || process.env.REACT_APP_BASE_URL || 'https://thontrangliennhat.com/api';
+                return `${API_URL}${imagePath}`; 
             }
             
             // Handle relative paths
@@ -63,7 +76,7 @@ function NewsLibrary() {
             setLoading(true);
             try {
                 // Sử dụng API thay vì đọc trực tiếp database.json
-                const response = await fetch('http://localhost:3001/api/news');
+                const response = await fetch(process.env.REACT_APP_API_URL || process.env.REACT_APP_BASE_URL || 'https://thontrangliennhat.com/api' + '/news');
                 
                 if (!response.ok) {
                     throw new Error(`Failed to fetch news: ${response.status}`);

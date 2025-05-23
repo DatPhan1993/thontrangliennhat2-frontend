@@ -241,7 +241,7 @@ export const createImage = async (imageData) => {
             
             // Nếu đang dùng URL tương đối, thêm domain
             if (imageUrl.startsWith('/') && isDevelopment()) {
-                imageUrl = `http://localhost:3001${imageUrl}`;
+                imageUrl = `${API_URL}${imageUrl}`;
                 console.log('Modified to absolute URL:', imageUrl);
             }
             

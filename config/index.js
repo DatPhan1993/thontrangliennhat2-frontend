@@ -7,16 +7,18 @@ const getBaseUrl = () => {
         return window.location.origin;
     }
     // Nếu không có window object (môi trường nodejs)
-    return process.env.REACT_APP_BASE_URL?.split('/api')[0] || 'http://localhost:3001';
+    return process.env.REACT_APP_PUBLIC_URL || 'https://thontrangliennhat.com';
 };
+
+const apiUrl = process.env.REACT_APP_API_URL || process.env.REACT_APP_BASE_URL || 'https://thontrangliennhat.com/api';
 
 const config = {
     routes,
-    apiUrl: process.env.REACT_APP_BASE_URL?.split('/api')[0] || 'http://localhost:3001',
-    uploadUrl: `${getBaseUrl()}/uploads`,
-    uploadImageUrl: `${getBaseUrl()}/images/uploads`,
-    imageUrl: `${getBaseUrl()}/images`,
-    publicUrl: process.env.REACT_APP_PUBLIC_URL || 'http://localhost:3000',
+    apiUrl: apiUrl,
+    uploadUrl: `${apiUrl}/uploads`,
+    uploadImageUrl: `${apiUrl}/images/uploads`,
+    imageUrl: `${apiUrl}/images`,
+    publicUrl: process.env.REACT_APP_PUBLIC_URL || 'https://thontrangliennhat.com',
 };
 
 export default config;
