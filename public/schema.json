@@ -1,33 +1,20 @@
 {
   "@context": "https://schema.org",
   "@type": "Organization",
-  "name": "HTX Nông Nghiệp - Dịch Vụ Tổng Hợp Liên Nhật",
-  "alternateName": "Thôn Trang Liên Nhật",
-  "url": "http://localhost:3000",
-  "logo": "http://localhost:3000/logo512.png",
-  "description": "HTX Nông Nghiệp - Dịch Vụ Tổng Hợp Liên Nhật cung cấp dịch vụ du lịch sinh thái, nuôi cá lồng, sản xuất thực phẩm sạch, tinh dầu tự nhiên tại Hà Tĩnh và Buôn Đôn, Đắk Lắk.",
-  "address": [
-    {
-      "@type": "PostalAddress",
-      "streetAddress": "Thôn Trang Liên Nhật",
-      "addressLocality": "Buôn Đôn",
-      "addressRegion": "Đắk Lắk",
-      "postalCode": "630000",
-      "addressCountry": "VN"
-    },
-    {
-      "@type": "PostalAddress",
-      "streetAddress": "Thôn Trang Liên Nhật",
-      "addressLocality": "Hà Tĩnh",
-      "addressRegion": "Hà Tĩnh",
-      "postalCode": "480000",
-      "addressCountry": "VN"
-    }
-  ],
+  "name": "Thôn Tráng Liên Nhất",
+  "url": "https://thontrangliennhat.com",
+  "logo": "https://thontrangliennhat.com/logo512.png",
+  "description": "Thôn Tráng Liên Nhất - Huyện Đức Thọ - Tỉnh Hà Tĩnh. Chuyên về du lịch sinh thái, nông nghiệp sạch và các sản phẩm OCOP.",
+  "address": {
+    "@type": "PostalAddress",
+    "addressLocality": "Huyện Đức Thọ",
+    "addressRegion": "Tỉnh Hà Tĩnh",
+    "addressCountry": "VN"
+  },
   "contactPoint": {
     "@type": "ContactPoint",
-    "telephone": "+84-xxx-xxx-xxx",
-    "contactType": "customer service"
+    "contactType": "customer service",
+    "availableLanguage": "Vietnamese"
   },
   "sameAs": [
     "https://www.facebook.com/thontrangliennhat",

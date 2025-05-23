@@ -1,11 +1,14 @@
-# www.robotstxt.org
-# Cho phép tất cả các robot
+# https://www.robotstxt.org/robotstxt.html
 User-agent: *
-Allow: /
-
-# Không cho phép truy cập vào thư mục admin nếu có
-Disallow: /admin/
 Disallow: /admin
+Disallow: /login
+Disallow: /dashboard
+Disallow: /temp
+Disallow: /node_modules
 
-# Sitemap
-Sitemap: http://localhost:3000/sitemap.xml 
+# Allow access to public assets
+Allow: /*.css
+Allow: /*.js  
+Allow: /static
+
+Sitemap: https://thontrangliennhat.com/sitemap.xml 
