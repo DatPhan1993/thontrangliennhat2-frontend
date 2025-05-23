@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 // Use environment variables for API URL
-const baseURL = process.env.REACT_APP_API_URL || process.env.REACT_APP_BASE_URL || 'https://api.thontrangliennhat.com';
+const baseURL = process.env.REACT_APP_API_URL || process.env.REACT_APP_BASE_URL || 'https://thontrangliennhat.com/api';
 console.log('Using API baseURL:', baseURL);
 
 // Clear any session storage on startup to ensure fresh data

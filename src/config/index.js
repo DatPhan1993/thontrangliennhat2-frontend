@@ -11,7 +11,7 @@ const getBaseUrl = () => {
 };
 
 // API URL riêng biệt cho API calls
-const apiUrl = process.env.REACT_APP_API_URL || process.env.REACT_APP_BASE_URL || 'https://api.thontrangliennhat.com';
+const apiUrl = process.env.REACT_APP_API_URL || process.env.REACT_APP_BASE_URL || 'https://thontrangliennhat.com/api';
 
 // Static assets URL (từ main domain, không phải API subdomain)
 const staticBaseUrl = process.env.REACT_APP_PUBLIC_URL || getBaseUrl();

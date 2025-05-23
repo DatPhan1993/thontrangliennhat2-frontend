@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const baseURL = process.env.REACT_APP_API_URL || process.env.REACT_APP_BASE_URL || 'https://api.thontrangliennhat.com';
+const baseURL = process.env.REACT_APP_API_URL || process.env.REACT_APP_BASE_URL || 'https://thontrangliennhat.com/api';
 
 /**
  * Upload a single image for a product

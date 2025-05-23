@@ -15,8 +15,8 @@ const isDevelopment = () => {
     return process.env.NODE_ENV === 'development';
 };
 
-// Server API base URL
-const LOCAL_API_URL = 'http://localhost:3001/api';
+// Server API base URL using environment variables
+const API_URL = process.env.REACT_APP_API_URL || process.env.REACT_APP_BASE_URL || 'https://api.thontrangliennhat.com';
 
 // Helper function to fetch from database.json in development
 const fetchFromDatabaseJson = async () => {
@@ -60,7 +60,7 @@ const callLocalApi = async (endpoint, method = 'GET', data = null) => {
         
         // Thêm tham số timestamp để tránh cache
         const timestamp = Date.now();
-        const apiUrl = `${LOCAL_API_URL}/${endpoint}${endpoint.includes('?') ? '&' : '?'}_=${timestamp}`;
+        const apiUrl = `${API_URL}/${endpoint}${endpoint.includes('?') ? '&' : '?'}_=${timestamp}`;
         
         console.log(`Calling API: ${apiUrl} with method ${method}`);
         const response = await fetch(apiUrl, options);
@@ -112,7 +112,6 @@ export const getImages = async () => {
         
         // Gọi API với cache busting
         const timestamp = Date.now();
-        const API_URL = process.env.REACT_APP_API_URL || process.env.REACT_APP_BASE_URL || 'https://api.thontrangliennhat.com';
         const url = isDevelopment() 
             ? `${API_URL}/images?_=${timestamp}` 
             : '/api/images';
@@ -215,7 +214,6 @@ export const createImage = async (imageData) => {
             console.log('Uploading image file...');
             
             // Determine the correct API endpoint based on environment
-            const API_URL = process.env.REACT_APP_API_URL || process.env.REACT_APP_BASE_URL || 'https://api.thontrangliennhat.com';
             const baseUrl = isDevelopment() 
                 ? API_URL
                 : '';
@@ -644,7 +642,6 @@ export const getImageUrl = (imagePath) => {
         imagePath = '/' + imagePath;
     }
     
-    const API_URL = process.env.REACT_APP_API_URL || process.env.REACT_APP_BASE_URL || 'https://api.thontrangliennhat.com';
     const LOCAL_API_URL = API_URL;
     
     return `${LOCAL_API_URL}${imagePath}`;

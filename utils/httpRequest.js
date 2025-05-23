@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const httpRequest = axios.create({
-    baseURL: process.env.REACT_APP_API_URL || process.env.REACT_APP_BASE_URL || 'https://api.thontrangliennhat.com',
+    baseURL: process.env.REACT_APP_API_URL || process.env.REACT_APP_BASE_URL || 'https://thontrangliennhat.com/api',
 });
 
 httpRequest.interceptors.request.use(
