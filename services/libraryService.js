@@ -112,13 +112,14 @@ export const getImages = async () => {
         
         // Gọi API với cache busting
         const timestamp = Date.now();
-        const apiUrl = isDevelopment() 
-            ? `http://localhost:3001/api/images?_=${timestamp}` 
-            : `/api/images?_=${timestamp}`;
+        const API_URL = process.env.REACT_APP_API_URL || process.env.REACT_APP_BASE_URL || 'https://api.thontrangliennhat.com';
+        const url = isDevelopment() 
+            ? `${API_URL}/images?_=${timestamp}` 
+            : '/api/images';
         
-        console.log('Calling API:', apiUrl);
+        console.log('Calling API:', url);
         
-        const response = await fetch(apiUrl, {
+        const response = await fetch(url, {
             method: 'GET',
             headers: {
                 'Cache-Control': 'no-cache, no-store, must-revalidate',
@@ -214,14 +215,15 @@ export const createImage = async (imageData) => {
             console.log('Uploading image file...');
             
             // Determine the correct API endpoint based on environment
-            const apiBaseUrl = isDevelopment() 
-                ? 'http://localhost:3001/api' 
-                : '/api';  // In production this will be relative to the host
+            const API_URL = process.env.REACT_APP_API_URL || process.env.REACT_APP_BASE_URL || 'https://api.thontrangliennhat.com';
+            const baseUrl = isDevelopment() 
+                ? API_URL
+                : '';
             
-            console.log('Using API base URL:', apiBaseUrl);
+            console.log('Using API base URL:', baseUrl);
             
             // Upload the file using the special file upload endpoint
-            const uploadResponse = await fetch(`${apiBaseUrl}/upload/image`, {
+            const uploadResponse = await fetch(`${baseUrl}/upload/image`, {
                 method: 'POST',
                 body: originalData
             });
@@ -252,7 +254,7 @@ export const createImage = async (imageData) => {
             console.log('Creating image record with URL:', imageUrl);
             
             // Directly call API instead of using callLocalApi
-            const createResponse = await fetch(`${apiBaseUrl}/images`, {
+            const createResponse = await fetch(`${baseUrl}/images`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -626,4 +628,24 @@ export const deleteVideo = async (videoId) => {
         console.error('Error deleting video', error);
         throw error;
     }
+};
+
+// Hàm helper để lấy URL của hình ảnh
+export const getImageUrl = (imagePath) => {
+    if (!imagePath) return '';
+    
+    // Nếu đã là URL đầy đủ, trả về nguyên vẹn
+    if (imagePath.startsWith('http://') || imagePath.startsWith('https://')) {
+        return imagePath;
+    }
+    
+    // Nếu không bắt đầu bằng /, thêm vào
+    if (!imagePath.startsWith('/')) {
+        imagePath = '/' + imagePath;
+    }
+    
+    const API_URL = process.env.REACT_APP_API_URL || process.env.REACT_APP_BASE_URL || 'https://api.thontrangliennhat.com';
+    const LOCAL_API_URL = API_URL;
+    
+    return `${LOCAL_API_URL}${imagePath}`;
 };

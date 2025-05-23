@@ -1,7 +1,6 @@
 import axios from 'axios';
 
-// Always use localhost for API
-const baseURL = 'http://localhost:3001/api';
+const baseURL = process.env.REACT_APP_API_URL || process.env.REACT_APP_BASE_URL || 'https://api.thontrangliennhat.com';
 
 console.log('API Service using baseURL:', baseURL);
 
