@@ -2,14 +2,14 @@
   "name": "thontrangliennhat.com",
   "version": "1.0.0",
   "private": true,
-  "homepage": "http://localhost:3000",
+  "homepage": ".",
   "engines": {
     "node": "18.x"
   },
-  "proxy": "http://localhost:3001",
   "dependencies": {
     "@ckeditor/ckeditor5-build-classic": "^44.3.0",
     "@ckeditor/ckeditor5-react": "^9.5.0",
+    "@craco/craco": "^7.1.0",
     "@fortawesome/free-brands-svg-icons": "^6.5.1",
     "@fortawesome/free-solid-svg-icons": "^6.5.1",
     "@fortawesome/react-fontawesome": "^0.2.0",
@@ -23,6 +23,7 @@
     "busboy": "^1.6.0",
     "classnames": "^2.5.1",
     "cors": "^2.8.5",
+    "craco-alias": "^3.0.1",
     "date-fns": "^4.1.0",
     "dompurify": "^3.2.6",
     "express": "^5.1.0",
@@ -72,12 +73,10 @@
     ]
   },
   "devDependencies": {
-    "@craco/craco": "^7.1.0",
     "@types/babel__core": "^7.20.5",
     "@types/node": "^22.14.0",
     "@types/react": "^19.1.0",
     "@types/react-dom": "^19.1.2",
-    "craco-alias": "^3.0.1",
     "css-loader": "^7.1.2",
     "sass-loader": "^16.0.5",
     "style-loader": "^4.0.0"
