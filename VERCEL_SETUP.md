@@ -9,11 +9,16 @@ https://vercel.com/phan-dats-projects-d067d5c1/thontrangliennhat2-frontend/setti
 
 | Key | Value | Environment | Mô tả |
 |-----|-------|-------------|-------|
-| `REACT_APP_API_URL` | `https://thontrangliennhat.com/api` | All | URL API backend |
-| `REACT_APP_BASE_URL` | `https://thontrangliennhat.com/api` | All | Base URL cho API calls |
+| `REACT_APP_API_URL` | `https://thontrangliennhat.com/api` | All | URL API backend chính |
+| `REACT_APP_BASE_URL` | `https://thontrangliennhat.com/api` | All | Base URL cho API calls (fallback) |
 | `REACT_APP_PUBLIC_URL` | `https://thontrangliennhat.com` | Production | URL public của website |
 | `REACT_APP_PUBLIC_URL` | `https://thontrangliennhat2-frontend-git-main-phan-dats-projects-d067d5c1.vercel.app` | Preview | URL preview |
 | `REACT_APP_PUBLIC_URL` | `http://localhost:3000` | Development | URL local development |
+
+### Lưu ý về API Configuration:
+- API URL đã được cập nhật để sử dụng `https://thontrangliennhat.com/api` thay vì localhost
+- Đảm bảo backend API đang chạy tại domain `thontrangliennhat.com`
+- Nếu API subdomain khác (ví dụ: `api.thontrangliennhat.com`), hãy cập nhật giá trị phù hợp
 
 ### Biến môi trường tối ưu hóa (tùy chọn):
 
@@ -35,6 +40,7 @@ https://vercel.com/phan-dats-projects-d067d5c1/thontrangliennhat2-frontend/setti
 
 ### Custom Domain:
 - Domain chính: `thontrangliennhat.com`
+- API Domain: `thontrangliennhat.com/api` (hoặc `api.thontrangliennhat.com`)
 - Alias: `www.thontrangliennhat.com`
 
 ### DNS Records cần thiết:
@@ -53,8 +59,14 @@ Value: 76.76.19.61
 - ✅ Static assets serving
 - ✅ API proxy setup (cho development)
 - ✅ SEO optimization (sitemap, robots.txt)
+- ✅ Environment-based API URL configuration
 
 ## 🔄 Auto Deployment:
 - Mỗi push lên `main` branch sẽ tự động deploy
 - Preview deployments cho Pull Requests
-- Rollback nhanh khi có lỗi 
+- Rollback nhanh khi có lỗi
+
+## 🛠️ Troubleshooting:
+- Nếu vẫn thấy localhost trong console, clear browser cache và reload
+- Kiểm tra Environment Variables đã được set đúng trong Vercel
+- Đảm bảo backend API CORS đã allow domain frontend 
