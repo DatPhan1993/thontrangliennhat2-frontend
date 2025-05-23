@@ -1,17 +1,17 @@
 import React, { useEffect, useState } from 'react';
 import classNames from 'classnames/bind';
-import { getProducts } from '~/services/productService';
+import { getProductsByCategory, getProducts } from '~/services/productService';
 import styles from './Product.module.scss';
 import Title from '~/components/Title/Title';
 import PushNotification from '~/components/PushNotification/PushNotification';
 import LoadingScreen from '~/components/LoadingScreen/LoadingScreen';
 import routes from '~/config/routes';
 import { getCategoriesBySlug } from '~/services/categoryService';
-import Product from '~/components/Product/Product';
+import ProductCard from '~/components/Product/Product';
 import { Helmet } from 'react-helmet';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faChevronLeft, faChevronRight } from '@fortawesome/free-solid-svg-icons';
-import { normalizeImageUrl, DEFAULT_IMAGE } from '~/utils/imageUtils';
+import { faChevronLeft, faChevronRight, faSyncAlt } from '@fortawesome/free-solid-svg-icons';
+import { Button } from 'antd';
 
 const cx = classNames.bind(styles);
 
@@ -24,90 +24,50 @@ const Products = () => {
     const productsPerPage = 9;
 
     useEffect(() => {
-        const fetchProductsAndCategories = async () => {
+        const fetchProducts = async () => {
+            setLoading(true);
+            setError(null);
+            
             try {
+                // Fetch categories and products
                 const [categoriesData, productsData] = await Promise.all([
                     getCategoriesBySlug('san-pham'),
-                    getProducts(),
+                    getProducts()
                 ]);
                 
-                // Process products
-                const processedProducts = productsData.map(product => {
-                    console.log(`[Product] Processing product: ${product.id} - ${product.name}`);
-                    
-                    // Ensure image is properly formatted
-                    let productImage;
-                    if (Array.isArray(product.images) && product.images.length > 0) {
-                        productImage = normalizeImageUrl(product.images[0]);
-                    } else if (typeof product.images === 'string' && product.images.trim() !== '') {
-                        productImage = normalizeImageUrl(product.images);
-                    } else {
-                        productImage = DEFAULT_IMAGE;
-                    }
-                    
-                    return {
-                        ...product,
-                        displayImageUrl: productImage
-                    };
-                });
-                
+                if (categoriesData && Array.isArray(categoriesData)) {
                 setCategories(categoriesData);
-                setAllProducts(processedProducts);
-                console.log(`[Product] Loaded ${processedProducts.length} products`);
-            } catch (error) {
-                setError(error);
-                console.error('Error fetching products:', error);
+                }
+                
+                if (productsData && Array.isArray(productsData)) {
+                    // Process products for display
+                    const processedProducts = productsData.map(product => ({
+                        ...product,
+                        id: product.id,
+                        name: product.name || product.title,
+                        title: product.title || product.name,
+                        summary: product.summary,
+                        createdAt: product.createdAt || product.created_at || new Date().toISOString(),
+                        views: product.views || 0,
+                        image: Array.isArray(product.images) && product.images.length > 0 ? 
+                               product.images[0] : product.image || '',
+                        }));
+                    
+                    setAllProducts(processedProducts);
+                    setError(null);
+                } else {
+                    setError("Không tìm thấy sản phẩm nào. Vui lòng thử lại sau.");
+                }
+            } catch (err) {
+                console.error("Error fetching products:", err);
+                setError("Lỗi khi tải dữ liệu sản phẩm. Vui lòng thử lại sau.");
             } finally {
                 setLoading(false);
             }
         };
 
-        fetchProductsAndCategories();
+        fetchProducts();
     }, []);
-
-    const getCategorySlug = (categoryId) => {
-        if (!categoryId) return 'san-pham';
-        
-        // Convert to string for comparison if needed
-        const categoryIdStr = String(categoryId);
-        console.log(`Looking for category with ID: ${categoryIdStr}`, categories);
-        
-        // First, try to find a direct match
-        const category = categories.find((cat) => String(cat.id) === categoryIdStr);
-        
-        // If found, return the slug
-        if (category) {
-            console.log(`Found category for product: ${category.slug}`);
-            return category.slug;
-        }
-        
-        // If not found directly, check each category's children
-        for (const parentCategory of categories) {
-            if (parentCategory.children && Array.isArray(parentCategory.children)) {
-                const childCategory = parentCategory.children.find(
-                    (child) => String(child.id) === categoryIdStr
-                );
-                
-                if (childCategory) {
-                    console.log(`Found child category for product: ${childCategory.slug}`);
-                    return childCategory.slug;
-                }
-            }
-        }
-        
-        // If no category is found, use the parent category slug 'san-pham'
-        console.log(`No category found for ID: ${categoryIdStr}, using default 'san-pham'`);
-        return 'san-pham';
-    };
-
-    if (error) {
-        const errorMessage = error.response ? error.response.data.message : 'Network Error';
-        return <PushNotification message={errorMessage} />;
-    }
-
-    if (loading) {
-        return <LoadingScreen isLoading={loading} />;
-    }
 
     // Pagination
     const indexOfLastProduct = currentPage * productsPerPage;
@@ -122,70 +82,100 @@ const Products = () => {
         }
     };
 
+    const getCategorySlug = (categoryId) => {
+        const category = categories.find((cat) => cat.id === categoryId);
+        return category ? category.slug : 'san-pham';
+    };
+
+    if (error) {
+        const errorMessage = error.response ? error.response.data.message : error.message || 'Network Error';
+        return <PushNotification message={errorMessage} />;
+    }
+
+    if (loading) {
+        return <LoadingScreen isLoading={loading} />;
+    }
+
     return (
         <article className={cx('wrapper')}>
             <Helmet>
-                <title>Sản Phẩm | HTX Sản Xuất Nông Nghiệp - Dịch Vụ Tổng Hợp Liên Nhật</title>
+                <title>Sản Phẩm | HTX Nông Nghiệp - Du Lịch Phú Nông Buôn Đôn</title>
                 <meta
                     name="description"
-                    content="HTX Sản Xuất Nông Nghiệp - Dịch Vụ Tổng Hợp Liên Nhật hoạt động đa ngành nghề, trong đó tiêu biểu có thể kể đến là nuôi cá lồng, cải tạo nâng cấp vườn cây quanh các hồ thủy điện, phát triển về du lịch sinh thái, du lịch nông nghiệp. Ngoài ra còn thực hiện sản xuất các loại thực phẩm như chả cá, trái cây thực phẩm sấy khô và sấy dẻo, các loại tinh dầu tự nhiên,…"
+                    content="HTX Nông Nghiệp - Du Lịch Phú Nông Buôn Đôn hoạt động đa ngành nghề, trong đó tiêu biểu có thể kể đến là nuôi cá lồng, cải tạo nâng cấp vườn cây quanh các hồ thủy điện, phát triển về du lịch sinh thái, du lịch nông nghiệp. Ngoài ra còn thực hiện sản xuất các loại thực phẩm như chả cá, trái cây thực phẩm sấy khô và sấy dẻo, các loại tinh dầu tự nhiên,…"
                 />
                 <meta
                     name="keywords"
-                    content="dịch vụ nông nghiệp du lịch, hợp tác xã, sản phẩm nông nghiệp, thontrangliennhat"
+                    content="dịch vụ nông nghiệp du lịch, hợp tác xã, sản phẩm nông nghiệp, phunongbuondon"
                 />
-                <meta name="author" content="HTX Nông Nghiệp - Du Lịch Thôn Trang Liên Nhật" />
+                <meta name="author" content="HTX Nông Nghiệp - Du Lịch Phú Nông Buôn" />
             </Helmet>
             
-            <div className={cx('products-section')}>
-                <div className={cx('products-header')}>
-                    <h2 className={cx('products-title')}>Tất cả sản phẩm</h2>
-                </div>
-                
-                <div className={cx('products-grid')}>
-                    {currentProducts.map((product) => {
-                        const categorySlug = getCategorySlug(product.child_nav_id);
-                        console.log(`Product ${product.id} (${product.name}) category slug: ${categorySlug}`);
-                        
-                        return (
-                            <Product
-                                key={product.id}
-                                image={product.displayImageUrl}
-                                name={product.name}
-                                link={`${routes.products}/${categorySlug}/${product.id}`}
-                            />
-                        );
-                    })}
-                </div>
-                
-                {totalPages > 1 && (
-                    <div className={cx('pagination')}>
-                        <div 
-                            className={cx('pagination-button')} 
-                            onClick={() => handlePageChange(currentPage - 1)}
+            {error ? (
+                <div className={cx('error-container')}>
+                    <div className={cx('error-message')}>
+                        <h3>Thông báo</h3>
+                        <p>{error}</p>
+                        <Button 
+                            className={cx('retry-button')}
+                            onClick={() => window.location.reload()}
+                            icon={<FontAwesomeIcon icon={faSyncAlt} />}
                         >
-                            <FontAwesomeIcon icon={faChevronLeft} />
-                        </div>
-                        
-                        {Array.from({ length: totalPages }, (_, index) => (
-                            <div
-                                key={index}
-                                className={cx('pagination-button', { active: currentPage === index + 1 })}
-                                onClick={() => handlePageChange(index + 1)}
-                            >
-                                {index + 1}
+                            Thử lại
+                        </Button>
+                    </div>
+                </div>
+            ) : (
+            <div className={cx('products-section')}>
+                    <div className={cx('products-header')}>
+                    <h2 className={cx('products-title')}>Sản Phẩm</h2>
+                    </div>
+                    
+                    <div className={cx('products-grid')}>
+                        {currentProducts.map((product, index) => (
+                            <div key={index} className={cx('product-item')}>
+                                <ProductCard
+                                    name={product.name}
+                                    image={product.image}
+                                    price={product.price}
+                                    views={product.views}
+                                    productId={product.id}
+                                    category="san-pham"
+                                    link={`${routes.products}/san-pham/${product.id}`}
+                                />
                             </div>
                         ))}
-                        
-                        <div 
-                            className={cx('pagination-button')} 
-                            onClick={() => handlePageChange(currentPage + 1)}
-                        >
-                            <FontAwesomeIcon icon={faChevronRight} />
-                        </div>
                     </div>
-                )}
-            </div>
+                    
+                    {totalPages > 1 && (
+                        <div className={cx('pagination')}>
+                            <div 
+                                className={cx('pagination-button')} 
+                                onClick={() => handlePageChange(currentPage - 1)}
+                            >
+                                <FontAwesomeIcon icon={faChevronLeft} />
+                            </div>
+                            
+                            {Array.from({ length: totalPages }, (_, index) => (
+                                <div
+                                    key={index}
+                                    className={cx('pagination-button', { active: currentPage === index + 1 })}
+                                    onClick={() => handlePageChange(index + 1)}
+                                >
+                                    {index + 1}
+                                </div>
+                            ))}
+                            
+                            <div 
+                                className={cx('pagination-button')} 
+                                onClick={() => handlePageChange(currentPage + 1)}
+                            >
+                                <FontAwesomeIcon icon={faChevronRight} />
+                            </div>
+                        </div>
+                    )}
+                </div>
+            )}
         </article>
     );
 };

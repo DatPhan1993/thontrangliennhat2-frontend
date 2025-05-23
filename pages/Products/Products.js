@@ -9,7 +9,7 @@ import styles from './Products.module.scss';
 import LoadingScreen from '~/components/LoadingScreen/LoadingScreen';
 import { getCategoriesBySlug } from '~/services/categoryService';
 import routes from '~/config/routes';
-import { Helmet } from 'react-helmet';
+import { Helmet } from 'react-helmet-async';
 import { Empty } from 'antd';
 import Product from '~/components/Product/Product';
 import { normalizeImageUrl } from '~/utils/imageUtils';

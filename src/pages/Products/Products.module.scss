@@ -19,7 +19,7 @@
     min-height: 300px;
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    align-items: center;
+    align-items: stretch;
     gap: 20px;
     margin: 40px 0;
     
@@ -32,10 +32,16 @@
     }
 }
 
+.product-grid-item {
+    display: flex;
+    height: 100%;
+}
+
 .pagination {
     display: flex;
     justify-content: center;
     gap: 8px;
+    margin-bottom: 20px;
 
     .pageButton {
         width: 32px;
@@ -50,12 +56,25 @@
         transition: background-color 0.3s;
 
         &.active {
-            background-color: #e0e0e0;
+            background-color: var(--primary);
+            color: white;
             font-weight: bold;
         }
 
         &:hover:not(.active) {
             background-color: #e0e0e0;
         }
+    }
+}
+
+.empty-element {
+    grid-column: span 3;
+    
+    @include respond-to(lg) {
+        grid-column: span 2;
+    }
+    
+    @include respond-to(sm) {
+        grid-column: span 1;
     }
 }

@@ -13,7 +13,7 @@ import routes from '~/config/routes';
 import { getCategoriesBySlug } from '~/services/categoryService';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Autoplay, Navigation, Pagination } from 'swiper/modules';
-import { Helmet } from 'react-helmet';
+import { Helmet } from 'react-helmet-async';
 import dayjs from 'dayjs';
 import 'swiper/css';
 import 'swiper/css/autoplay';

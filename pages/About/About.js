@@ -2,7 +2,7 @@ import classNames from 'classnames/bind';
 import React from 'react';
 import Title from '~/components/Title/Title';
 import styles from './About.module.scss';
-import { Helmet } from 'react-helmet';
+import { Helmet } from 'react-helmet-async';
 
 const cx = classNames.bind(styles);
 

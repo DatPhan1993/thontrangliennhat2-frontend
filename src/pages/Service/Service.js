@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import classNames from 'classnames/bind';
 import CardService from '~/components/CardService/CardService';
 // import SuggestCard from '~/components/SuggestCard';
@@ -11,11 +11,26 @@ import PushNotification from '~/components/PushNotification/PushNotification';
 import LoadingScreen from '~/components/LoadingScreen/LoadingScreen';
 import routes from '~/config/routes';
 import { getCategoriesBySlug } from '~/services/categoryService';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faChevronLeft, faChevronRight } from '@fortawesome/free-solid-svg-icons';
+import { Swiper, SwiperSlide } from 'swiper/react';
+import { Autoplay } from 'swiper/modules';
+import 'swiper/css';
+import 'swiper/css/autoplay';
 import { Helmet } from 'react-helmet';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faChevronLeft, faChevronRight, faSyncAlt } from '@fortawesome/free-solid-svg-icons';
+import { Button } from 'antd';
 
 const cx = classNames.bind(styles);
+
+// Helper function to process image paths
+const processImagePath = (images) => {
+    // Handle array of images
+    if (Array.isArray(images)) {
+        return images.length > 0 ? images[0] : '';
+    }
+    // Handle single image string
+    return images || '';
+};
 
 const Service = () => {
     const [allServices, setAllServices] = useState([]);
@@ -24,78 +39,53 @@ const Service = () => {
     const [error, setError] = useState(null);
     const [currentPage, setCurrentPage] = useState(1);
     const servicesPerPage = 9;
-    const navigate = useNavigate();
-    // const [selectedSuggestion, setSelectedSuggestion] = useState(0);
+    
+    const fetchServices = async () => {
+        setLoading(true);
+        setError(null);
+        
+        try {
+            // Fetch categories and services
+            const [categoriesData, servicesData] = await Promise.all([
+                getCategoriesBySlug('san-xuat'),
+                getServices()
+            ]);
+            
+            if (categoriesData && Array.isArray(categoriesData)) {
+                setCategories(categoriesData);
+            }
+            
+            if (servicesData && Array.isArray(servicesData)) {
+                console.log(`Found ${servicesData.length} total services`);
+                
+                // Process services for display
+                const processedServices = servicesData.map(service => ({
+                    ...service,
+                    id: service.id,
+                    name: service.name || service.title,
+                    title: service.title || service.name,
+                    summary: service.summary,
+                    createdAt: service.createdAt || service.created_at || new Date().toISOString(),
+                    views: service.views || 0,
+                    image: processImagePath(service.images),
+                }));
+                
+                setAllServices(processedServices);
+                setError(null);
+            } else {
+                setError("Không tìm thấy dịch vụ nào. Vui lòng thử lại sau.");
+            }
+        } catch (err) {
+            console.error("Error fetching services:", err);
+            setError("Lỗi khi tải dữ liệu dịch vụ. Vui lòng thử lại sau.");
+        } finally {
+            setLoading(false);
+        }
+    };
 
     useEffect(() => {
-        const fetchServicesAndCategories = async () => {
-            try {
-                const [categoriesData, servicesData] = await Promise.all([
-                    getCategoriesBySlug('dich-vu'),
-                    getServices(),
-                ]);
-                
-                // Process services
-                const processedServices = servicesData.map(service => {
-                    console.log(`[Service] Processing service: ${service.id} - ${service.name}`);
-                    
-                    return {
-                        ...service,
-                        image: service.images
-                    };
-                });
-                
-                setCategories(categoriesData);
-                setAllServices(processedServices);
-                console.log(`[Service] Loaded ${processedServices.length} services`);
-            } catch (error) {
-                setError(error);
-                console.error('Error fetching services:', error);
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        fetchServicesAndCategories();
+        fetchServices();
     }, []);
-
-    // const handleButtonClick = (index) => {
-    //     setSelectedSuggestion(index);
-    // };
-
-    const handleServiceClick = (service, categorySlug) => {
-        console.log('Navigating to service:', service);
-        console.log('Category slug:', categorySlug);
-        console.log('Service ID:', service.id);
-        
-        // Ensure we have a valid ID before navigating
-        if (!service.id) {
-            console.error('Service ID is missing:', service);
-            return;
-        }
-        
-        const url = `${routes.services}/${categorySlug}/${service.id}`;
-        console.log('Navigation URL:', url);
-        navigate(url);
-    };
-
-    const getCategorySlug = (categoryId) => {
-        if (!categoryId) return 'dich-vu';
-        
-        // Convert to string for comparison if needed
-        const categoryIdStr = String(categoryId);
-        const category = categories.find((cat) => String(cat.id) === categoryIdStr);
-        return category ? category.slug : 'dich-vu';
-    };
-
-    if (error) {
-        const errorMessage = error.response ? error.response.data.message : 'Network Error';
-        return <PushNotification message={errorMessage} />;
-    }
-
-    if (loading) {
-        return <LoadingScreen isLoading={loading} />;
-    }
 
     // Pagination
     const indexOfLastService = currentPage * servicesPerPage;
@@ -110,83 +100,92 @@ const Service = () => {
         }
     };
 
-    // const filteredServiceItems = serviceItems
-    //     .filter((item) => {
-    //         if (selectedSuggestion === 0) {
-    //             return item.isFeatured;
-    //         }
-    //         if (selectedSuggestion === 1) {
-    //             return item.views > 10;
-    //         }
-    //         return true;
-    //     })
-    //     .slice(0, 5);
+    if (error) {
+        const errorMessage = error.response ? error.response.data.message : 'Network Error';
+        return <PushNotification message={errorMessage} />;
+    }
+
+    if (loading) {
+        return <LoadingScreen isLoading={loading} />;
+    }
 
     return (
         <article className={cx('wrapper')}>
             <Helmet>
-                <title>Dịch Vụ Du Lịch | HTX Sản Xuất Nông Nghiệp - Dịch Vụ Tổng Hợp Liên Nhật</title>
+                <title> Sản Xuất Liên Nhật | Thôn Trang Liên Nhật</title>
                 <meta
                     name="description"
-                    content="HTX Sản Xuất Nông Nghiệp - Dịch Vụ Tổng Hợp Liên Nhật hoạt động đa ngành nghề, trong đó tiêu biểu có thể kể đến là nuôi cá lồng, cải tạo nâng cấp vườn cây quanh các hồ thủy điện, phát triển về du lịch sinh thái, du lịch nông nghiệp. Ngoài ra còn thực hiện sản xuất các loại thực phẩm như chả cá, trái cây thực phẩm sấy khô và sấy dẻo, các loại tinh dầu tự nhiên,…"
+                    content="Khám phá các dịch vụ du lịch đặc sắc tại Thôn Trang Liên Nhật - từ tour tham quan đến các hoạt động trải nghiệm"
                 />
-                <meta
-                    name="keywords"
-                    content="dịch vụ nông nghiệp du lịch, hợp tác xã, sản phẩm nông nghiệp, thontrangliennhat"
-                />
-                <meta name="author" content="HTX Nông Nghiệp - Du Lịch Thôn Trang Liên Nhật" />
             </Helmet>
             
-            <div className={cx('services-section')}>
-                <div className={cx('services-header')}>
-                    <h2 className={cx('services-title')}>Dịch Vụ Du Lịch</h2>
-                </div>
-                
-                <div className={cx('services-grid')}>
-                    {currentServices.map((service) => (
-                        <div 
-                            key={service.id}
-                            className={cx('service-item')}
-                            onClick={() => handleServiceClick(service, getCategorySlug(service.child_nav_id))}
+            {error ? (
+                <div className={cx('error-container')}>
+                    <div className={cx('error-message')}>
+                        <h3>Thông báo</h3>
+                        <p>{error}</p>
+                        <Button 
+                            className={cx('retry-button')}
+                            onClick={fetchServices}
+                            icon={<FontAwesomeIcon icon={faSyncAlt} />}
                         >
-                            <CardService
-                                title={service.name}
-                                summary={service.summary}
-                                image={service.images}
-                                createdAt={service.created_at || service.createdAt}
-                            />
-                        </div>
-                    ))}
-                </div>
-                
-                {totalPages > 1 && (
-                    <div className={cx('pagination')}>
-                        <div 
-                            className={cx('pagination-button')} 
-                            onClick={() => handlePageChange(currentPage - 1)}
-                        >
-                            <FontAwesomeIcon icon={faChevronLeft} />
-                        </div>
-                        
-                        {Array.from({ length: totalPages }, (_, index) => (
-                            <div
-                                key={index}
-                                className={cx('pagination-button', { active: currentPage === index + 1 })}
-                                onClick={() => handlePageChange(index + 1)}
-                            >
-                                {index + 1}
-                            </div>
-                        ))}
-                        
-                        <div 
-                            className={cx('pagination-button')} 
-                            onClick={() => handlePageChange(currentPage + 1)}
-                        >
-                            <FontAwesomeIcon icon={faChevronRight} />
-                        </div>
+                            Thử lại
+                        </Button>
                     </div>
-                )}
-            </div>
+                </div>
+            ) : (
+                <div className={cx('services-section')}>
+                    <div className={cx('services-header')}>
+                        <h2 className={cx('services-title')}>Sản Xuất Liên Nhật</h2>
+                    </div>
+                    
+                    <div className={cx('services-grid')}>
+                        {currentServices.map((service, index) => (
+                            <Link 
+                                key={index} 
+                                to={`${routes.services}/san-xuat/${service.id}`}
+                                className={cx('service-item')}
+                            >
+                                <CardService
+                                    title={service.title}
+                                    summary={service.summary}
+                                    image={service.image}
+                                    createdAt={service.createdAt}
+                                    views={service.views}
+                                />
+                            </Link>
+                        ))}
+                    </div>
+                    
+                    {totalPages > 1 && (
+                        <div className={cx('pagination')}>
+                            <div 
+                                className={cx('pagination-button')} 
+                                onClick={() => handlePageChange(currentPage - 1)}
+                            >
+                                <FontAwesomeIcon icon={faChevronLeft} />
+                            </div>
+                            
+                            {Array.from({ length: totalPages }, (_, index) => (
+                                <div
+                                    key={index}
+                                    className={cx('pagination-button', { active: currentPage === index + 1 })}
+                                    onClick={() => handlePageChange(index + 1)}
+                                >
+                                    {index + 1}
+                                </div>
+                            ))}
+                            
+                            <div 
+                                className={cx('pagination-button')} 
+                                onClick={() => handlePageChange(currentPage + 1)}
+                            >
+                                <FontAwesomeIcon icon={faChevronRight} />
+                            </div>
+                        </div>
+                    )}
+                </div>
+            )}
         </article>
     );
 };

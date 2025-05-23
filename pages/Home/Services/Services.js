@@ -50,7 +50,7 @@ function Services() {
             
             const [servicesData, categoriesData] = await Promise.all([
                 getServices(),
-                getCategoriesBySlug('dich-vu'),
+                getCategoriesBySlug('san-xuat'),
             ]);
             
             // Process service images with proper URLs
@@ -112,12 +112,12 @@ function Services() {
     };
 
     const getCategorySlug = (categoryId) => {
-        if (!categoryId) return 'dich-vu'; // Default category if none exists
+        if (!categoryId) return 'san-xuat'; // Default category if none exists
         
         // Convert to string for comparison if needed
         const categoryIdStr = String(categoryId);
         const category = categories.find((cat) => String(cat.id) === categoryIdStr);
-        return category ? category.slug : 'dich-vu'; // Fallback to default if category not found
+        return category ? category.slug : 'san-xuat'; // Fallback to default if category not found
     };
 
     const handleViewAllServices = () => {

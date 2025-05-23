@@ -109,12 +109,12 @@ const publicRoutes = [
     {
         path: config.routes.serviceDetail,
         component: ServiceDetail,
-        layout: (props) => <DefaultLayout {...props} baseRoute={config.routes.services} categoryType={'dich-vu'} />,
+        layout: (props) => <DefaultLayout {...props} baseRoute={config.routes.services} categoryType={'san-xuat'} />,
     },
     {
         path: config.routes.servicesCategory,
         component: ServiceCategory,
-        layout: (props) => <DefaultLayout {...props} baseRoute={config.routes.services} categoryType={'dich-vu'} />,
+        layout: (props) => <DefaultLayout {...props} baseRoute={config.routes.services} categoryType={'san-xuat'} />,
     },
     { path: config.routes.experiences, component: Experience, layout: OnlyHeaderLayout },
     {

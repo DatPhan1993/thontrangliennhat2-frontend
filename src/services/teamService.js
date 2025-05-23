@@ -11,24 +11,16 @@ const getFromSessionStorage = (key) => {
 };
 
 // Members
-export const getMembers = async (forceRefresh = false) => {
+export const getMembers = async () => {
     const sessionKey = 'allMembers';
 
-    // Only use cached data if not forcing refresh
-    if (!forceRefresh) {
-        const cachedData = getFromSessionStorage(sessionKey);
-        if (cachedData) {
-            return cachedData;
-        }
-    } else {
-        // Clear the cache when forcing refresh
-        sessionStorage.removeItem(sessionKey);
+    const cachedData = getFromSessionStorage(sessionKey);
+    if (cachedData) {
+        return cachedData;
     }
 
     try {
-        // Add a timestamp to force browser to make a fresh request
-        const timestamp = new Date().getTime();
-        const response = await httpRequest.get(`/teams?_=${timestamp}`);
+        const response = await httpRequest.get('/teams');
         const membersData = response.data.data;
 
         // Save to sessionStorage
@@ -43,19 +35,14 @@ export const getMembers = async (forceRefresh = false) => {
 
 export const addMember = async (memberData) => {
     try {
-        // Cấu hình đặc biệt cho form data với file upload
-        const config = {
-            headers: {
-                'Content-Type': 'multipart/form-data'
-            }
-        };
-        
-        const response = await httpRequest.post(`/teams`, memberData, config);
+        const response = await httpRequest.post(`/teams`, memberData);
 
-        // Clear all member-related cache
         sessionStorage.removeItem(`allMembers`);
-        
-        // Don't need to refresh here as we'll force refresh when needed
+
+        // Refresh sessionStorage for all services list
+        const updateMember = await getMembers();
+        saveToSessionStorage('allMembers', updateMember);
+
         return response.data.data;
     } catch (error) {
         console.error('Error adding member', error);
@@ -67,9 +54,12 @@ export const updateMember = async (memberId, memberData) => {
     try {
         const response = await httpRequest.post(`/teams/${memberId}`, memberData);
 
-        // Clear all member-related cache
         sessionStorage.removeItem(`member_${memberId}`);
         sessionStorage.removeItem(`allMembers`);
+
+        // Refresh sessionStorage for all services list
+        const updateMember = await getMembers();
+        saveToSessionStorage('allMembers', updateMember);
 
         return response.data;
     } catch (error) {
@@ -78,24 +68,16 @@ export const updateMember = async (memberId, memberData) => {
     }
 };
 
-export const getMemberById = async (memberId, forceRefresh = false) => {
+export const getMemberById = async (memberId) => {
     const sessionKey = `member_${memberId}`;
 
-    // Only use cached data if not forcing refresh
-    if (!forceRefresh) {
-        const cachedData = getFromSessionStorage(sessionKey);
-        if (cachedData) {
-            return cachedData;
-        }
-    } else {
-        // Clear the cache when forcing refresh
-        sessionStorage.removeItem(sessionKey);
+    const cachedData = getFromSessionStorage(sessionKey);
+    if (cachedData) {
+        return cachedData;
     }
 
     try {
-        // Add a timestamp to force browser to make a fresh request
-        const timestamp = new Date().getTime();
-        const response = await httpRequest.get(`/teams/${memberId}?_=${timestamp}`);
+        const response = await httpRequest.get(`/teams/${memberId}`);
         const memberData = response.data.data;
 
         // Save to sessionStorage
@@ -112,9 +94,12 @@ export const deleteMember = async (memberId) => {
     try {
         await httpRequest.delete(`/teams/${memberId}`);
 
-        // Clear all member-related cache
         sessionStorage.removeItem(`allMembers`);
         sessionStorage.removeItem(`member_${memberId}`);
+
+        // Refresh sessionStorage for all services list
+        const updateMember = await getMembers();
+        saveToSessionStorage('allMembers', updateMember);
     } catch (error) {
         console.error('Error deleting member', error);
         throw error;

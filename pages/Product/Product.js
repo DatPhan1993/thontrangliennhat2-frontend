@@ -8,7 +8,7 @@ import LoadingScreen from '~/components/LoadingScreen/LoadingScreen';
 import routes from '~/config/routes';
 import { getCategoriesBySlug } from '~/services/categoryService';
 import Product from '~/components/Product/Product';
-import { Helmet } from 'react-helmet';
+import { Helmet } from 'react-helmet-async';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChevronLeft, faChevronRight } from '@fortawesome/free-solid-svg-icons';
 import { normalizeImageUrl, DEFAULT_IMAGE } from '~/utils/imageUtils';

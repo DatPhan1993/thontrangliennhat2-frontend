@@ -3,7 +3,7 @@ import { CKEditor } from '@ckeditor/ckeditor5-react';
 import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
 import './CustomEditor.css';
 
-const CustomEditor = ({ onChange, initialValue }) => {
+const CustomEditor = ({ onChange, initialValue, placeholder }) => {
     const [editorReady, setEditorReady] = useState(false);
     const [editorData, setEditorData] = useState(initialValue || '');
 
@@ -50,6 +50,8 @@ const CustomEditor = ({ onChange, initialValue }) => {
                 'link',
                 'blockQuote',
                 'insertTable',
+                'horizontalLine',
+                'specialCharacters',
                 '|',
                 'undo',
                 'redo'
@@ -68,7 +70,7 @@ const CustomEditor = ({ onChange, initialValue }) => {
         table: {
             contentToolbar: ['tableColumn', 'tableRow', 'mergeTableCells']
         },
-        placeholder: 'Nhập nội dung tin tức ở đây...'
+        placeholder: placeholder || 'Nhập nội dung chi tiết ở đây...'
     };
 
     return (
@@ -82,8 +84,8 @@ const CustomEditor = ({ onChange, initialValue }) => {
                         console.log('Editor is ready to use!', editor);
                         
                         // Add some initial content if empty
-                        if (!editorData) {
-                            editor.setData('<p>Hãy viết nội dung tin tức của bạn tại đây...</p>');
+                        if (!editorData && !initialValue) {
+                            editor.setData('<p>Mô tả chi tiết về dịch vụ/sản phẩm của bạn...</p>');
                         }
                         
                         // Set focus to the editor

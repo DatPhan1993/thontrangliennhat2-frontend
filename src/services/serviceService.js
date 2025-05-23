@@ -34,22 +34,15 @@ export const getServicePagination = async (page = 1, limit = 4) => {
 };
 
 // Get all services and cache the result
-export const getServices = async (forceRefresh = true) => {
+export const getServices = async () => {
     const sessionKey = 'allServices';
 
-    // If forceRefresh is true, skip the cache
-    if (!forceRefresh) {
-        const cachedData = getFromSessionStorage(sessionKey);
-        if (cachedData) {
-            return cachedData;
-        }
-    } else {
-        // Clear the cache when forcing refresh
-        sessionStorage.removeItem(sessionKey);
+    const cachedData = getFromSessionStorage(sessionKey);
+    if (cachedData) {
+        return cachedData;
     }
 
     try {
-        console.log('Fetching fresh services data from API');
         const response = await httpRequest.get('/services');
         const servicesData = response.data.data;
 
@@ -66,35 +59,22 @@ export const getServices = async (forceRefresh = true) => {
 // Get service by ID and cache the result
 export const getServiceById = async (id) => {
     const sessionKey = `service_${id}`;
-    console.log('getServiceById called with ID:', id);
 
     const cachedData = getFromSessionStorage(sessionKey);
     if (cachedData) {
-        console.log('Returning cached service data for ID:', id);
         return cachedData;
     }
 
     try {
-        console.log('Fetching service data for ID:', id);
-        // Get all services and find the one with matching ID
-        const allServices = await getServices();
-        console.log('All services fetched, looking for ID:', id);
+        const response = await httpRequest.get(`/services/${id}`);
+        let serviceData = response.data.data;
         
-        // Find the specific service by ID
-        const serviceData = allServices.find(service => service.id === parseInt(id));
-        
-        if (!serviceData) {
-            console.error(`Service with id ${id} not found in the list of services`);
-            throw new Error(`Service with id ${id} not found`);
-        }
-        
-        console.log('Service found:', serviceData);
-
-        // Chuẩn hóa trường images thành mảng
-        if (serviceData && typeof serviceData.images === 'string') {
-            serviceData.images = [serviceData.images]; 
-        } else if (!serviceData.images) {
-            serviceData.images = [];
+        // Handle case when the API returns an array of services
+        if (Array.isArray(serviceData)) {
+            const foundService = serviceData.find(s => s.id.toString() === id.toString());
+            if (foundService) {
+                serviceData = foundService;
+            }
         }
 
         // Save to sessionStorage
@@ -131,98 +111,18 @@ export const getServiceByCategory = async (categoryId) => {
 };
 
 // Create service (no sessionStorage needed for POST requests)
-export const createService = async (serviceData) => {
+export const createService = async (experienceData) => {
     try {
-        console.log('Creating new service with data:', serviceData);
-        
-        // Xử lý trường hợp dữ liệu là FormData
-        if (serviceData instanceof FormData) {
-            // Log FormData trước khi gửi
-            console.log('FormData being sent to API:');
-            for (let [key, value] of serviceData.entries()) {
-                if (key === 'images[]' || key === 'images') {
-                    if (value instanceof File) {
-                        console.log(`${key}: File - ${value.name} (${value.size} bytes)`);
-                    } else {
-                        console.log(`${key}: ${value instanceof Blob ? 'Blob' : value.substring(0, 50)}`);
-                    }
-                } else {
-                    console.log(`${key}: ${value}`);
-                }
-            }
-            
-            // Đảm bảo có ít nhất một ảnh và không là mảng trống
-            if (!serviceData.has('images') && !serviceData.has('images[]')) {
-                // Thêm ảnh mặc định
-                console.log('No images found, adding default image');
-                serviceData.append('images', '/images/uploads/default-image.jpg');
-            }
-            
-            // Tạo request sử dụng XMLHttpRequest để hỗ trợ FormData tốt hơn
-            const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:3001/api';
-            return new Promise((resolve, reject) => {
-                const xhr = new XMLHttpRequest();
-                xhr.open('POST', `${apiUrl}/services`, true);
-                
-                xhr.onload = function() {
-                    if (xhr.status >= 200 && xhr.status < 300) {
-                        // Xử lý kết quả thành công
-                        try {
-                            const data = JSON.parse(xhr.responseText);
-                            console.log('Success response:', data);
-                            
-                            // Xóa cache
-                            sessionStorage.removeItem('allServices');
-                            
-                            // Trả về dữ liệu
-                            resolve(data.data);
-                        } catch (error) {
-                            console.error('Error parsing response:', error);
-                            reject(new Error('Invalid response from server'));
-                        }
-                    } else {
-                        // Xử lý lỗi
-                        console.error('Server error:', xhr.status, xhr.responseText);
-                        
-                        try {
-                            const errorData = JSON.parse(xhr.responseText);
-                            reject(new Error(errorData.message || 'Server error'));
-                        } catch (e) {
-                            reject(new Error(`Server error: ${xhr.status}`));
-                        }
-                    }
-                };
-                
-                xhr.onerror = function() {
-                    console.error('Network error occurred');
-                    reject(new Error('Network error occurred. Please check your connection.'));
-                };
-                
-                // Gửi form data
-                xhr.send(serviceData);
-            });
-        } else {
-            // Đảm bảo có trường images nếu là object
-            if (serviceData.images === undefined) {
-                serviceData.images = ['/images/uploads/default-image.jpg'];
-            }
-            
-            const response = await httpRequest.post('/services', serviceData);
-            console.log('API response:', response.data);
+        const response = await httpRequest.post('services', experienceData);
 
-            sessionStorage.removeItem('allServices');
-            // Refresh sessionStorage for all services list
-            const updatedServices = await getServices();
-            saveToSessionStorage('allServices', updatedServices);
+        sessionStorage.removeItem(`allServices`);
+        // Refresh sessionStorage for all experiences list
+        const updatedServices = await getServices();
+        saveToSessionStorage('allServices', updatedServices);
 
-            return response.data.data;
-        }
+        return response.data.data;
     } catch (error) {
-        console.error('Error adding service:', error);
-        if (error.response) {
-            console.error('Server response:', error.response.data);
-            console.error('Status:', error.response.status);
-        }
+        console.error('Error adding experience', error);
         throw error;
     }
 };
@@ -230,50 +130,92 @@ export const createService = async (serviceData) => {
 // Update service and refresh sessionStorage for that service item
 export const updateService = async (id, serviceData) => {
     try {
-        console.log('Updating service with ID:', id);
+        console.log(`Updating service with ID: ${id}`);
         
-        // Log FormData keys before sending
+        // Always use POST method with _method=PUT for FormData
         if (serviceData instanceof FormData) {
-            console.log('FormData being sent to API:');
+            // Ensure method override and ID are included
+            if (!serviceData.has('_method')) {
+                serviceData.append('_method', 'PUT');
+            }
+            if (!serviceData.has('id')) {
+                serviceData.append('id', id);
+            }
+            
+            // Log FormData contents for debugging
+            console.log('FormData contents:');
             for (let [key, value] of serviceData.entries()) {
-                if (key === 'images[]' || key === 'images') {
-                    if (value instanceof File) {
-                        console.log(`${key}: File - ${value.name} (${value.size} bytes)`);
-                    } else {
-                        console.log(`${key}: ${value.substring(0, 50)}${value.length > 50 ? '...' : ''}`);
-                    }
+                if (value instanceof File) {
+                    console.log(`${key}: File - ${value.name} (${value.size} bytes)`);
+                } else if (typeof value === 'string') {
+                    console.log(`${key}: ${value.substring(0, 100)}${value.length > 100 ? '...' : ''}`);
                 } else {
-                    console.log(`${key}: ${value}`);
+                    console.log(`${key}: [Object]`);
                 }
             }
+            
+            // Make a POST request to the update endpoint with specific URL
+            try {
+                const url = `/services/${id}`;
+                console.log('Making POST request to URL:', url);
+                const response = await httpRequest.post(url, serviceData);
+                
+                // Clear all relevant caches to ensure fresh data
+                sessionStorage.removeItem(`service_${id}`);
+                sessionStorage.removeItem('allServices');
+                
+                // Clear any category-related caches
+                Object.keys(sessionStorage).forEach(key => {
+                    if (key.startsWith('services_category_') || key.startsWith('services_page_')) {
+                        sessionStorage.removeItem(key);
+                    }
+                });
+
+                // If we got a valid response, update the cache with the new data
+                if (response.data && response.data.data) {
+                    saveToSessionStorage(`service_${id}`, response.data.data);
+                }
+
+                return response.data.data;
+            } catch (err) {
+                console.error(`Error in POST request for service ${id}:`, err);
+                
+                if (err.response) {
+                    console.error('Response status:', err.response.status);
+                    console.error('Response data:', err.response.data);
+                }
+                
+                throw err; // Re-throw to be handled by the caller
+            }
+        } else {
+            // For JSON data, continue using PUT method
+            const response = await httpRequest.put(`/services/${id}`, serviceData);
+            
+            // Clear relevant caches
+            sessionStorage.removeItem(`service_${id}`);
+            sessionStorage.removeItem('allServices');
+            
+            Object.keys(sessionStorage).forEach(key => {
+                if (key.startsWith('services_category_') || key.startsWith('services_page_')) {
+                    sessionStorage.removeItem(key);
+                }
+            });
+
+            if (response.data && response.data.data) {
+                saveToSessionStorage(`service_${id}`, response.data.data);
+            }
+
+            return response.data.data;
         }
-
-        const response = await httpRequest.post(`/services/${id}`, serviceData);
-        console.log('API response:', response.data);
-
-        sessionStorage.removeItem(`service_${id}`);
-        sessionStorage.removeItem(`allServices`);
-        const updatedServices = await getServices();
-        saveToSessionStorage('allServices', updatedServices);
-        saveToSessionStorage(`service_${id}`, response.data.data);
-
-        return response.data.data;
     } catch (error) {
-        console.error(`Error updating service with id ${id}`, error);
+        console.error(`Error updating service with id ${id}:`, error);
         throw error;
     }
 };
 
 export const deleteService = async (id) => {
     try {
-        // Try multiple potential API endpoints 
-        let response;
-        try {
-            response = await httpRequest.delete(`/service/${id}`); 
-        } catch (firstError) {
-            console.log('First delete attempt failed, trying alternative endpoint');
-            response = await httpRequest.delete(`/services/${id}`);
-        }
+        await httpRequest.delete(`/services/${id}`);
 
         // Remove the deleted service from sessionStorage
         sessionStorage.removeItem(`service_${id}`);
@@ -282,8 +224,6 @@ export const deleteService = async (id) => {
         // Refresh sessionStorage for all services list
         const updatedServices = await getServices();
         saveToSessionStorage('allServices', updatedServices);
-        
-        return response.data.data;
     } catch (error) {
         console.error(`Error deleting service with id ${id}`, error);
         throw error;

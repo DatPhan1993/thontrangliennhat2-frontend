@@ -97,11 +97,11 @@ const Footer = () => {
             <div className={cx('bottomBar')}>
                 <p>
                     Copyright 2025 &copy;{' '}
-                    <a href="https://thontrangliennhat.com/" className={cx('company-name')}>
+                    <a href="http://localhost:3000/" className={cx('company-name')}>
                         HTX Liên Nhật
                     </a>
                     . All Rights Reserved. Thiết kế bởi{' '}
-                    <a href="https://thontrangliennhat.com/" className={cx('company-design-name')}>
+                    <a href="http://localhost:3000/" className={cx('company-design-name')}>
                         DP
                     </a>
                 </p>

@@ -10,7 +10,6 @@ import { Autoplay } from 'swiper/modules';
 import 'swiper/css';
 import 'swiper/css/autoplay';
 import { getMembers } from '~/services/teamService';
-import { getImageUrl } from '~/utils/imageUtils';
 
 const cx = classNames.bind(styles);
 
@@ -25,14 +24,10 @@ function Teams() {
         const loadTeams = async () => {
             setLoading(true);
             try {
-                // Always force refresh to get latest data
-                console.log('Fetching fresh team data...');
-                const members = await getMembers(true);
+                const members = await getMembers();
                 members.sort((a, b) => b.name.localeCompare(a.name));
                 setTeams(members);
-                console.log('Team data refreshed successfully');
             } catch (error) {
-                console.error('Error loading team data:', error);
                 setError(error);
             } finally {
                 setLoading(false);
@@ -94,7 +89,7 @@ function Teams() {
                             768: { slidesPerView: 2 },
                             0: { slidesPerView: 1 },
                         }}
-                        loop={teamsArr.length >= (slidesPerView * 2)}
+                        loop={true}
                         modules={[Autoplay]}
                         autoplay={{
                             delay: 2000,
@@ -104,15 +99,7 @@ function Teams() {
                         {teamsArr?.map((team, index) => (
                             <SwiperSlide key={index} className={cx('slide')} onClick={() => handleOpenDetail(team)}>
                                 <div className={cx('team-card')}>
-                                    <img 
-                                        src={getImageUrl(team.image)} 
-                                        alt={team.name} 
-                                        className={cx('team-image')}
-                                        onError={(e) => {
-                                            console.error('Error loading team image:', team.image);
-                                            e.target.src = '/placeholder-image.svg';
-                                        }} 
-                                    />
+                                    <img src={team.image} alt={team.name} className={cx('team-image')} />
                                     <div className={cx('team-info')}>
                                         <h3 className={cx('team-name')}>{team.name}</h3>
                                         <p className={cx('team-position')}>{team.position}</p>
@@ -123,7 +110,7 @@ function Teams() {
                     </Swiper>
                 </div>
             </div>
-            <TeamModal open={!!selectedTeam} onClose={handleCloseDetail} team={selectedTeam} />
+            <TeamModal visible={!!selectedTeam} onClose={handleCloseDetail} team={selectedTeam} />
         </div>
     );
 }

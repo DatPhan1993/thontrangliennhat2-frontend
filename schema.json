@@ -3,8 +3,8 @@
   "@type": "Organization",
   "name": "HTX Nông Nghiệp - Dịch Vụ Tổng Hợp Liên Nhật",
   "alternateName": "Thôn Trang Liên Nhật",
-  "url": "https://thontrangliennhat.com",
-  "logo": "https://thontrangliennhat.com/logo512.png",
+  "url": "http://localhost:3000",
+  "logo": "http://localhost:3000/logo512.png",
   "description": "HTX Nông Nghiệp - Dịch Vụ Tổng Hợp Liên Nhật cung cấp dịch vụ du lịch sinh thái, nuôi cá lồng, sản xuất thực phẩm sạch, tinh dầu tự nhiên tại Hà Tĩnh và Buôn Đôn, Đắk Lắk.",
   "address": [
     {

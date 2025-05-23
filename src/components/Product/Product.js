@@ -8,12 +8,16 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChevronRight, faImage } from '@fortawesome/free-solid-svg-icons';
 import { DEFAULT_IMAGE } from '~/utils/imageUtils';
 import config from '~/config';
+import routes from '~/config/routes';
 
 const cx = classNames.bind(styles);
 
-function Product({ image, name, link }) {
+function Product({ image, name, link, productId, category }) {
     const [imageError, setImageError] = useState(false);
     const imgRef = useRef(null);
+    
+    // Ensure we have a valid link
+    const productLink = link || `${routes.products}/san-pham/${productId}`;
     
     // Try to load image with multiple fallback sources
     useEffect(() => {
@@ -105,8 +109,8 @@ function Product({ image, name, link }) {
     };
 
     return (
-        <Link to={link}>
             <div className={cx('product-item')}>
+            <div className={cx('product-image-container')}>
                 {imageError ? (
                     <div className={cx('product-image-error')}>
                         <FontAwesomeIcon icon={faImage} className={cx('error-icon')} />
@@ -121,15 +125,17 @@ function Product({ image, name, link }) {
                         onError={handleImageError}
                     />
                 )}
+            </div>
                 <div className={cx('product-item-details')}>
                     <h2 className={cx('product-item-name')}>{name}</h2>
 
+                <Link to={productLink} className={cx('detail-button-link')}>
                     <Button rounded outline rightIcon={<FontAwesomeIcon icon={faChevronRight}/>} className={cx('product-item-button')}>
                         Xem chi tiết
                     </Button>
-                </div>
+                </Link>
             </div>
-        </Link>
+        </div>
     );
 }
 
@@ -139,7 +145,9 @@ Product.propTypes = {
         PropTypes.array
     ]),
     name: PropTypes.string.isRequired,
-    link: PropTypes.string.isRequired,
+    link: PropTypes.string,
+    productId: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+    category: PropTypes.string
 };
 
 export default Product;

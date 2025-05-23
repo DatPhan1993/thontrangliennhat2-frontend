@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import styles from './News.module.scss';
 import classNames from 'classnames/bind';
-import { getNews } from 'services/newsService';
-import { getCategoriesBySlug } from 'services/categoryService';
+import { getNews } from '~/services/newsService';
+import { getCategoriesBySlug } from '~/services/categoryService';
 import CardContent from '~/components/CardContent/CardContent';
 import ButtonGroup from '~/components/ButtonGroup/ButtonGroup';
 import Title from '~/components/Title/Title';
@@ -13,6 +13,16 @@ import routes from '~/config/routes';
 import dayjs from 'dayjs';
 
 const cx = classNames.bind(styles);
+
+// Helper function to process image paths
+const processImagePath = (images) => {
+    // Handle array of images
+    if (Array.isArray(images)) {
+        return images.length > 0 ? images[0] : '';
+    }
+    // Handle single image string
+    return images || '';
+};
 
 function News() {
     const [newsArr, setNews] = useState([]);
@@ -64,7 +74,7 @@ function News() {
     };
 
     const getCategorySlug = (categoryId) => {
-        const category = categories.find((cat) => cat.id == categoryId);
+        const category = categories.find((cat) => cat.id === categoryId);
         return category ? category.slug : '';
     };
 
@@ -88,7 +98,7 @@ function News() {
                                 <CardContent
                                     title={news.title}
                                     summary={news.summary}
-                                    image={Array.isArray(news.images) && news.images.length > 0 ? news.images[0] : news.image || news.images}
+                                    image={processImagePath(news.images)}
                                     link={news.link}
                                     createdAt={news.created_at}
                                     views={news.views}

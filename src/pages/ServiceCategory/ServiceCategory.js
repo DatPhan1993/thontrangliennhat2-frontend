@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import classNames from 'classnames/bind';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowLeft, faArrowRight } from '@fortawesome/free-solid-svg-icons';
@@ -18,7 +18,6 @@ const cx = classNames.bind(styles);
 
 function ServiceCategory() {
     const location = useLocation();
-    const navigate = useNavigate();
     const [service, setService] = useState([]);
     const [categoryId, setCategoryId] = useState(null);
     const [categoryName, setCategoryName] = useState('');
@@ -36,7 +35,7 @@ function ServiceCategory() {
     useEffect(() => {
         async function fetchCategory() {
             try {
-                const categories = await getCategoriesBySlug('dich-vu');
+                const categories = await getCategoriesBySlug('san-xuat');
                 const category = categories.find((cat) => cat.slug === slug);
                 if (category) {
                     setCategoryId(category.id);
@@ -82,21 +81,6 @@ function ServiceCategory() {
         }
     };
 
-    const handleServiceClick = (serviceId) => {
-        console.log('Navigating to service with ID:', serviceId);
-        console.log('Category slug:', slug);
-        
-        // Ensure we have a valid ID before navigating
-        if (!serviceId) {
-            console.error('Service ID is missing');
-            return;
-        }
-        
-        const url = `${routes.services}/${slug}/${serviceId}`;
-        console.log('Navigation URL:', url);
-        navigate(url);
-    };
-
     const renderServiceCategory = () => {
         if (currentServiceCategory.length === 0) {
             return (
@@ -108,11 +92,7 @@ function ServiceCategory() {
             );
         }
         return currentServiceCategory.map((serviceItem, index) => (
-            <div 
-                key={serviceItem.id} 
-                className={cx('service-item')}
-                onClick={() => handleServiceClick(serviceItem.id)}
-            >
+            <Link to={`${routes.services}/${slug}/${serviceItem.id}`} key={serviceItem.id}>
                 <CardService
                     key={index}
                     title={serviceItem.name}
@@ -120,7 +100,7 @@ function ServiceCategory() {
                     summary={serviceItem.summary}
                     createdAt={new Date(serviceItem.createdAt).getTime()}
                 />
-            </div>
+            </Link>
         ));
     };
 
@@ -149,13 +129,13 @@ function ServiceCategory() {
     return (
         <div className={cx('container')}>
             <Helmet>
-                <title>{categoryName} | HTX Sản Xuất Nông Nghiệp - Dịch Vụ Tổng Hợp Liên Nhật</title>
+                <title>{categoryName} | HTX Nông Nghiệp - Du Lịch Phú Nông Buôn Đôn</title>
                 <meta
                     name="description"
-                    content={`Xem các dịch vụ du lịch liên quan đến ${categoryName} trên HTX Nông Nghiệp - Du Lịch Thôn Trang Liên Nhật.`}
+                    content={`Xem các dịch vụ du lịch liên quan đến ${categoryName} trên HTX Nông Nghiệp - Du Lịch Phú Nông Buôn.`}
                 />
-                <meta name="keywords" content={`${categoryName}, dịch vụ, thontrangliennhat`} />
-                <meta name="author" content="HTX Nông Nghiệp - Du Lịch Thôn Trang Liên Nhật" />
+                <meta name="keywords" content={`${categoryName}, dịch vụ, phunongbuondon`} />
+                <meta name="author" content="HTX Nông Nghiệp - Du Lịch Phú Nông Buôn" />
             </Helmet>
             {loading ? (
                 <LoadingScreen isLoading={loading} />

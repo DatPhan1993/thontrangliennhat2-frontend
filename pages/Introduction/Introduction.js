@@ -1,7 +1,7 @@
 import classNames from 'classnames/bind';
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { Helmet } from 'react-helmet';
+import { Helmet } from 'react-helmet-async';
 import Title from '~/components/Title/Title';
 import styles from './Introduction.module.scss';
 import PushNotification from '~/components/PushNotification/PushNotification';

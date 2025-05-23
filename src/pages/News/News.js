@@ -2,95 +2,100 @@ import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import classNames from 'classnames/bind';
 import Card from '~/components/CardContent/CardContent';
-import SuggestCard from '~/components/SuggestCard/SuggestCard';
-import { getNewsAll, getNewsByCategory } from '~/services/newsService';
+import { getNews } from '~/services/newsService';
 import styles from './News.module.scss';
-import Title from '~/components/Title/Title';
-import ButtonGroup from '~/components/ButtonGroup/ButtonGroup';
 import PushNotification from '~/components/PushNotification/PushNotification';
 import LoadingScreen from '~/components/LoadingScreen/LoadingScreen';
 import routes from '~/config/routes';
 import { getCategoriesBySlug } from '~/services/categoryService';
-import { Swiper, SwiperSlide } from 'swiper/react';
-import { Autoplay, Navigation, Pagination } from 'swiper/modules';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faChevronLeft, faChevronRight, faSyncAlt } from '@fortawesome/free-solid-svg-icons';
 import { Helmet } from 'react-helmet';
 import dayjs from 'dayjs';
-import 'swiper/css';
-import 'swiper/css/autoplay';
-import 'swiper/css/navigation';
-import 'swiper/css/pagination';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faArrowLeft, faArrowRight } from '@fortawesome/free-solid-svg-icons';
-import { Empty } from 'antd';
-import { getImageUrl } from '~/utils/imageUtils';
+import { Button } from 'antd';
 
 const cx = classNames.bind(styles);
 
+// Helper function to process image paths
+const processImagePath = (images) => {
+    // Handle array of images
+    if (Array.isArray(images)) {
+        return images.length > 0 ? images[0] : '';
+    }
+    // Handle single image string
+    return images || '';
+};
+
 const News = () => {
-    const [newsItems, setNewsItems] = useState([]);
+    const [allNews, setAllNews] = useState([]);
     const [categories, setCategories] = useState([]);
-    const [groupedNews, setGroupedNews] = useState({});
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const [selectedSuggestion, setSelectedSuggestion] = useState(0);
     const [currentPage, setCurrentPage] = useState(1);
     const newsPerPage = 9;
-
-    useEffect(() => {
-        const fetchCategoriesAndNews = async () => {
-            try {
-                setLoading(true);
-                setError(null);
-                
-                const categoriesData = await getCategoriesBySlug('tin-tuc');
+    
+    const fetchNews = async () => {
+        setLoading(true);
+        setError(null);
+        
+        try {
+            // Fetch categories and news
+            const [categoriesData, newsData] = await Promise.all([
+                getCategoriesBySlug('tin-tuc'),
+                getNews()
+            ]);
+            
+            if (categoriesData && Array.isArray(categoriesData)) {
                 setCategories(categoriesData);
-
-                // Get all news items
-                const allNewsData = await getNewsAll();
-                console.log("All news data:", allNewsData);
+            }
+            
+            if (newsData && Array.isArray(newsData)) {
+                console.log(`Found ${newsData.length} total news items`);
                 
-                const processedNews = allNewsData.map((item) => ({
-                    ...item,
-                    isNew: dayjs().diff(dayjs(item.createdAt), 'day') <= 3,
+                // Process news for display
+                const processedNews = newsData.map(news => ({
+                    ...news,
+                    id: news.id,
+                    title: news.title,
+                    summary: news.summary,
+                    createdAt: news.createdAt || news.created_at || new Date().toISOString(),
+                    views: news.views || 0,
+                    image: processImagePath(news.images),
+                    isNew: dayjs().diff(dayjs(news.createdAt || news.created_at), 'day') <= 3,
                 }));
                 
-                setNewsItems(processedNews);
-
-                // Group news by category
-                const groupedNewsMap = {};
-                await Promise.all(
-                    categoriesData.map(async (category) => {
-                        const newsData = await getNewsByCategory(category.id);
-                        groupedNewsMap[category.id] = newsData.map((item) => ({
-                            ...item,
-                            isNew: dayjs().diff(dayjs(item.createdAt), 'day') <= 3,
-                        }));
-                    }),
-                );
-
-                setGroupedNews(groupedNewsMap);
-            } catch (error) {
-                setError(error);
-                console.error('Error fetching news:', error);
-            } finally {
-                setLoading(false);
+                setAllNews(processedNews);
+                setError(null);
+            } else {
+                setError("Không tìm thấy tin tức nào. Vui lòng thử lại sau.");
             }
-        };
-
-        fetchCategoriesAndNews();
-    }, []);
-
-    const handleButtonClick = (index) => {
-        setSelectedSuggestion(index);
+        } catch (err) {
+            console.error("Error fetching news:", err);
+            setError("Lỗi khi tải dữ liệu tin tức. Vui lòng thử lại sau.");
+        } finally {
+            setLoading(false);
+        }
     };
 
-    const getCategorySlug = (categoryId) => {
-        const category = categories.find((category) => categoryId === category.id);
-        return category ? category.slug : '';
+    useEffect(() => {
+        fetchNews();
+    }, []);
+
+    // Pagination
+    const indexOfLastNews = currentPage * newsPerPage;
+    const indexOfFirstNews = indexOfLastNews - newsPerPage;
+    const currentNews = allNews.slice(indexOfFirstNews, indexOfLastNews);
+    const totalPages = Math.ceil(allNews.length / newsPerPage);
+
+    const handlePageChange = (pageNumber) => {
+        if (pageNumber >= 1 && pageNumber <= totalPages) {
+            setCurrentPage(pageNumber);
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
     };
 
     if (error) {
-        const errorMessage = error.response ? error.response.data.message : 'Network Error';
+        const errorMessage = error.response ? error.response.data.message : error.message || 'Network Error';
         return <PushNotification message={errorMessage} />;
     }
 
@@ -98,176 +103,84 @@ const News = () => {
         return <LoadingScreen isLoading={loading} />;
     }
 
-    const filteredNewsItems = newsItems
-        .filter((item) => {
-            if (selectedSuggestion === 0) {
-                return item.isFeatured;
-            }
-            if (selectedSuggestion === 1) {
-                return item.views > 10;
-            }
-            return true;
-        })
-        .slice(0, 5);
-
-    // Pagination logic
-    const indexOfLastNews = currentPage * newsPerPage;
-    const indexOfFirstNews = indexOfLastNews - newsPerPage;
-    const currentNewsItems = newsItems.slice(indexOfFirstNews, indexOfLastNews);
-    const totalPages = Math.ceil(newsItems.length / newsPerPage);
-
-    const handlePageChange = (pageNumber) => {
-        if (pageNumber >= 1 && pageNumber <= totalPages) {
-            setCurrentPage(pageNumber);
-        }
-    };
-
-    const renderNews = () => {
-        if (currentNewsItems.length === 0) {
-            return (
-                <>
-                    <div />
-                    <Empty className={cx('empty-element')} description="Đang cập nhật..." />
-                    <div />
-                </>
-            );
-        }
-
-        return currentNewsItems.map((item, index) => (
-            <Link key={index} to={`${routes.news}/tin-tuc-id/${item.id}`}>
-                <Card
-                    title={item.title}
-                    summary={item.summary}
-                    image={item.images}
-                    createdAt={item.createdAt}
-                    views={item.views}
-                    isNew={item.isNew}
-                />
-            </Link>
-        ));
-    };
-
-    const renderPagination = () => {
-        if (totalPages <= 1) return null;
-        
-        return (
-            <div className={cx('pagination')}>
-                <div
-                    className={cx('pageButton', { disabled: currentPage === 1 })}
-                    onClick={() => handlePageChange(currentPage - 1)}
-                >
-                    <FontAwesomeIcon icon={faArrowLeft} />
-                </div>
-                {Array.from({ length: totalPages }, (_, index) => (
-                    <div
-                        key={index}
-                        className={cx('pageButton', { active: currentPage === index + 1 })}
-                        onClick={() => handlePageChange(index + 1)}
-                    >
-                        {index + 1}
-                    </div>
-                ))}
-                <div
-                    className={cx('pageButton', { disabled: currentPage === totalPages })}
-                    onClick={() => handlePageChange(currentPage + 1)}
-                >
-                    <FontAwesomeIcon icon={faArrowRight} />
-                </div>
-            </div>
-        );
-    };
-
     return (
         <article className={cx('wrapper')}>
             <Helmet>
-                <title>Tin Tức | HTX Sản Xuất Nông Nghiệp - Dịch Vụ Tổng Hợp Liên Nhật</title>
+                <title>Tin Tức | Thôn Trang Liên Nhật</title>
                 <meta
                     name="description"
-                    content="HTX Sản Xuất Nông Nghiệp - Dịch Vụ Tổng Hợp Liên Nhật hoạt động đa ngành nghề, trong đó tiêu biểu có thể kể đến là nuôi cá lồng, cải tạo nâng cấp vườn cây quanh các hồ thủy điện, phát triển về du lịch sinh thái, du lịch nông nghiệp. Ngoài ra còn thực hiện sản xuất các loại thực phẩm như chả cá, trái cây thực phẩm sấy khô và sấy dẻo, các loại tinh dầu tự nhiên,…"
+                    content="Cập nhật những tin tức mới nhất từ Thôn Trang Liên Nhật - Sự kiện, hoạt động và thông tin hữu ích"
                 />
-                <meta name="keywords" content="tin tức, cập nhật, thontrangliennhat" />
             </Helmet>
             
-            <div className={cx('news-section')}>
-                <Title text="Tin Tức" />
-                
-                <div className={cx('news-grid')}>
-                    {renderNews()}
+            {error ? (
+                <div className={cx('error-container')}>
+                    <div className={cx('error-message')}>
+                        <h3>Thông báo</h3>
+                        <p>{error}</p>
+                        <Button 
+                            className={cx('retry-button')}
+                            onClick={fetchNews}
+                            icon={<FontAwesomeIcon icon={faSyncAlt} />}
+                        >
+                            Thử lại
+                        </Button>
+                    </div>
                 </div>
-                
-                {renderPagination()}
-
-                <div className={cx('suggest')}>
-                    <h2 className={cx('suggest-title')}>Có thể bạn quan tâm</h2>
-                    <ButtonGroup buttons={['Nổi bật', 'Xem nhiều']} onButtonClick={handleButtonClick} />
-                    <div className={cx('suggest-items')}>
-                        {filteredNewsItems.map((item, index) => (
-                            <Link key={index} to={`${routes.news}/tin-tuc-id/${item.id}`}>
-                                <SuggestCard
-                                    title={item.title}
-                                    summary={item.summary}
-                                    image={item.images}
-                                    createdAt={item.createdAt}
-                                    views={item.views}
-                                    isNew={item.isNew}
+            ) : (
+                <div className={cx('news-section')}>
+                    <div className={cx('news-header')}>
+                        <h2 className={cx('news-title')}>Tin Tức</h2>
+                    </div>
+                    
+                    <div className={cx('news-grid')}>
+                        {currentNews.map((newsItem, index) => (
+                            <Link 
+                                key={index} 
+                                to={`${routes.news}/tin-tuc-id/${newsItem.id}`}
+                                className={cx('news-item')}
+                            >
+                                <Card
+                                    title={newsItem.title}
+                                    summary={newsItem.summary}
+                                    image={newsItem.image}
+                                    createdAt={newsItem.createdAt}
+                                    views={newsItem.views}
+                                    isNew={newsItem.isNew}
                                 />
                             </Link>
                         ))}
                     </div>
-                </div>
-                
-                {categories.map((category) => {
-                    const slides = groupedNews[category.id]?.slice(0, 6) || [];
-                    const shouldLoop = slides.length > 3;
-
-                    return (
-                        <div key={category.id} className={cx('news-category')}>
-                            <Title
-                                text={category.title || 'Loading...'}
-                                showSeeAll={true}
-                                slug={`${routes.news}/${category.slug}`}
-                                categoryId={category.id}
-                            />
-                            <Swiper
-                                spaceBetween={10}
-                                slidesPerView={3}
-                                breakpoints={{
-                                    1280: { slidesPerView: 3 },
-                                    1024: { slidesPerView: 3 },
-                                    768: { slidesPerView: 2 },
-                                    0: { slidesPerView: 1 },
-                                }}
-                                loop={shouldLoop}
-                                modules={[Autoplay, Navigation, Pagination]}
-                                autoplay={{
-                                    delay: 2000,
-                                    disableOnInteraction: false,
-                                }}
-                                navigation={{
-                                    nextEl: '.swiper-button-next',
-                                    prevEl: '.swiper-button-prev',
-                                }}
-                                pagination={{ clickable: true }}
+                    
+                    {totalPages > 1 && (
+                        <div className={cx('pagination')}>
+                            <div 
+                                className={cx('pagination-button')} 
+                                onClick={() => handlePageChange(currentPage - 1)}
                             >
-                                {groupedNews[category.id]?.slice(0, 6).map((item, index) => (
-                                    <SwiperSlide key={index} className={cx('slide')}>
-                                        <Link to={`${routes.news}/tin-tuc-id/${item.id}`}>
-                                            <Card
-                                                title={item.title}
-                                                summary={item.summary}
-                                                image={item.images}
-                                                createdAt={item.createdAt}
-                                                views={item.views}
-                                                isNew={item.isNew}
-                                            />
-                                        </Link>
-                                    </SwiperSlide>
-                                ))}
-                            </Swiper>
+                                <FontAwesomeIcon icon={faChevronLeft} />
+                            </div>
+                            
+                            {Array.from({ length: totalPages }, (_, index) => (
+                                <div
+                                    key={index}
+                                    className={cx('pagination-button', { active: currentPage === index + 1 })}
+                                    onClick={() => handlePageChange(index + 1)}
+                                >
+                                    {index + 1}
+                                </div>
+                            ))}
+                            
+                            <div 
+                                className={cx('pagination-button')} 
+                                onClick={() => handlePageChange(currentPage + 1)}
+                            >
+                                <FontAwesomeIcon icon={faChevronRight} />
+                            </div>
                         </div>
-                    );
-                })}
-            </div>
+                    )}
+                </div>
+            )}
         </article>
     );
 };

@@ -1,10 +1,10 @@
 import config from '~/config';
 
 // Layouts
-import OnlyHeaderLayout from '~/layouts/OnlyHeaderLayout/OnlyHeaderLayout';
-import NothingLayout from '~/layouts/NothingLayout/NothingLayout';
-import AdminLayout from '~/layouts/AdminLayout/AdminLayout';
-import DefaultLayout from '~/layouts/DefaultLayout/DefaultLayout';
+import DefaultLayout from "~/layouts/DefaultLayout/DefaultLayout";
+import OnlyHeaderLayout from "~/layouts/OnlyHeaderLayout/OnlyHeaderLayout";
+import NothingLayout from "~/layouts/NothingLayout/NothingLayout";
+import AdminLayout from "~/layouts/AdminLayout/AdminLayout";
 
 // Pages
 import Home from '~/pages/Home';
@@ -109,12 +109,12 @@ const publicRoutes = [
     {
         path: config.routes.serviceDetail,
         component: ServiceDetail,
-        layout: (props) => <DefaultLayout {...props} baseRoute={config.routes.services} categoryType={'dich-vu'} />,
+        layout: (props) => <DefaultLayout {...props} baseRoute={config.routes.services} categoryType={'san-xuat'} />,
     },
     {
         path: config.routes.servicesCategory,
         component: ServiceCategory,
-        layout: (props) => <DefaultLayout {...props} baseRoute={config.routes.services} categoryType={'dich-vu'} />,
+        layout: (props) => <DefaultLayout {...props} baseRoute={config.routes.services} categoryType={'san-xuat'} />,
     },
     { path: config.routes.experiences, component: Experience, layout: OnlyHeaderLayout },
     {
@@ -127,14 +127,6 @@ const publicRoutes = [
     {
         path: config.routes.experiencesCategory,
         component: ExperienceCategory,
-        layout: (props) => (
-            <DefaultLayout {...props} baseRoute={config.routes.experiences} categoryType={'trai-nghiem'} />
-        ),
-    },
-    // Add a direct route for experience details by ID for simplified access
-    {
-        path: '/trai-nghiem/:id',
-        component: ExperienceDetail,
         layout: (props) => (
             <DefaultLayout {...props} baseRoute={config.routes.experiences} categoryType={'trai-nghiem'} />
         ),

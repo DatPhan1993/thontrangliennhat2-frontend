@@ -10,7 +10,7 @@ import LoadingScreen from '~/components/LoadingScreen/LoadingScreen';
 import routes from '~/config/routes';
 import Title from '~/components/Title/Title';
 import { Spin } from 'antd';
-import { normalizeImageUrl } from '~/utils/imageUtils';
+import DOMPurify from 'dompurify';
 
 const UpdateService = () => {
     const { id } = useParams();
@@ -18,14 +18,15 @@ const UpdateService = () => {
     const [categories, setCategories] = useState([]);
     const [notification, setNotification] = useState({ message: '', type: '' });
     const [initialValues, setInitialValues] = useState(null);
-    const [loadingService, setLoadingService] = useState(true);
-    const [loadingError, setLoadingError] = useState(null);
+    const [isLoading, setIsLoading] = useState(true);
+    const [previewContent, setPreviewContent] = useState('');
 
-    // Danh sách các danh mục đặc biệt cho dịch vụ
-    const serviceCategories = [
-        { id: 1, title: 'Du lịch trải nghiệm nông nghiệp' },
-        { id: 2, title: 'Phiên chợ quê' },
-        { id: 3, title: 'Trò chơi dân gian' }
+    // Define custom service categories
+    const customCategories = [
+        { id: 'gao-huu-co-lien-nhat', title: 'Gạo Hữu Cơ Liên Nhật' },
+        { id: 'ca-ro-dong', title: 'Cá Rô Đồng' },
+        { id: 'tom-cang-xanh', title: 'Tôm Càng Xanh' },
+        { id: 'oc-buou', title: 'Ốc Bươu' }
     ];
 
     const validationSchema = Yup.object({
@@ -36,58 +37,56 @@ const UpdateService = () => {
         content: Yup.string().required('Nội dung là bắt buộc'),
     });
 
+    // Function to preserve line breaks in content
+    const preserveLineBreaks = (content) => {
+        if (!content) return '';
+        
+        // First check if content already has HTML formatting
+        if (content.includes('<p>') || content.includes('<br') || content.includes('<div')) {
+            return content;
+        }
+        
+        // Otherwise, convert line breaks to <br> tags and wrap in paragraphs
+        return content
+            .split('\n\n')
+            .map(paragraph => `<p>${paragraph.replace(/\n/g, '<br>')}</p>`)
+            .join('');
+    };
+
     useEffect(() => {
         const fetchCategories = async () => {
             try {
                 const fetchedCategories = await getCategoriesBySlug('dich-vu');
-                if (fetchedCategories && fetchedCategories.length > 0) {
-                setCategories(fetchedCategories);
-                } else {
-                    // Use default categories if API returns empty
-                    setCategories(serviceCategories);
-                }
+                // Combine fetched categories with custom categories
+                setCategories(fetchedCategories.length > 0 ? fetchedCategories : customCategories);
             } catch (error) {
                 console.error('Lỗi khi tải danh mục:', error);
-                setLoadingError('Không thể tải danh mục dịch vụ.');
-                // Use default categories on error
-                setCategories(serviceCategories);
+                // Fallback to custom categories if API fails
+                setCategories(customCategories);
             }
         };
 
         const fetchService = async () => {
-            setLoadingService(true);
-            setLoadingError(null);
             try {
-                console.log('Fetching service with ID:', id);
                 const service = await getServiceById(id);
-                console.log('Service data received:', service);
+                console.log('Fetched service:', service);
                 
-                // Normalize the image URL for proper display
-                let imageUrl = '';
-                if (service.images) {
-                    if (Array.isArray(service.images) && service.images.length > 0) {
-                        imageUrl = normalizeImageUrl(service.images[0]);
-                    } else if (typeof service.images === 'string') {
-                        imageUrl = normalizeImageUrl(service.images);
-                    }
-                } else if (service.image) {
-                    imageUrl = normalizeImageUrl(service.image);
-                }
-                
-                console.log('Normalized image URL:', imageUrl);
+                // Ensure content is a string
+                const content = service.content || '';
+                setPreviewContent(content);
                 
                 setInitialValues({
                     title: service.name,
-                    summary: service.summary,
-                    image: imageUrl,
-                    categoryId: service.child_nav_id,
-                    content: service.content || '',
+                    summary: service.summary || '',
+                    image: service.images && service.images.length > 0 ? service.images[0] : '',
+                    categoryId: service.child_nav_id || '',
+                    content: content,
+                    isFeatured: service.isFeatured || false
                 });
-                setLoadingService(false);
             } catch (error) {
                 console.error('Lỗi khi tải dịch vụ:', error);
-                setLoadingError('Không thể tải thông tin dịch vụ. Vui lòng thử lại sau.');
-                setLoadingService(false);
+            } finally {
+                setIsLoading(false);
             }
         };
 
@@ -97,117 +96,90 @@ const UpdateService = () => {
 
     const handleImageUpload = (event, setFieldValue) => {
         const file = event.target.files[0];
-        if (file) {
-            console.log('New image selected:', file.name);
-            setFieldValue('image', file);
-        }
+        setFieldValue('image', file);
     };
+    
+    const handleContentChange = (e, setFieldValue) => {
+        const content = e.target.value;
+        setFieldValue('content', content);
+        // Update preview with preserved line breaks
+        setPreviewContent(preserveLineBreaks(content));
+    };
+    
     const handleSubmit = async (values, { resetForm }) => {
-        console.log('Submit values:', values);
         const formData = new FormData();
 
         formData.append('name', values.title);
-        formData.append('summary', values.summary);
+        formData.append('summary', values.summary || '');
 
-        // Handle image upload
-        if (values.image instanceof File) {
-            // It's a new file uploaded by the user
-            formData.append('images[]', values.image);
-            console.log('Appending new image file:', values.image.name);
-        } else if (typeof values.image === 'string' && values.image) {
-            // For existing images, we need to handle them differently
-            if (values.image.startsWith('http') || values.image.startsWith('/')) {
-                // It's an existing image URL
-                formData.append('images', values.image);
-                console.log('Keeping existing image URL:', values.image);
-            } else {
-                // In case it's a base64 string or some other format
-                try {
-                    const response = await fetch(values.image);
-                    const blob = await response.blob();
-                    const file = new File([blob], "image.jpg", { type: "image/jpeg" });
-                    formData.append('images[]', file);
-                    console.log('Converted image string to file');
-                } catch (error) {
-                    console.error('Error converting image:', error);
-                    formData.append('images', values.image);
-                }
+        // Handle image properly - prioritize new uploaded files over existing URLs
+        if (values.image) {
+            if (values.image instanceof File) {
+                // If it's a File object (new upload)
+                formData.append('images[]', values.image);
+                console.log('Appending new image file:', values.image.name);
+            } else if (typeof values.image === 'string' && values.image.trim() !== '') {
+                // If it's a string URL (existing image)
+                formData.append('images[]', values.image);
+                console.log('Appending existing image path:', values.image);
             }
-        } else {
-            console.log('No image provided');
         }
 
-        formData.append('child_nav_id', values.categoryId);
-        formData.append('content', values.content);
-        // Adding isFeatured with a default value
-        formData.append('isFeatured', 1);
+        // Apply line break preservation before sending
+        const contentWithLineBreaks = preserveLineBreaks(values.content);
         
-        // Log the formData contents for debugging
-        console.log('Submitting form data for service ID:', id);
+        formData.append('child_nav_id', values.categoryId || '');
+        formData.append('content', contentWithLineBreaks);
+        formData.append('isFeatured', values.isFeatured ? 'true' : 'false');
+        formData.append('_method', 'PUT'); // Ensure method override is included
+
+        // Log FormData contents for debugging
+        console.log('FormData being sent:');
         for (let [key, value] of formData.entries()) {
-            console.log(`FormData: ${key} = ${value instanceof File ? value.name : (typeof value === 'string' ? value.substring(0, 50) + (value.length > 50 ? '...' : '') : value)}`);
+            if (value instanceof File) {
+                console.log(`${key}: File - ${value.name} (${value.size} bytes)`);
+            } else if (typeof value === 'string' && value.length < 100) {
+                console.log(`${key}: ${value}`);
+            } else {
+                console.log(`${key}: [Data too large to display]`);
+            }
         }
+        console.log('Service ID:', id);
 
         try {
-            console.log('Calling updateService API');
-            const updatedService = await updateService(id, formData);
-            console.log('Service updated successfully:', updatedService);
+            setIsLoading(true);
+            await updateService(id, formData);
             setNotification({ message: 'Cập nhật dịch vụ thành công!', type: 'success' });
             setTimeout(() => {
                 navigate(routes.serviceList);
-            }, 1000);
+            }, 1500);
         } catch (error) {
-            console.error('Error details:', error);
+            setIsLoading(false);
             setNotification({ message: 'Lỗi khi cập nhật dịch vụ.', type: 'error' });
             console.error('Lỗi khi cập nhật dịch vụ:', error);
+            
+            // Log error details
+            if (error.response) {
+                console.error('Error response:', error.response.status, error.response.data);
+            } else if (error.request) {
+                console.error('No response received:', error.request);
+            } else {
+                console.error('Error message:', error.message);
+            }
+        } finally {
+            setIsLoading(false);
         }
     };
 
-    if (loadingService) {
-        return (
-            <div className={styles.loadingContainer}>
-                <LoadingScreen />
-                <p>Đang tải thông tin dịch vụ...</p>
-            </div>
-        );
-    }
-
-    if (loadingError) {
-        return (
-            <div className={styles.errorContainer}>
-                <h2>Lỗi</h2>
-                <p>{loadingError}</p>
-                <button 
-                    className={styles.backButton}
-                    onClick={() => navigate(routes.serviceList)}
-                >
-                    Quay lại danh sách dịch vụ
-                </button>
-            </div>
-        );
-    }
-
-    // Only render the form if we have initialValues
-    if (!initialValues) {
-        return (
-            <div className={styles.errorContainer}>
-                <h2>Không tìm thấy dịch vụ</h2>
-                <p>Dịch vụ này không tồn tại hoặc đã bị xóa.</p>
-                <button 
-                    className={styles.backButton}
-                    onClick={() => navigate(routes.serviceList)}
-                >
-                    Quay lại danh sách dịch vụ
-                </button>
-            </div>
-        );
+    if (isLoading && !initialValues) {
+        return <LoadingScreen />;
     }
 
     return (
         <div className={styles.editService}>
             <Title text="Cập nhật dịch vụ" />
             {notification.message && <PushNotification message={notification.message} type={notification.type} />}
-            <Formik initialValues={initialValues} validationSchema={validationSchema} onSubmit={handleSubmit}>
+            <Formik initialValues={initialValues} validationSchema={validationSchema} onSubmit={handleSubmit} enableReinitialize>
                 {({ isSubmitting, setFieldValue, values }) => (
                     <Form className={styles.form}>
                         <div className={styles.formGroup}>
@@ -217,7 +189,7 @@ const UpdateService = () => {
                         </div>
                         <div className={styles.formGroup}>
                             <label htmlFor="summary">Tóm Tắt</label>
-                            <Field name="summary" type="text" className={styles.input} />
+                            <Field name="summary" as="textarea" rows="3" className={styles.textArea} />
                             <ErrorMessage name="summary" component="div" className={styles.error} />
                         </div>
                         <div className={styles.formGroup}>
@@ -233,7 +205,11 @@ const UpdateService = () => {
                         {values.image && (
                             <div className={styles.imagePreview}>
                                 <img
-                                    src={values.image}
+                                    src={
+                                        typeof values.image === 'string'
+                                            ? values.image
+                                            : URL.createObjectURL(values.image)
+                                    }
                                     alt="Service"
                                     className={styles.serviceImage}
                                 />
@@ -243,38 +219,41 @@ const UpdateService = () => {
                             <label htmlFor="categoryId">Danh Mục</label>
                             <Field as="select" name="categoryId" className={styles.input}>
                                 <option value="">Chọn danh mục</option>
-                                {/* Danh mục đặc biệt */}
-                                {serviceCategories.map((category) => (
+                                {categories.map((category) => (
                                     <option key={category.id} value={category.id}>
                                         {category.title}
                                     </option>
                                 ))}
-                                
-                                {/* Các danh mục từ server */}
-                                {categories.length > serviceCategories.length && (
-                                    <option disabled>──────────</option>
-                                )}
-                                {categories.length > serviceCategories.length && 
-                                    categories
-                                        .filter(cat => !serviceCategories.some(sc => sc.id === cat.id))
-                                        .map((category) => (
-                                            <option key={category.id} value={category.id}>
-                                                {category.title || category.name}
-                                            </option>
-                                        ))
-                                }
                             </Field>
                             <ErrorMessage name="categoryId" component="div" className={styles.error} />
                         </div>
                         <div className={styles.formGroup}>
                             <label htmlFor="content">Nội Dung</label>
-                            <Field
-                                as="textarea"
-                                name="content"
-                                className={`${styles.input} ${styles.textarea}`}
-                                rows="10"
+                            <Field 
+                                name="content" 
+                                as="textarea" 
+                                rows="15" 
+                                className={styles.textArea} 
+                                placeholder="Nhập nội dung chi tiết về sản xuất..."
+                                onChange={(e) => handleContentChange(e, setFieldValue)}
                             />
                             <ErrorMessage name="content" component="div" className={styles.error} />
+                        </div>
+                        
+                        {/* Content Preview */}
+                        <div className={styles.formGroup}>
+                            <label>Xem trước nội dung</label>
+                            <div 
+                                className={styles.contentPreview}
+                                dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(previewContent) }}
+                            />
+                        </div>
+                        
+                        <div className={styles.formGroup}>
+                            <label htmlFor="isFeatured" className={styles.checkboxLabel}>
+                                <Field name="isFeatured" type="checkbox" className={styles.checkbox} />
+                                Dịch vụ nổi bật
+                            </label>
                         </div>
                         <button type="submit" disabled={isSubmitting} className={styles.submitButton}>
                             {isSubmitting ? <Spin size="small" /> : 'Cập nhật'}

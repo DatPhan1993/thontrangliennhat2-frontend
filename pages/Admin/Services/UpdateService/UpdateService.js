@@ -39,7 +39,7 @@ const UpdateService = () => {
     useEffect(() => {
         const fetchCategories = async () => {
             try {
-                const fetchedCategories = await getCategoriesBySlug('dich-vu');
+                const fetchedCategories = await getCategoriesBySlug('san-xuat');
                 if (fetchedCategories && fetchedCategories.length > 0) {
                 setCategories(fetchedCategories);
                 } else {

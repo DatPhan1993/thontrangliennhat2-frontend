@@ -17,7 +17,7 @@ import {
 import Button from '~/components/Button/Button';
 import { createMessage } from '~/services/contactService';
 import PushNotification from '~/components/PushNotification/PushNotification';
-import { Helmet } from 'react-helmet';
+import { Helmet } from 'react-helmet-async';
 import styles from './Contact.module.scss';
 import {
     faFacebook,

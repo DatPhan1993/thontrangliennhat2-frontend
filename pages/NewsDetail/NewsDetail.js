@@ -7,7 +7,7 @@ import PushNotification from '~/components/PushNotification/PushNotification';
 import DateTime from '~/components/DateTime/DateTime';
 import Title from '~/components/Title/Title';
 import { getNewsById } from '~/services/newsService';
-import { Helmet } from 'react-helmet';
+import { Helmet } from 'react-helmet-async';
 
 const cx = classNames.bind(styles);
 

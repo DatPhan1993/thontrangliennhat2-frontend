@@ -10,7 +10,7 @@ import { Link } from 'react-router-dom';
 import CardService from '~/components/CardService/CardService';
 import { getCategoriesBySlug } from '~/services/categoryService';
 import routes from '~/config/routes';
-import { Helmet } from 'react-helmet';
+import { Helmet } from 'react-helmet-async';
 import LoadingScreen from '~/components/LoadingScreen/LoadingScreen';
 import { Empty } from 'antd';
 
@@ -36,7 +36,7 @@ function ServiceCategory() {
     useEffect(() => {
         async function fetchCategory() {
             try {
-                const categories = await getCategoriesBySlug('dich-vu');
+                const categories = await getCategoriesBySlug('san-xuat');
                 const category = categories.find((cat) => cat.slug === slug);
                 if (category) {
                     setCategoryId(category.id);

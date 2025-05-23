@@ -7,7 +7,7 @@ import PushNotification from '~/components/PushNotification/PushNotification';
 import DateTime from '~/components/DateTime/DateTime';
 import Title from '~/components/Title/Title';
 import { getExperienceById } from '~/services/experienceService';
-import { Helmet } from 'react-helmet';
+import { Helmet } from 'react-helmet-async';
 import routes from '~/config/routes';
 import { getImageUrl } from '~/utils/imageUtils';
 
@@ -42,10 +42,10 @@ const ExperienceDetail = () => {
                 }
                 
                 // Fallback: Direct fetch from database.json in the thontrangliennhat-api directory
-                const response = await fetch('/thontrangliennhat-api/database.json');
+                const response = await fetch('/Users/admin/thontrangliennhat2-api/database.json');
                 if (!response.ok) {
                     // Try alternate location if first attempt fails
-                    const altResponse = await fetch('./thontrangliennhat-api/database.json');
+                    const altResponse = await fetch('/thontrangliennhat2-api/database.json');
                     if (!altResponse.ok) {
                         throw new Error(`Failed to fetch database.json: ${response.status}`);
                     }

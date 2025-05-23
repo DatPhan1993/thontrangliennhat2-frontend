@@ -7,7 +7,7 @@ import PushNotification from '~/components/PushNotification/PushNotification';
 import DateTime from '~/components/DateTime/DateTime';
 import Title from '~/components/Title/Title';
 import { getServiceById } from '~/services/serviceService';
-import { Helmet } from 'react-helmet';
+import { Helmet } from 'react-helmet-async';
 import routes from '~/config/routes';
 import { getImageUrl } from '~/utils/imageUtils';
 import config from '~/config';

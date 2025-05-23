@@ -56,7 +56,7 @@
     {
       "id": 4,
       "title": "DỊCH VỤ",
-      "slug": "dich-vu",
+      "slug": "san-xuat",
       "position": 4,
       "children": []
     },
@@ -353,7 +353,7 @@
       "categoryId": 1,
       "isFeatured": "1",
       "views": 0,
-      "type": "dich-vu",
+      "type": "san-xuat",
       "price": 0,
       "discountPrice": 0,
       "images": [
@@ -376,7 +376,7 @@
       "categoryId": 2,
       "isFeatured": "1",
       "views": 0,
-      "type": "dich-vu",
+      "type": "san-xuat",
       "price": 0,
       "discountPrice": 0,
       "images": [
@@ -399,7 +399,7 @@
       "categoryId": 3,
       "isFeatured": "1",
       "views": 0,
-      "type": "dich-vu",
+      "type": "san-xuat",
       "price": 0,
       "discountPrice": 0,
       "images": [

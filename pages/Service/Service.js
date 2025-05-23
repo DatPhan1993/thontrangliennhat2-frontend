@@ -13,7 +13,7 @@ import routes from '~/config/routes';
 import { getCategoriesBySlug } from '~/services/categoryService';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChevronLeft, faChevronRight } from '@fortawesome/free-solid-svg-icons';
-import { Helmet } from 'react-helmet';
+import { Helmet } from 'react-helmet-async';
 
 const cx = classNames.bind(styles);
 
@@ -31,7 +31,7 @@ const Service = () => {
         const fetchServicesAndCategories = async () => {
             try {
                 const [categoriesData, servicesData] = await Promise.all([
-                    getCategoriesBySlug('dich-vu'),
+                    getCategoriesBySlug('san-xuat'),
                     getServices(),
                 ]);
                 
@@ -80,12 +80,12 @@ const Service = () => {
     };
 
     const getCategorySlug = (categoryId) => {
-        if (!categoryId) return 'dich-vu';
+        if (!categoryId) return 'san-xuat';
         
         // Convert to string for comparison if needed
         const categoryIdStr = String(categoryId);
         const category = categories.find((cat) => String(cat.id) === categoryIdStr);
-        return category ? category.slug : 'dich-vu';
+        return category ? category.slug : 'san-xuat';
     };
 
     if (error) {

@@ -12,7 +12,6 @@ import { Helmet } from 'react-helmet';
 const cx = classNames.bind(styles);
 
 const NewsDetail = () => {
-    // Updated parameter handling to work with the new URL pattern /tin-tuc/tin-tuc-id/:id
     const { id } = useParams();
     const [newsDetail, setNewsDetail] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -21,15 +20,20 @@ const NewsDetail = () => {
     const fetchNewsDetail = async (id) => {
         try {
             setLoading(true);
-            const data = await getNewsById(id);
-            // Chuyển đổi images thành mảng nếu nó là một chuỗi
-            if (data && typeof data.images === 'string') {
-                data.images = [data.images]; // Chuyển đổi thành mảng có một phần tử
-            } else if (!data.images) {
-                data.images = []; // Nếu không có images, tạo một mảng rỗng
+            const response = await getNewsById(id);
+            
+            // Handle case when API returns an array
+            if (Array.isArray(response)) {
+                const news = response.find(item => item.id.toString() === id.toString());
+                if (news) {
+                    setNewsDetail(news);
+                } else {
+                    throw new Error('News not found');
+                }
+            } else {
+                setNewsDetail(response);
             }
-            setNewsDetail(data);
-            console.log('News detail with processed images:', data);
+            
             setError(null);
         } catch (error) {
             setError(error);
@@ -48,29 +52,48 @@ const NewsDetail = () => {
     }, [id]);
 
     if (error) {
-        const errorMessage = error.response ? error.response.data.message : 'Network Error';
+        const errorMessage = error.response ? error.response.data.message : error.message || 'Network Error';
         return <PushNotification message={errorMessage} />;
     }
 
-    if (loading) {
+    if (loading || !newsDetail) {
         return <LoadingScreen isLoading={loading} />;
     }
+
+    // Make sure the title is a string
+    const newsTitle = newsDetail.title || newsDetail.name || 'Chi tiết tin tức';
 
     return (
         <article className={cx('wrapper')}>
             <Helmet>
-                <title>{newsDetail.title} | HTX Sản Xuất Nông Nghiệp - Dịch Vụ Tổng Hợp Liên Nhật</title>
-                <meta name="description" content={newsDetail.summary} />
-                <meta name="keywords" content="tin tức, thontrangliennhat, chi tiết tin tức" />
-                <meta name="author" content="HTX Nông Nghiệp - Du Lịch Thôn Trang Liên Nhật" />
+                <title>{`${newsTitle} | HTX Nông Nghiệp - Du Lịch Phú Nông Buôn Đôn`}</title>
+                <meta name="description" content={newsDetail.summary || ''} />
+                <meta name="keywords" content={`tin tức, phunongbuondon, ${newsTitle}`} />
+                <meta name="author" content="HTX Nông Nghiệp - Du Lịch Phú Nông Buôn" />
             </Helmet>
             <div className={cx('header')}>
-                <Title text={newsDetail.title} className={cx('title')} />
+                <Title text={newsTitle} className={cx('title')} />
             </div>
-            <div className={cx('content')} dangerouslySetInnerHTML={{ __html: newsDetail.content }} />
+            
+            {newsDetail.images && newsDetail.images.length > 0 && (
+                <div className={cx('news-image')}>
+                    <img 
+                        src={Array.isArray(newsDetail.images) ? newsDetail.images[0] : newsDetail.images} 
+                        alt={newsTitle} 
+                    />
+                </div>
+            )}
+            
+            {newsDetail.summary && (
+                <div className={cx('news-summary')}>
+                    {newsDetail.summary}
+                </div>
+            )}
+            
+            <div className={cx('content')} dangerouslySetInnerHTML={{ __html: newsDetail.content || '' }} />
             <DateTime
-                timestamp={newsDetail.created_at}
-                views={newsDetail.views}
+                timestamp={newsDetail.created_at || newsDetail.createdAt || new Date().toISOString()}
+                views={newsDetail.views || 0}
                 showDate={true}
                 showTime={true}
                 showViews={true}

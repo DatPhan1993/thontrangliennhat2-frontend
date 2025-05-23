@@ -9,7 +9,7 @@ const cx = classNames.bind(styles);
 function Card({
     title,
     summary = 'Default Summary',
-    image = '/images/placeholder-image.jpg',
+    image = '',
     createdAt = new Date().toISOString(),
     isNew = false,
 }) {
@@ -27,10 +27,6 @@ function Card({
                     src={processedImage} 
                     alt={displayTitle} 
                     className={cx('card_image')} 
-                    onError={(e) => {
-                        console.log('Image load error, using fallback:', e.target.src);
-                        e.target.src = '/images/placeholder-image.jpg';
-                    }}
                 />
             </div>
             <div className={cx('card_content')}>

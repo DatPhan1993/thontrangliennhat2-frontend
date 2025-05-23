@@ -10,7 +10,7 @@ import { Link } from 'react-router-dom';
 import Card from '~/components/CardContent/CardContent';
 import { getCategoriesBySlug } from '~/services/categoryService';
 import routes from '~/config/routes';
-import { Helmet } from 'react-helmet';
+import { Helmet } from 'react-helmet-async';
 import dayjs from 'dayjs';
 import { DatePicker, Space, Button, Empty } from 'antd';
 import { FilterOutlined } from '@ant-design/icons';

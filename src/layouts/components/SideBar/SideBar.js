@@ -13,6 +13,9 @@ function SideBar({ categoryType }) {
     const baseRoute = useBaseRoute();
     const location = useLocation();
     const [windowWidth, setWindowWidth] = useState(window.innerWidth);
+    
+    // List of items to hide
+    const hiddenItems = ['Gạo Hữu Cơ Liên Nhật', 'Cá Rô Đồng', 'Tôm Càng Xanh', 'Ốc Bươu'];
 
     useEffect(() => {
         async function fetchCategoryData() {
@@ -66,47 +69,51 @@ function SideBar({ categoryType }) {
             ];
         }
 
-        return categoriesData.map((category) => {
-            const isActive = location.pathname.includes(category.slug);
-            const titleContent = (
-                <span style={getTextStyle(isActive)}>
-                    <FontAwesomeIcon icon={faCircleDot} style={getIconStyle(isActive)} />
-                    {category.title}
-                </span>
-            );
-
-            if (category.children && category.children.length > 0) {
-                return {
-                    key: category.id,
-                    label: titleContent,
-                    children: category.children.map((subcategory) => {
-                        const subcategoryActive = location.pathname.includes(subcategory.slug);
-                        return {
-                            key: subcategory.id,
-                            label: (
-                                <Link
-                                    to={`${baseRoute}/${subcategory.slug}`}
-                                    style={getTextStyle(subcategoryActive)}
-                                >
-                                    <FontAwesomeIcon icon={faCircleDot} style={getIconStyle(subcategoryActive)} />
-                                    {subcategory.title}
-                                </Link>
-                            )
-                        };
-                    })
-                };
-            }
-
-            return {
-                key: category.id,
-                label: (
-                    <Link to={`${baseRoute}/${category.slug}`} style={getTextStyle(isActive)}>
+        return categoriesData
+            .filter(category => !hiddenItems.includes(category.title))
+            .map((category) => {
+                const isActive = location.pathname.includes(category.slug);
+                const titleContent = (
+                    <span style={getTextStyle(isActive)}>
                         <FontAwesomeIcon icon={faCircleDot} style={getIconStyle(isActive)} />
                         {category.title}
-                    </Link>
-                )
-            };
-        });
+                    </span>
+                );
+
+                if (category.children && category.children.length > 0) {
+                    return {
+                        key: category.id,
+                        label: titleContent,
+                        children: category.children
+                            .filter(subcategory => !hiddenItems.includes(subcategory.title))
+                            .map((subcategory) => {
+                                const subcategoryActive = location.pathname.includes(subcategory.slug);
+                                return {
+                                    key: subcategory.id,
+                                    label: (
+                                        <Link
+                                            to={`${baseRoute}/${subcategory.slug}`}
+                                            style={getTextStyle(subcategoryActive)}
+                                        >
+                                            <FontAwesomeIcon icon={faCircleDot} style={getIconStyle(subcategoryActive)} />
+                                            {subcategory.title}
+                                        </Link>
+                                    )
+                                };
+                            })
+                    };
+                }
+
+                return {
+                    key: category.id,
+                    label: (
+                        <Link to={`${baseRoute}/${category.slug}`} style={getTextStyle(isActive)}>
+                            <FontAwesomeIcon icon={faCircleDot} style={getIconStyle(isActive)} />
+                            {category.title}
+                        </Link>
+                    )
+                };
+            });
     };
 
     // Render loading spinner if needed

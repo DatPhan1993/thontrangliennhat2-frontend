@@ -33,7 +33,7 @@ const MessageList = () => {
         if (window.confirm('Bạn có chắc chắn muốn xóa tin nhắn này không?')) {
             try {
                 await deleteMessage(id);
-                setMessages(messages.filter((message) => message.id !== id));
+                setMessages(messages.filter((message) => message._id !== id));
                 setNotificationMessage('Xóa tin nhắn thành công!');
                 setIsError(false);
             } catch (error) {
@@ -85,16 +85,16 @@ const MessageList = () => {
                     <tbody>
                         {currentMessages.length > 0 ? (
                             currentMessages.map((message) => (
-                                <tr key={message.id}>
+                                <tr key={message._id}>
                                     <td>{message.name}</td>
                                     <td>{message.email}</td>
                                     <td>{message.phone}</td>
                                     <td>{message.title}</td>
                                     <td>{message.content}</td>
-                                    <td>{message.created_at ? new Date(message.created_at).toLocaleString() : 'Invalid Date'}</td>
+                                    <td>{new Date(message.created_at).toLocaleString()}</td>
                                     <td>
                                         <button
-                                            onClick={() => handleDelete(message.id)}
+                                            onClick={() => handleDelete(message._id)}
                                             className={styles.deleteButton}
                                         >
                                             <FontAwesomeIcon icon={faTrash} /> Xóa

@@ -48,7 +48,7 @@ const AddService = () => {
                 // Try both methods to get categories
                 let fetchedCategories = [];
                 try {
-                    fetchedCategories = await getCategoriesByType('dich-vu');
+                    fetchedCategories = await getCategoriesByType('san-xuat');
                     console.log('Categories from getCategoriesByType:', fetchedCategories);
                 } catch (error) {
                     console.log('Error using getCategoriesByType:', error);
@@ -102,7 +102,7 @@ const AddService = () => {
             formData.append('summary', values.summary);
             formData.append('child_nav_id', values.categoryId);
             formData.append('content', values.content);
-            formData.append('type', 'dich-vu');
+            formData.append('type', 'san-xuat');
             formData.append('isFeatured', 'true');
             
             // Xử lý ảnh

@@ -12,9 +12,9 @@ const debugLog = (message, data) => {
 };
 
 // URL hình ảnh mặc định khi không có hình
-export const DEFAULT_IMAGE = 'https://via.placeholder.com/300x200?text=No+Image+Available';
-export const DEFAULT_SMALL_IMAGE = 'https://via.placeholder.com/100x100?text=No+Image';
-export const DEFAULT_ERROR_IMAGE = 'https://via.placeholder.com/300x200?text=Image+Error';
+export const DEFAULT_IMAGE = '';
+export const DEFAULT_SMALL_IMAGE = '';
+export const DEFAULT_ERROR_IMAGE = '';
 
 /**
  * Chuẩn hóa URL hình ảnh
@@ -41,12 +41,19 @@ export const normalizeImageUrl = (imageUrl, defaultImage = DEFAULT_IMAGE) => {
         return imageUrl;
     }
     
+    // Normalize path separators to forward slashes
+    imageUrl = imageUrl.replace(/\\/g, '/');
+    
+    // Special case for static assets - serve from frontend
+    if (imageUrl.startsWith('/images/') || 
+        imageUrl.startsWith('/static/')) {
+        console.log('[ImageUtil] Using frontend path for static:', imageUrl);
+        return imageUrl;
+    }
+    
     // Get base API URL from config
     const apiBaseUrl = config.apiUrl || 'http://localhost:3001';
     console.log('[ImageUtil] API Base URL:', apiBaseUrl);
-    
-    // Normalize path separators to forward slashes
-    imageUrl = imageUrl.replace(/\\/g, '/');
     
     // Nếu là đường dẫn tương đối (bắt đầu bằng /)
     if (imageUrl.startsWith('/')) {

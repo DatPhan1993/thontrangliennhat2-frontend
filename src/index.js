@@ -6,6 +6,7 @@ import GlobalStyles from './components/GlobalStyles/GlobalStyles';
 import { ConfigProvider } from 'antd';
 import viVN from 'antd/es/locale/vi_VN';
 import ReactGA from 'react-ga4';
+import { HelmetProvider } from 'react-helmet-async';
 
 // Suppress React UNSAFE lifecycle method warnings
 const suppressLifecycleWarnings = () => {
@@ -31,11 +32,13 @@ ReactGA.initialize('G-GRXHD0H7CY');
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
     <React.StrictMode>
+        <HelmetProvider>
         <GlobalStyles>
             <ConfigProvider locale={viVN}>
                 <App />
             </ConfigProvider>
         </GlobalStyles>
+        </HelmetProvider>
     </React.StrictMode>,
 );
 

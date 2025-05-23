@@ -10,7 +10,7 @@ import styles from './ExperienceCategory.module.scss';
 import { Link } from 'react-router-dom';
 import CardExperience from '~/components/CardService/CardService';
 import routes from '~/config/routes';
-import { Helmet } from 'react-helmet';
+import { Helmet } from 'react-helmet-async';
 import LoadingScreen from '~/components/LoadingScreen/LoadingScreen';
 import { Empty } from 'antd';
 import { getImageUrl } from '~/utils/imageUtils';

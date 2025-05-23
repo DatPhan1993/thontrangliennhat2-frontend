@@ -2,11 +2,10 @@ import React, { useRef, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import styles from './TeamModal.module.scss';
 import classNames from 'classnames/bind';
-import { getImageUrl } from '~/utils/imageUtils';
 
 const cx = classNames.bind(styles);
 
-const TeamModal = ({ open, onClose, team }) => {
+const TeamModal = ({ visible, onClose, team }) => {
     const modalRef = useRef(null);
 
     useEffect(() => {
@@ -16,16 +15,16 @@ const TeamModal = ({ open, onClose, team }) => {
             }
         };
 
-        if (open) {
+        if (visible) {
             document.addEventListener('mousedown', handleClickOutside);
         }
 
         return () => {
             document.removeEventListener('mousedown', handleClickOutside);
         };
-    }, [open, onClose]);
+    }, [visible, onClose]);
 
-    if (!open) return null;
+    if (!visible) return null;
 
     return (
         <div className={cx('modal-overlay')}>
@@ -36,7 +35,7 @@ const TeamModal = ({ open, onClose, team }) => {
                 {team && (
                     <div className={cx('team-detail')}>
                         <div className={cx('team-image-container')}>
-                            <img src={getImageUrl(team.image)} alt={team.name} className={cx('team-image')} />
+                            <img src={team.image} alt={team.name} className={cx('team-image')} />
                         </div>
                         <div className={cx('team-info')}>
                             <h2 className={cx('team-name')}>{team.name}</h2>
@@ -50,7 +49,7 @@ const TeamModal = ({ open, onClose, team }) => {
 };
 
 TeamModal.propTypes = {
-    open: PropTypes.bool.isRequired,
+    visible: PropTypes.bool.isRequired,
     onClose: PropTypes.func.isRequired,
     team: PropTypes.object,
 };

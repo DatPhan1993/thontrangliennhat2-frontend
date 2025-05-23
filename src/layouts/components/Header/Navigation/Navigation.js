@@ -42,13 +42,29 @@ function Navigation({ isFixed }) {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [openSubMenus, setOpenSubMenus] = useState({});
     const [openSubSubMenus, setOpenSubSubMenus] = useState({});
+    
+    // List of titles to hide
+    const hiddenMenuItems = ['Gạo Hữu Cơ Liên Nhật', 'Cá Rô Đồng', 'Tôm Càng Xanh', 'Ốc Bươu'];
 
     useEffect(() => {
         const fetchNavigationLinks = async () => {
             try {
                 const links = await getNavigationLinks();
                 const sortedLinks = links.sort((a, b) => a.position - b.position);
-                setNavigationLinks(sortedLinks);
+                
+                // Process the links to filter out specific submenu items
+                const processedLinks = sortedLinks.map(link => {
+                    if (link.slug === 'san-xuat') {
+                        // Filter out specific items from the children array
+                        const filteredChildren = link.children.filter(
+                            child => !hiddenMenuItems.includes(child.title)
+                        );
+                        return { ...link, children: filteredChildren };
+                    }
+                    return link;
+                });
+                
+                setNavigationLinks(processedLinks);
             } catch (error) {
                 setError(error);
                 console.error('Error fetching navigation links:', error);

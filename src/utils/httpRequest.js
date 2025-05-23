@@ -1,19 +1,7 @@
 import axios from 'axios';
 
-// Determine API base URL based on environment
-let baseURL = '';
-
-// Development environment
-if (process.env.NODE_ENV === 'development') {
-    baseURL = 'http://localhost:3001/api';
-} 
-// Production environment
-else {
-    // Use direct API URL for production environment
-    baseURL = 'https://thontrangliennhat2-api-phan-dats-projects-d067d5c1.vercel.app/api';
-    console.log('Using direct API URL in httpRequest for production');
-}
-
+// Always use localhost for API
+const baseURL = 'http://localhost:3001/api';
 console.log('Using API baseURL:', baseURL);
 
 // Clear any session storage on startup to ensure fresh data
@@ -61,7 +49,7 @@ instance.interceptors.request.use(config => {
         'X-Timestamp': timestamp.toString()
     };
     
-    // Handle FormData correctly
+    // For FormData correctly
     if (config.data instanceof FormData) {
         // Log what we're sending for debugging
         console.log(`Sending FormData with ${Array.from(config.data.keys()).length} keys`);
@@ -71,16 +59,44 @@ instance.interceptors.request.use(config => {
         delete config.headers['Content-Type'];
         
         // Add debug information
-        if (process.env.NODE_ENV === 'development') {
-            console.log('FormData keys:', Array.from(config.data.keys()));
+        console.log('FormData keys:', Array.from(config.data.keys()));
+        for (let [key, value] of config.data.entries()) {
+            if (value instanceof File) {
+                console.log(`${key}: File - ${value.name} (${value.size} bytes)`);
+            } else if (typeof value === 'string' && value.length < 100) {
+                console.log(`${key}: ${value}`);
+            } else {
+                console.log(`${key}: [Data too large to display]`);
+            }
+        }
+
+        // Special handling for service updates
+        if (config.url.includes('/services/') && config.method === 'post') {
+            // Ensure we have the _method field for PUT simulation
+            let hasMethodOverride = false;
             for (let [key, value] of config.data.entries()) {
-                if (value instanceof File) {
-                    console.log(`${key}: File - ${value.name} (${value.size} bytes)`);
-                } else if (typeof value === 'string' && value.length < 100) {
-                    console.log(`${key}: ${value}`);
-                } else {
-                    console.log(`${key}: [Data too large to display]`);
+                if (key === '_method' && value === 'PUT') {
+                    hasMethodOverride = true;
+                    break;
                 }
+            }
+            
+            if (!hasMethodOverride) {
+                config.data.append('_method', 'PUT');
+                console.log('Added missing _method=PUT field for service update');
+            }
+            
+            // Log the URL we're using
+            console.log('Service update URL (full):', baseURL + config.url);
+            
+            // Make sure URL format is correct by checking if numeric ID is at the end
+            const urlParts = config.url.split('/');
+            const lastPart = urlParts[urlParts.length - 1];
+            
+            if (!isNaN(parseInt(lastPart))) {
+                console.log('Service ID in URL:', lastPart);
+            } else {
+                console.warn('Warning: Service ID not found in URL path:', config.url);
             }
         }
     } else {

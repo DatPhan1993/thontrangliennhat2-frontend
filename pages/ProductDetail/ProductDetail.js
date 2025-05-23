@@ -4,7 +4,7 @@ import classNames from 'classnames/bind';
 import styles from './ProductDetail.module.scss';
 import LoadingScreen from '~/components/LoadingScreen/LoadingScreen';
 import { getProductById } from '~/services/productService';
-import { Helmet } from 'react-helmet';
+import { Helmet } from 'react-helmet-async';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
     faChevronDown,

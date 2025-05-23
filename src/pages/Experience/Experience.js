@@ -11,7 +11,7 @@ import routes from '~/config/routes';
 import { getCategoriesBySlug } from '~/services/categoryService';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChevronLeft, faChevronRight, faSyncAlt } from '@fortawesome/free-solid-svg-icons';
-import { Helmet } from 'react-helmet';
+import { Helmet } from 'react-helmet-async';
 import { getImageUrl } from '~/utils/imageUtils';
 import { Button } from 'antd';
 

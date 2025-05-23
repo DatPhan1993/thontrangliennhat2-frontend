@@ -10,12 +10,14 @@ const getBaseUrl = () => {
     return process.env.REACT_APP_BASE_URL?.split('/api')[0] || 'http://localhost:3001';
 };
 
+const apiBaseUrl = process.env.REACT_APP_BASE_URL?.split('/api')[0] || 'http://localhost:3001';
+
 const config = {
     routes,
-    apiUrl: process.env.REACT_APP_BASE_URL?.split('/api')[0] || 'http://localhost:3001',
-    uploadUrl: `${getBaseUrl()}/uploads`,
-    uploadImageUrl: `${getBaseUrl()}/images/uploads`,
-    imageUrl: `${getBaseUrl()}/images`,
+    apiUrl: apiBaseUrl,
+    uploadUrl: `${apiBaseUrl}/uploads`,
+    uploadImageUrl: `${apiBaseUrl}/images/uploads`,
+    imageUrl: `${apiBaseUrl}/images`,
     publicUrl: process.env.REACT_APP_PUBLIC_URL || 'http://localhost:3000',
 };
 

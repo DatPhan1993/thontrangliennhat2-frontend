@@ -8,4 +8,4 @@ Disallow: /admin/
 Disallow: /admin
 
 # Sitemap
-Sitemap: https://thontrangliennhat.com/sitemap.xml 
+Sitemap: http://localhost:3000/sitemap.xml 

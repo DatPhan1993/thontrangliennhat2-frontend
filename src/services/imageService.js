@@ -1,23 +1,7 @@
 import axios from 'axios';
 
-// Determine API base URL based on environment
-let baseURL = '';
-
-// Development environment
-if (process.env.NODE_ENV === 'development') {
-    baseURL = 'http://localhost:3001/api';
-} 
-// Production environment
-else {
-    // Check if we're running on Vercel
-    if (process.env.VERCEL_URL) {
-        baseURL = `https://${process.env.VERCEL_URL}/api`;
-    } 
-    // For other production environments
-    else {
-        baseURL = 'https://thontrangliennhat.com/api';
-    }
-}
+// Always use localhost for API
+const baseURL = 'http://localhost:3001/api';
 
 /**
  * Upload a single image for a product
