@@ -8,7 +8,6 @@ import Login from './pages/Admin/Login/Login';
 import ScrollToTop from './components/ScrollToTop/ScrollToTop';
 import Error404 from './pages/Error404/Error404';
 import { clearExperienceCache, clearCategoryCache } from './services/utils';
-import DebugEnv from './components/DebugEnv';
 
 // RouteLogger component to log route changes
 function RouteLogger() {
@@ -57,7 +56,6 @@ function App() {
         <Router>
             <AuthProvider>
                 <div className="App">
-                    <DebugEnv />
                     <ScrollToTop />
                     <RouteLogger />
                     <Routes>
