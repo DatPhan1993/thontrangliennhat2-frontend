@@ -16,7 +16,7 @@
     <meta property="og:title" content="Thôn Trang Liên Nhật - HTX Nông Nghiệp Dịch Vụ Tổng Hợp" />
     <meta property="og:description" content="HTX Nông Nghiệp - Dịch Vụ Tổng Hợp Liên Nhật cung cấp dịch vụ du lịch sinh thái, nuôi cá lồng, sản xuất thực phẩm sạch và tinh dầu tự nhiên tại Buôn Đôn, Đắk Lắk." />
     <meta property="og:image" content="%PUBLIC_URL%/logo512.png" />
-    <meta property="og:url" content="https://thontrangliennhat.com" />
+    <meta property="og:url" content="http://localhost:3000" />
     <meta property="og:type" content="website" />
     <meta property="og:locale" content="vi_VN" />
     
@@ -27,7 +27,7 @@
     <meta name="twitter:image" content="%PUBLIC_URL%/logo512.png" />
     
     <!-- Canonical URL để tránh nội dung trùng lặp -->
-    <link rel="canonical" href="https://thontrangliennhat.com" />
+    <link rel="canonical" href="http://localhost:3000" />
     
     <link rel="apple-touch-icon" sizes="192x192" href="%PUBLIC_URL%/logo192.png">
     <link rel="icon" type="image/png" sizes="32x32" href="%PUBLIC_URL%/logo192.png">
@@ -37,34 +37,6 @@
     <meta name="theme-color" content="#ffffff">
     <title>Thôn Trang Liên Nhật - HTX Nông Nghiệp Dịch Vụ Tổng Hợp | Buôn Đôn, Đắk Lắk</title>
     
-    <!-- 🔧 CACHE & URL FIX SCRIPT - Tự động fix localhost URLs và cache -->
-    <script>
-      // Environment detection and API configuration
-      window.THONTRANG_CONFIG = {
-        API_BASE: 'https://api.thontrangliennhat.com',
-        FRONTEND_BASE: 'https://thontrangliennhat.com',
-        VERSION: '1.0.0'
-      };
-      
-      // Quick fix for immediate URL replacement
-      (function() {
-        // Fix any localhost URLs in meta tags immediately
-        document.querySelectorAll('meta[property*="og:"], meta[name*="twitter:"], link[rel="canonical"]').forEach(meta => {
-          if (meta.content && meta.content.includes('localhost:3000')) {
-            meta.content = meta.content.replace('http://localhost:3000', window.THONTRANG_CONFIG.FRONTEND_BASE);
-          }
-          if (meta.href && meta.href.includes('localhost:3000')) {
-            meta.href = meta.href.replace('http://localhost:3000', window.THONTRANG_CONFIG.FRONTEND_BASE);
-          }
-        });
-        
-        console.log('🔧 Meta tags URL fix applied');
-      })();
-    </script>
-    
-    <!-- Load the main fix script -->
-    <script src="https://api.thontrangliennhat.com/fix-cache.js" async></script>
-    
     <!-- Structured data for better SEO -->
     <script type="application/ld+json">
     {
@@ -72,8 +44,8 @@
       "@type": "Organization",
       "name": "HTX Nông Nghiệp - Dịch Vụ Tổng Hợp Liên Nhật",
       "alternateName": "Thôn Trang Liên Nhật",
-      "url": "https://thontrangliennhat.com",
-      "logo": "https://thontrangliennhat.com/logo512.png",
+      "url": "http://localhost:3000",
+      "logo": "http://localhost:3000/logo512.png",
       "description": "HTX Nông Nghiệp - Dịch Vụ Tổng Hợp Liên Nhật cung cấp dịch vụ du lịch sinh thái, nuôi cá lồng, sản xuất thực phẩm sạch, tinh dầu tự nhiên tại Buôn Đôn, Đắk Lắk.",
       "address": {
         "@type": "PostalAddress",
@@ -90,61 +62,9 @@
       }
     }
     </script>
-    
-    <!-- Additional inline script for immediate fixes -->
-    <script>
-      // Console message for debugging
-      console.log('🚀 Thôn Trang Liên Nhật - Auto Fix Enabled');
-      console.log('📡 API Base:', window.THONTRANG_CONFIG.API_BASE);
-      console.log('🌐 Frontend Base:', window.THONTRANG_CONFIG.FRONTEND_BASE);
-      
-      // Performance monitoring
-      window.addEventListener('load', function() {
-        console.log('⚡ Page loaded in:', performance.now().toFixed(2) + 'ms');
-        
-        // Check for any remaining localhost URLs
-        const images = document.querySelectorAll('img[src*="localhost"]');
-        if (images.length > 0) {
-          console.warn('⚠️ Found', images.length, 'images with localhost URLs - Fix script will handle them');
-        }
-      });
-      
-      // Add cache control headers via JavaScript
-      if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.getRegistrations().then(function(registrations) {
-          if (registrations.length === 0) {
-            console.log('✅ No service workers - cache is fresh');
-          }
-        });
-      }
-    </script>
   </head>
   <body>
-    <noscript>
-      <div style="text-align: center; padding: 50px; font-family: Arial, sans-serif;">
-        <h2>Cần bật JavaScript</h2>
-        <p>Bạn cần bật JavaScript để sử dụng website này.</p>
-        <p>You need to enable JavaScript to run this app.</p>
-      </div>
-    </noscript>
+    <noscript>You need to enable JavaScript to run this app.</noscript>
     <div id="root"></div>
-    
-    <!-- Error handling script -->
-    <script>
-      window.addEventListener('error', function(e) {
-        if (e.filename && e.filename.includes('localhost')) {
-          console.warn('🔧 Localhost resource error detected:', e.filename);
-          // The fix script will handle this
-        }
-      });
-      
-      // Handle image loading errors
-      document.addEventListener('error', function(e) {
-        if (e.target.tagName === 'IMG' && e.target.src.includes('localhost')) {
-          console.log('🔧 Fixing image URL:', e.target.src);
-          e.target.src = e.target.src.replace('http://localhost:3001', window.THONTRANG_CONFIG.API_BASE);
-        }
-      }, true);
-    </script>
   </body>
 </html>

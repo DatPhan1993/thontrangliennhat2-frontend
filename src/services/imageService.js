@@ -1,4 +1,5 @@
 import axios from 'axios';
+import api from '../utils/api';
 
 const baseURL = (process.env.REACT_APP_API_URL || process.env.REACT_APP_BASE_URL || 'https://api.thontrangliennhat.com') + '/api';
 

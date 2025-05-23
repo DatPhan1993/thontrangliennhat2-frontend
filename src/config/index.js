@@ -7,7 +7,7 @@ const getBaseUrl = () => {
         return window.location.origin;
     }
     // Fallback cho môi trường nodejs
-    return process.env.REACT_APP_PUBLIC_URL || 'http://localhost:3000';
+    return process.env.REACT_APP_PUBLIC_URL || 'https://thontrangliennhat.com';
 };
 
 // API URL riêng biệt cho API calls - không thêm /api vì endpoints đã có sẵn
@@ -22,7 +22,7 @@ const config = {
     uploadUrl: `${staticBaseUrl}/uploads`,
     uploadImageUrl: `${staticBaseUrl}/images/uploads`,
     imageUrl: `${staticBaseUrl}/images`,
-    publicUrl: process.env.REACT_APP_PUBLIC_URL || 'http://localhost:3000',
+    publicUrl: process.env.REACT_APP_PUBLIC_URL || 'https://thontrangliennhat.com',
 };
 
 export default config;

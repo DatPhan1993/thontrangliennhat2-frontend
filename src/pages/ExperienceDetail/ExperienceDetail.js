@@ -10,6 +10,7 @@ import { getExperienceById } from '~/services/experienceService';
 import { Helmet } from 'react-helmet-async';
 import routes from '~/config/routes';
 import { getImageUrl } from '~/utils/imageUtils';
+import api from '../utils/api';
 
 const cx = classNames.bind(styles);
 

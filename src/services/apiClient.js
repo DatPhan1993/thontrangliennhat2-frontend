@@ -1,4 +1,5 @@
 import axios from 'axios';
+import api from '../utils/api';
 
 // Simple API client for localhost development with proxy
 const apiClient = axios.create({
