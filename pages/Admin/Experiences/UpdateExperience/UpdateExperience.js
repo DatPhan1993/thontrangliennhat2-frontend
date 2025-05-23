@@ -12,6 +12,24 @@ import Title from '~/components/Title/Title';
 import { Spin } from 'antd';
 import useDataRefresh from '~/hooks/useDataRefresh';
 
+const API_URL = process.env.REACT_APP_API_URL || process.env.REACT_APP_BASE_URL || 'https://thontrangliennhat.com/api';
+
+const makeAbsoluteUrl = (url) => {
+    if (!url) return '';
+    if (url.startsWith('http://') || url.startsWith('https://')) {
+        return url;
+    }
+    return `${API_URL}${url}`;
+};
+
+const makeAbsoluteUrl2 = (url) => {
+    if (!url) return '';
+    if (url.startsWith('http://') || url.startsWith('https://')) {
+        return url;
+    }
+    return `${API_URL}/${url}`;
+};
+
 const UpdateExperience = () => {
     const { id } = useParams();
     const navigate = useNavigate();
@@ -34,11 +52,11 @@ const UpdateExperience = () => {
         // If it's a relative path, make it absolute
         if (url.startsWith('/')) {
             // Use the API server URL for images
-            return `http://localhost:3001${url}`;
+            return `${API_URL}${url}`;
         }
         
         // Default case - add leading slash if needed
-        return `http://localhost:3001/${url}`;
+        return `${API_URL}/${url}`;
     };
 
     const validationSchema = Yup.object({

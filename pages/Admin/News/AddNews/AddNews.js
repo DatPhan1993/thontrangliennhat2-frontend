@@ -12,6 +12,8 @@ import { useDropzone } from 'react-dropzone';
 import { Spin } from 'antd';
 import axios from 'axios';
 
+const API_URL = process.env.REACT_APP_API_URL || process.env.REACT_APP_BASE_URL || 'https://thontrangliennhat.com/api';
+
 const AddNews = () => {
     const [categories, setCategories] = useState([]);
     const [notification, setNotification] = useState({ message: '', type: '' });
@@ -104,7 +106,7 @@ const AddNews = () => {
         const formData = new FormData();
                 formData.append('image', file);
                 
-                const response = await axios.post('http://localhost:3001/api/upload/image', formData, {
+                const response = await axios.post(`${API_URL}/upload/image`, formData, {
                     headers: {
                         'Content-Type': 'multipart/form-data',
                     },
