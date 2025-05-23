@@ -10,7 +10,7 @@ const getBaseUrl = () => {
     return process.env.REACT_APP_PUBLIC_URL || 'https://thontrangliennhat.com';
 };
 
-const apiUrl = process.env.REACT_APP_API_URL || process.env.REACT_APP_BASE_URL || 'https://thontrangliennhat.com/api';
+const apiUrl = process.env.REACT_APP_API_URL || process.env.REACT_APP_BASE_URL || 'https://api.thontrangliennhat.com';
 
 const config = {
     routes,

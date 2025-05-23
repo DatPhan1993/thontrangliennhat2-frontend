@@ -12,7 +12,7 @@ import { useDropzone } from 'react-dropzone';
 import { Spin } from 'antd';
 import axios from 'axios';
 
-const API_URL = process.env.REACT_APP_API_URL || process.env.REACT_APP_BASE_URL || 'https://thontrangliennhat.com/api';
+const API_URL = process.env.REACT_APP_API_URL || process.env.REACT_APP_BASE_URL || 'https://api.thontrangliennhat.com';
 
 const AddNews = () => {
     const [categories, setCategories] = useState([]);

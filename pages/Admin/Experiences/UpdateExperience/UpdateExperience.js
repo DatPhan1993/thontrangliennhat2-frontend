@@ -12,7 +12,7 @@ import Title from '~/components/Title/Title';
 import { Spin } from 'antd';
 import useDataRefresh from '~/hooks/useDataRefresh';
 
-const API_URL = process.env.REACT_APP_API_URL || process.env.REACT_APP_BASE_URL || 'https://thontrangliennhat.com/api';
+const API_URL = process.env.REACT_APP_API_URL || process.env.REACT_APP_BASE_URL || 'https://api.thontrangliennhat.com';
 
 const makeAbsoluteUrl = (url) => {
     if (!url) return '';
