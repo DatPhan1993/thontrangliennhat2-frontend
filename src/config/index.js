@@ -6,18 +6,22 @@ const getBaseUrl = () => {
     if (typeof window !== 'undefined') {
         return window.location.origin;
     }
-    // Nếu không có window object (môi trường nodejs)
-    return process.env.REACT_APP_BASE_URL?.split('/api')[0] || 'http://localhost:3001';
+    // Fallback cho môi trường nodejs
+    return process.env.REACT_APP_PUBLIC_URL || 'http://localhost:3000';
 };
 
-const apiBaseUrl = process.env.REACT_APP_BASE_URL?.split('/api')[0] || 'http://localhost:3001';
+// API URL riêng biệt cho API calls
+const apiUrl = process.env.REACT_APP_API_URL || process.env.REACT_APP_BASE_URL || 'https://api.thontrangliennhat.com';
+
+// Static assets URL (từ main domain, không phải API subdomain)
+const staticBaseUrl = process.env.REACT_APP_PUBLIC_URL || getBaseUrl();
 
 const config = {
     routes,
-    apiUrl: apiBaseUrl,
-    uploadUrl: `${apiBaseUrl}/uploads`,
-    uploadImageUrl: `${apiBaseUrl}/images/uploads`,
-    imageUrl: `${apiBaseUrl}/images`,
+    apiUrl: apiUrl,
+    uploadUrl: `${staticBaseUrl}/uploads`,
+    uploadImageUrl: `${staticBaseUrl}/images/uploads`,
+    imageUrl: `${staticBaseUrl}/images`,
     publicUrl: process.env.REACT_APP_PUBLIC_URL || 'http://localhost:3000',
 };
 
