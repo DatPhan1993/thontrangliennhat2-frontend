@@ -1,17 +1,21 @@
-# 🔧 Fix API HTTPS URLs - Hướng dẫn
+# ✅ **RESOLVED** - Fix API HTTPS URLs - Hướng dẫn
 
-## ❌ **Vấn đề đã được giải quyết:**
-- API calls đang sử dụng HTTP thay vì HTTPS
-- Console browser báo lỗi Network Error cho các API requests
-- Requests đến `http://api.thontrangliennhat.com` thất bại
+## ✅ **Vấn đề đã được giải quyết:**
+- ✅ API calls đang sử dụng HTTPS thay vì HTTP
+- ✅ Console browser không còn báo lỗi "blocked: mixed-content"
+- ✅ Requests đến `https://api.thontrangliennhat.com` hoạt động bình thường
+
+## 🎯 **Root Cause:**
+- **Missing `.env` file**: Environment variables chưa được tạo
+- Code đã được cấu hình đúng nhưng thiếu file `.env` để set HTTPS URLs
 
 ## ✅ **Giải pháp đã áp dụng:**
 
-### 1. **Tạo file `.env` với HTTPS URLs:**
+### 1. **File `.env` đã được tạo với HTTPS URLs:**
 ```bash
 REACT_APP_API_URL=https://api.thontrangliennhat.com
 REACT_APP_BASE_URL=https://api.thontrangliennhat.com
-REACT_APP_PUBLIC_URL=http://localhost:3000
+REACT_APP_PUBLIC_URL=https://thontrangliennhat2-frontend-50lx8a6rg.vercel.app
 GENERATE_SOURCEMAP=false
 CI=false
 ```
@@ -32,15 +36,8 @@ CI=false
 ## 🚀 **Cách sử dụng:**
 
 ### **Development (Local):**
-1. Copy file `.env.example` thành `.env`:
-   ```bash
-   cp .env.example .env
-   ```
-
-2. Restart development server:
-   ```bash
-   npm start
-   ```
+1. ✅ File `.env` đã được tạo tự động
+2. ✅ Development server đã restart để áp dụng env vars
 
 ### **Production (Vercel):**
 Environment variables đã được set trong Vercel Dashboard:
@@ -50,8 +47,8 @@ Environment variables đã được set trong Vercel Dashboard:
 ## 🔍 **Kiểm tra:**
 1. Mở browser console (F12)
 2. Kiểm tra Network tab
-3. Tất cả API requests bây giờ sẽ sử dụng HTTPS
-4. Không còn lỗi "Network Error" hoặc "Mixed Content"
+3. ✅ Tất cả API requests bây giờ sẽ sử dụng HTTPS
+4. ✅ Không còn lỗi "blocked: mixed-content"
 
 ## 📝 **Lưu ý:**
 - File `.env` không được commit vào Git (đã có trong .gitignore)
@@ -63,4 +60,5 @@ Environment variables đã được set trong Vercel Dashboard:
 - ✅ API calls hoạt động bình thường với HTTPS
 - ✅ Không còn lỗi Mixed Content
 - ✅ Bảo mật được cải thiện
-- ✅ Website hoạt động ổn định trên production 
+- ✅ Website hoạt động ổn định trên production
+- ✅ Development server sử dụng đúng environment variables 
