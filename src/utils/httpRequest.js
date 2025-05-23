@@ -1,5 +1,4 @@
 import axios from 'axios';
-import api from '../utils/api';
 
 // Use environment variables for API URL - thêm /api vào cuối
 const baseURL = (process.env.REACT_APP_API_URL || process.env.REACT_APP_BASE_URL || 'https://api.thontrangliennhat.com') + '/api';

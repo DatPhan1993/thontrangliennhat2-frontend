@@ -1,5 +1,4 @@
 import httpRequest from '~/utils/httpRequest';
-import api from '../utils/api';
 
 export const login = async (credentials) => {
     try {
