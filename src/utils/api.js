@@ -14,7 +14,7 @@ export const API_CONFIG = {
   PRODUCTION: 'https://api.thontrangliennhat.com',
   
   // Development API endpoint  
-  DEVELOPMENT: 'https://api.thontrangliennhat.com',
+  DEVELOPMENT: 'http://localhost:3001',
   
   // Determine current environment
   get BASE_URL() {
@@ -61,7 +61,7 @@ export class ApiClient {
   // Fix localhost URLs automatically
   fixUrl(url) {
     if (typeof url === 'string' && url.includes('localhost:3001')) {
-      return url.replace('https://api.thontrangliennhat.com', API_CONFIG.PRODUCTION);
+      return url.replace('http://localhost:3001', API_CONFIG.PRODUCTION);
     }
     return url;
   }
@@ -169,13 +169,24 @@ export const ImageUtils = {
   fixImageUrl(url) {
     if (!url) return '';
     
+    // Fix localhost URLs
     if (typeof url === 'string' && url.includes('localhost:3001')) {
-      return url.replace('https://api.thontrangliennhat.com', API_CONFIG.PRODUCTION);
+      return url.replace('http://localhost:3001', API_CONFIG.PRODUCTION);
     }
     
-    // If URL is relative, make it absolute
+    // If URL is relative with leading slash, make it absolute
     if (url.startsWith('/images/') || url.startsWith('/videos/')) {
-      return `${API_CONFIG.BASE_URL}${url}`;
+      return `${API_CONFIG.PRODUCTION}${url}`;
+    }
+    
+    // If URL is relative without leading slash, make it absolute  
+    if (url.startsWith('images/') || url.startsWith('videos/')) {
+      return `${API_CONFIG.PRODUCTION}/${url}`;
+    }
+    
+    // If already absolute URL, return as is
+    if (url.startsWith('http://') || url.startsWith('https://')) {
+      return url;
     }
     
     return url;
