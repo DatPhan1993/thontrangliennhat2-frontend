@@ -2,8 +2,8 @@ import axios from 'axios';
 
 // Simple API client for localhost development with proxy
 const apiClient = axios.create({
-  baseURL: process.env.REACT_APP_API_URL || process.env.REACT_APP_BASE_URL || 'https://api.thontrangliennhat.com',
-  timeout: 10000,
+  baseURL: (process.env.REACT_APP_API_URL || process.env.REACT_APP_BASE_URL || 'https://api.thontrangliennhat.com') + '/api',
+  timeout: 15000,
   headers: {
     'Content-Type': 'application/json',
   }

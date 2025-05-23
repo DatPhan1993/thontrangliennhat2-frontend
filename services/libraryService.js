@@ -16,7 +16,7 @@ const isDevelopment = () => {
 };
 
 // Server API base URL using environment variables
-const API_URL = process.env.REACT_APP_API_URL || process.env.REACT_APP_BASE_URL || 'https://api.thontrangliennhat.com';
+const API_URL = (process.env.REACT_APP_API_URL || process.env.REACT_APP_BASE_URL || 'https://api.thontrangliennhat.com') + '/api';
 
 // Helper function to fetch from database.json in development
 const fetchFromDatabaseJson = async () => {
