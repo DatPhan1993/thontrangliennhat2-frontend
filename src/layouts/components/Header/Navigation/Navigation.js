@@ -21,7 +21,7 @@ import {
     // faUsers,
     // faEnvelope,
 } from '@fortawesome/free-solid-svg-icons';
-import images from '~/assets/images';
+import logoImage from '~/assets/images/thontrangliennhat-logo.png';
 
 // const iconsData = [
 //     { position: 1, icon: faInfoCircle },
@@ -156,20 +156,19 @@ function Navigation({ isFixed }) {
                 </div>
                     <Link to="/" className={cx('logo-link')}>
                     <img 
-                        src={images.logo} 
+                        src={logoImage} 
                         alt="THÔN TRANG LIÊN NHẬT" 
                         className={cx('logo')} 
                         onError={(e) => {
-                            console.error('Logo failed to load from assets');
-                            // Fallback to public if assets fail
+                            console.error('Logo failed to load from assets, trying public directory');
                             e.target.src = '/thontrangliennhat-logo.png';
                             e.target.onerror = () => {
-                                console.error('Both logo sources failed');
+                                console.error('Both logo sources failed, hiding logo');
                                 e.target.style.display = 'none';
                             };
                         }}
                         onLoad={() => {
-                            console.log('Logo loaded successfully from assets');
+                            console.log('✅ Logo loaded successfully from assets');
                         }}
                     />
                 </Link>

@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPhone, faEnvelope, faChevronRight, faMapMarkerAlt } from '@fortawesome/free-solid-svg-icons';
 import { faYoutube, faFacebook } from '@fortawesome/free-brands-svg-icons';
-import companyLogo from '~/assets/images/thontrangliennhat-logo.png';
+import logoImage from '~/assets/images/thontrangliennhat-logo.png';
 import styles from './Footer.module.scss';
 import classNames from 'classnames/bind';
 import routes from '~/config/routes';
@@ -17,20 +17,19 @@ const Footer = () => {
                 <div className={cx('footerLeft', 'footerColumnWide')}>
                     <Link to="/">
                         <img 
-                            src={companyLogo} 
+                            src={logoImage} 
                             alt="HỢP TÁC XÃ LIÊN NHẬT" 
                             className={cx('logo')} 
                             onError={(e) => {
-                                console.error('Footer logo failed to load from assets');
-                                // Fallback to public if assets fail
+                                console.error('Footer logo failed to load from assets, trying public directory');
                                 e.target.src = '/thontrangliennhat-logo.png';
                                 e.target.onerror = () => {
-                                    console.error('Footer: Both logo sources failed');
+                                    console.error('Footer: Both logo sources failed, hiding logo');
                                     e.target.style.display = 'none';
                                 };
                             }}
                             onLoad={() => {
-                                console.log('Footer logo loaded successfully from assets');
+                                console.log('✅ Footer logo loaded successfully from assets');
                             }}
                         />
                     </Link>
