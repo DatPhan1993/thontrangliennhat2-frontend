@@ -11,6 +11,17 @@ import routes from '~/config/routes';
 const cx = classNames.bind(styles);
 
 const Footer = () => {
+    const handleLogoError = (e) => {
+        // Try public directory fallback first
+        if (e.target.src !== `${process.env.PUBLIC_URL}/thontrangliennhat-logo.png`) {
+            e.target.src = `${process.env.PUBLIC_URL}/thontrangliennhat-logo.png`;
+        } else {
+            // If both sources fail, hide the logo
+            e.target.style.display = 'none';
+            console.warn('Footer logo could not be loaded from any source');
+        }
+    };
+
     return (
         <footer className={cx('wrapper')}>
             <div className={cx('inner')}>
@@ -20,14 +31,7 @@ const Footer = () => {
                             src={companyLogo} 
                             alt="HỢP TÁC XÃ LIÊN NHẬT" 
                             className={cx('logo')} 
-                            onError={(e) => {
-                                console.error('Footer assets logo failed, trying public directory');
-                                e.target.src = '/thontrangliennhat-logo.png';
-                                e.target.onerror = () => {
-                                    console.error('Footer: Both logo sources failed, hiding logo');
-                                    e.target.style.display = 'none';
-                                };
-                            }}
+                            onError={handleLogoError}
                         />
                     </Link>
                     <h5>HỢP TÁC XÃ LIÊN NHẬT</h5>

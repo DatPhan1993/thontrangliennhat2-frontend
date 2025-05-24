@@ -25,43 +25,51 @@ export const DEFAULT_ERROR_IMAGE = 'https://via.placeholder.com/300x200?text=Ima
 export const normalizeImageUrl = (imageUrl, defaultImage = DEFAULT_IMAGE) => {
     // Nếu không có URL hoặc URL không hợp lệ
     if (!imageUrl || typeof imageUrl !== 'string' || imageUrl.trim() === '') {
-        console.log('[ImageUtil] Invalid or empty image URL, using default');
+        debugLog('Invalid or empty image URL, using default', imageUrl);
         return defaultImage;
     }
     
     // Remove any query parameters to avoid caching issues
     imageUrl = imageUrl.split('?')[0];
     
-    // Log để debug
-    console.log('[ImageUtil] Processing image URL:', imageUrl);
+    debugLog('Processing image URL', imageUrl);
 
     // Nếu là URL đầy đủ, trả về ngay
     if (imageUrl.startsWith('http://') || imageUrl.startsWith('https://')) {
-        console.log('[ImageUtil] Using existing full URL:', imageUrl);
+        debugLog('Using existing full URL', imageUrl);
         return imageUrl;
     }
     
     // Get base API URL from config
     const apiBaseUrl = config.apiUrl || 'https://api.thontrangliennhat.com';
-    console.log('[ImageUtil] API Base URL:', apiBaseUrl);
+    debugLog('API Base URL', apiBaseUrl);
     
     // Normalize path separators to forward slashes
     imageUrl = imageUrl.replace(/\\/g, '/');
     
     // Nếu là đường dẫn tương đối (bắt đầu bằng /)
     if (imageUrl.startsWith('/')) {
-        // Handle uploads paths directly - this is for images uploaded via admin
-        const fullUrl = `${apiBaseUrl}${imageUrl}`;
-        console.log('[ImageUtil] Converting relative path to full URL:', fullUrl);
-        return fullUrl;
+        // Handle different path patterns
+        if (imageUrl.includes('/uploads/') || imageUrl.includes('/images/')) {
+            // Already has proper path structure
+            const fullUrl = `${apiBaseUrl}${imageUrl}`;
+            debugLog('Converting relative path to full URL', fullUrl);
+            return fullUrl;
+        } else {
+            // Add uploads path if missing
+            const fullUrl = `${apiBaseUrl}/images${imageUrl}`;
+            debugLog('Adding uploads path to relative URL', fullUrl);
+            return fullUrl;
+        }
     }
     
+    // Handle case where imageUrl is just a filename or partial path
     // Extract filename from path
     const filename = imageUrl.split('/').pop();
     
     // Create a proper API URL with the uploads path
     const fullUrl = `${apiBaseUrl}/images/uploads/${filename}`;
-    console.log('[ImageUtil] Created full URL with uploads path:', fullUrl);
+    debugLog('Created full URL with uploads path', fullUrl);
     return fullUrl;
 };
 
