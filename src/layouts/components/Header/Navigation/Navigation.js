@@ -156,19 +156,20 @@ function Navigation({ isFixed }) {
                 </div>
                     <Link to="/" className={cx('logo-link')}>
                     <img 
-                        src={images.logo} 
-                        alt="Logo" 
+                        src="/thontrangliennhat-logo.png" 
+                        alt="THÔN TRANG LIÊN NHẬT" 
                         className={cx('logo')} 
                         onError={(e) => {
-                            console.error('Assets logo failed to load, trying public logo:', images.logo);
-                            e.target.src = '/thontrangliennhat-logo.png';
+                            console.error('Logo failed to load from public directory');
+                            // Fallback to assets if public fails
+                            e.target.src = images.logo;
                             e.target.onerror = () => {
-                                console.error('Public logo also failed to load');
+                                console.error('Both logo sources failed');
                                 e.target.style.display = 'none';
                             };
                         }}
                         onLoad={() => {
-                            console.log('Logo loaded successfully:', images.logo);
+                            console.log('Logo loaded successfully from public directory');
                         }}
                     />
                 </Link>
