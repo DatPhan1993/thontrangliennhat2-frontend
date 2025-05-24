@@ -6,6 +6,7 @@ import LoadingScreen from '~/components/LoadingScreen/LoadingScreen';
 import PushNotification from '~/components/PushNotification/PushNotification';
 import Title from '~/components/Title/Title';
 import { getProductById } from '~/services/productService';
+import { normalizeImageUrl } from '~/utils/imageUtils';
 import { Helmet } from 'react-helmet';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
@@ -137,7 +138,7 @@ const ProductDetail = () => {
                                 <div key={thumbnailStartIndex + index} className={cx('thumbnail-item')}>
                                     <img
                                         className={cx('thumbnail-image')}
-                                        src={image.replace(/\\/g, '')}
+                                        src={normalizeImageUrl(image)}
                                         alt={`${productDetail.name} thumbnail ${thumbnailStartIndex + index + 1}`}
                                         onClick={() => handleThumbnailClick(thumbnailStartIndex + index)}
                                     />
@@ -166,7 +167,7 @@ const ProductDetail = () => {
                             <img
                                 key={index}
                                 className={cx('main-image')}
-                                src={image.replace(/\\/g, '')}
+                                src={normalizeImageUrl(image)}
                                 alt={`${productDetail.name} main ${index + 1}`}
                             />
                         ))}

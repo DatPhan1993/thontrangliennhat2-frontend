@@ -1,4 +1,5 @@
 import httpRequest from '~/utils/httpRequest';
+import { normalizeImageUrl } from '~/utils/imageUtils';
 
 // Helper functions for sessionStorage
 const saveToSessionStorage = (key, data) => {
@@ -21,7 +22,29 @@ export const getProducts = async () => {
 
     try {
         const response = await httpRequest.get('/products');
-        const products = response.data.data;
+        let products = response.data.data;
+
+        // Normalize image URLs for all products
+        if (products && Array.isArray(products)) {
+            products = products.map(product => {
+                // Handle single image field
+                if (product.image) {
+                    product.image = normalizeImageUrl(product.image);
+                }
+                
+                // Handle images array
+                if (product.images) {
+                    if (Array.isArray(product.images)) {
+                        product.images = product.images.map(img => normalizeImageUrl(img));
+                    } else if (typeof product.images === 'string') {
+                        // Handle comma-separated string of images
+                        product.images = product.images.split(',').map(img => normalizeImageUrl(img.trim()));
+                    }
+                }
+                
+                return product;
+            });
+        }
 
         // Save to sessionStorage
         saveToSessionStorage(sessionKey, products);
@@ -44,7 +67,29 @@ export const getProductsPagination = async ($page = 1, $limit = 8) => {
 
     try {
         const response = await httpRequest.get(`/products?page=${$page}&limit=${$limit}`);
-        const products = response.data.data;
+        let products = response.data.data;
+
+        // Normalize image URLs for all products
+        if (products && Array.isArray(products)) {
+            products = products.map(product => {
+                // Handle single image field
+                if (product.image) {
+                    product.image = normalizeImageUrl(product.image);
+                }
+                
+                // Handle images array
+                if (product.images) {
+                    if (Array.isArray(product.images)) {
+                        product.images = product.images.map(img => normalizeImageUrl(img));
+                    } else if (typeof product.images === 'string') {
+                        // Handle comma-separated string of images
+                        product.images = product.images.split(',').map(img => normalizeImageUrl(img.trim()));
+                    }
+                }
+                
+                return product;
+            });
+        }
 
         // Save to sessionStorage
         saveToSessionStorage(sessionKey, products);
@@ -74,6 +119,24 @@ export const getProductById = async (id) => {
             const foundProduct = product.find(p => p.id.toString() === id.toString());
             if (foundProduct) {
                 product = foundProduct;
+            }
+        }
+
+        // Normalize image URLs
+        if (product) {
+            // Handle single image field
+            if (product.image) {
+                product.image = normalizeImageUrl(product.image);
+            }
+            
+            // Handle images array
+            if (product.images) {
+                if (Array.isArray(product.images)) {
+                    product.images = product.images.map(img => normalizeImageUrl(img));
+                } else if (typeof product.images === 'string') {
+                    // Handle comma-separated string of images
+                    product.images = product.images.split(',').map(img => normalizeImageUrl(img.trim()));
+                }
             }
         }
 

@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🔍 Debug API Calls</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; max-width: 1000px; margin: 0 auto; }
+        .test-section { background: #f5f5f5; padding: 15px; margin: 10px 0; border-radius: 5px; }
+        .success { background: #d4edda; border: 1px solid #c3e6cb; }
+        .error { background: #f8d7da; border: 1px solid #f5c6cb; }
+        .warning { background: #fff3cd; border: 1px solid #ffeaa7; }
+        .code { background: #f8f9fa; padding: 10px; font-family: monospace; white-space: pre-wrap; }
+        .result { margin: 10px 0; padding: 10px; border-radius: 4px; }
+        button { padding: 10px 20px; margin: 5px; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <h1>🔍 Debug API Calls</h1>
+    
+    <div class="test-section">
+        <h2>🌐 Test API Endpoints</h2>
+        <button onclick="testEndpoint('products')">Test Products</button>
+        <button onclick="testEndpoint('teams')">Test Teams</button>
+        <button onclick="testEndpoint('services')">Test Services</button>
+        <button onclick="testHealth()">Test Health</button>
+        <button onclick="clearResults()">Clear Results</button>
+    </div>
+    
+    <div id="results"></div>
+
+    <script>
+        const API_BASE = 'https://api.thontrangliennhat.com';
+        
+        function log(message, type = 'info') {
+            const results = document.getElementById('results');
+            const div = document.createElement('div');
+            div.className = `result ${type}`;
+            div.innerHTML = `<strong>${new Date().toLocaleTimeString()}</strong>: ${message}`;
+            results.appendChild(div);
+            console.log(message);
+        }
+        
+        function clearResults() {
+            document.getElementById('results').innerHTML = '';
+        }
+        
+        async function testHealth() {
+            log('🔍 Testing health endpoint...', 'warning');
+            
+            try {
+                const response = await fetch(`${API_BASE}/api/health`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Cache-Control': 'no-cache'
+                    }
+                });
+                
+                log(`📡 Health Response Status: ${response.status} ${response.statusText}`, 
+                    response.ok ? 'success' : 'error');
+                
+                if (response.ok) {
+                    const data = await response.text();
+                    log(`📋 Health Response: <div class="code">${data}</div>`, 'success');
+                } else {
+                    const errorText = await response.text();
+                    log(`❌ Health Error: <div class="code">${errorText}</div>`, 'error');
+                }
+                
+            } catch (error) {
+                log(`💥 Health Network Error: ${error.message}`, 'error');
+                log(`🔧 Possible CORS issue or network blocking`, 'error');
+            }
+        }
+        
+        async function testEndpoint(endpoint) {
+            log(`🔍 Testing ${endpoint} endpoint...`, 'warning');
+            
+            try {
+                // Test with different methods to debug CORS
+                const testUrl = `${API_BASE}/api/${endpoint}`;
+                log(`📍 URL: ${testUrl}`, 'info');
+                
+                // Test 1: Basic fetch
+                log(`🧪 Test 1: Basic fetch...`, 'info');
+                
+                const response = await fetch(testUrl, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Cache-Control': 'no-cache, no-store, must-revalidate',
+                        'Pragma': 'no-cache',
+                        'Expires': '0'
+                    }
+                });
+                
+                log(`📡 Response Status: ${response.status} ${response.statusText}`, 
+                    response.ok ? 'success' : 'error');
+                
+                // Log all response headers
+                const headers = {};
+                for (let [key, value] of response.headers.entries()) {
+                    headers[key] = value;
+                }
+                log(`📋 Response Headers: <div class="code">${JSON.stringify(headers, null, 2)}</div>`, 'info');
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    log(`✅ ${endpoint} Success: Found ${data.data ? data.data.length : 0} items`, 'success');
+                    
+                    if (data.data && data.data.length > 0) {
+                        const sample = data.data[0];
+                        log(`📋 Sample Data: <div class="code">${JSON.stringify(sample, null, 2)}</div>`, 'success');
+                        
+                        // Check for image fields
+                        if (sample.image || sample.images || sample.avatar) {
+                            log(`🖼️ Image fields found: image=${sample.image}, images=${sample.images}, avatar=${sample.avatar}`, 'success');
+                        } else {
+                            log(`⚠️ No image fields found in ${endpoint} data`, 'warning');
+                        }
+                    }
+                } else {
+                    const errorText = await response.text();
+                    log(`❌ ${endpoint} Error Response: <div class="code">${errorText}</div>`, 'error');
+                    
+                    if (response.status === 500) {
+                        log(`🚨 Server Error 500 - API backend có vấn đề!`, 'error');
+                    } else if (response.status === 0 || response.status === 404) {
+                        log(`🚨 CORS or Network issue detected`, 'error');
+                    }
+                }
+                
+            } catch (error) {
+                log(`💥 ${endpoint} Network Error: ${error.message}`, 'error');
+                log(`🔧 This usually indicates CORS blocking or network issues`, 'error');
+                
+                // Additional debugging
+                if (error.name === 'TypeError' && error.message.includes('Failed to fetch')) {
+                    log(`🚨 CORS Error: Browser blocked the request due to CORS policy`, 'error');
+                    log(`🔧 Check if API server has correct CORS headers for this domain`, 'error');
+                }
+            }
+        }
+        
+        // Test all endpoints on page load
+        document.addEventListener('DOMContentLoaded', async () => {
+            log('🚀 Starting API diagnostics...', 'warning');
+            log(`🌐 Testing from domain: ${window.location.origin}`, 'info');
+            log(`🎯 API Base: ${API_BASE}`, 'info');
+            
+            // Test health first
+            await testHealth();
+            
+            // Wait a bit then test other endpoints
+            setTimeout(async () => {
+                await testEndpoint('teams');
+                setTimeout(async () => {
+                    await testEndpoint('products');
+                    setTimeout(async () => {
+                        await testEndpoint('services');
+                    }, 1000);
+                }, 1000);
+            }, 1000);
+        });
+    </script>
+</body>
+</html> 
