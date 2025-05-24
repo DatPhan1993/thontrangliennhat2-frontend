@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🔍 Logo Quick Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; background: #f5f5f5; }
+        .test { background: white; padding: 20px; margin: 10px 0; border-radius: 8px; }
+        img { max-width: 200px; height: auto; margin: 10px; border: 2px solid #ddd; }
+        .success { border-color: green; }
+        .error { border-color: red; }
+        .log { background: #f0f0f0; padding: 10px; margin: 10px 0; font-family: monospace; }
+    </style>
+</head>
+<body>
+    <h1>🔍 Logo Quick Test</h1>
+    
+    <div class="test">
+        <h3>1. Static Assets (Webpack)</h3>
+        <img id="logo1" src="/static/media/thontrangliennhat-logo.a114e7ea2696af9d14d8.png" alt="Logo">
+    </div>
+    
+    <div class="test">
+        <h3>2. Public Directory</h3>
+        <img id="logo2" src="/thontrangliennhat-logo.png" alt="Logo">
+    </div>
+    
+    <div class="test">
+        <h3>3. Alternative Sources</h3>
+        <img id="logo3" src="https://api.thontrangliennhat.com/images/thontrangliennhat-logo.png" alt="Logo">
+    </div>
+    
+    <div class="test">
+        <h2>📋 Test Results</h2>
+        <div id="results"></div>
+    </div>
+
+    <script>
+        const results = document.getElementById('results');
+        
+        function log(message, type = 'info') {
+            const div = document.createElement('div');
+            div.className = 'log';
+            div.style.color = type === 'success' ? 'green' : type === 'error' ? 'red' : 'black';
+            div.textContent = `${new Date().toLocaleTimeString()} - ${message}`;
+            results.appendChild(div);
+        }
+        
+        const tests = [
+            { id: 'logo1', name: 'Static/Media (Webpack)' },
+            { id: 'logo2', name: 'Public Directory' },
+            { id: 'logo3', name: 'API Server' }
+        ];
+        
+        tests.forEach(test => {
+            const img = document.getElementById(test.id);
+            
+            img.onload = function() {
+                this.classList.add('success');
+                log(`✅ ${test.name} - SUCCESS (${this.naturalWidth}x${this.naturalHeight})`, 'success');
+            };
+            
+            img.onerror = function() {
+                this.classList.add('error');
+                log(`❌ ${test.name} - FAILED`, 'error');
+            };
+        });
+        
+        log(`🌐 Testing from: ${window.location.href}`);
+    </script>
+</body>
+</html> 
