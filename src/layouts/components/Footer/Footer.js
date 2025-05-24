@@ -21,8 +21,12 @@ const Footer = () => {
                             alt="HỢP TÁC XÃ LIÊN NHẬT" 
                             className={cx('logo')} 
                             onError={(e) => {
-                                console.error('Footer logo loading failed');
-                                e.target.style.display = 'none';
+                                console.error('Footer assets logo failed, trying public directory');
+                                e.target.src = '/thontrangliennhat-logo.png';
+                                e.target.onerror = () => {
+                                    console.error('Footer: Both logo sources failed, hiding logo');
+                                    e.target.style.display = 'none';
+                                };
                             }}
                         />
                     </Link>

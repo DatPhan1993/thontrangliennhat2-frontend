@@ -160,8 +160,12 @@ function Navigation({ isFixed }) {
                         alt="THÔN TRANG LIÊN NHẬT" 
                         className={cx('logo')} 
                         onError={(e) => {
-                            console.error('Logo loading failed');
-                            e.target.style.display = 'none';
+                            console.error('Assets logo failed, trying public directory');
+                            e.target.src = '/thontrangliennhat-logo.png';
+                            e.target.onerror = () => {
+                                console.error('Both logo sources failed, hiding logo');
+                                e.target.style.display = 'none';
+                            };
                         }}
                     />
                 </Link>
