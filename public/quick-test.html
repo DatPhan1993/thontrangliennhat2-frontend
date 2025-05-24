@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Quick Image Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        img { width: 300px; height: 200px; border: 2px solid #ddd; margin: 10px; }
+        .success { border-color: green; }
+        .error { border-color: red; }
+        .info { padding: 10px; background: #f0f0f0; margin: 10px 0; }
+    </style>
+</head>
+<body>
+    <h1>🚀 Quick Production Image Test</h1>
+    
+    <div class="info">
+        <strong>Time:</strong> <span id="time"></span><br>
+        <strong>URL:</strong> <span id="url"></span>
+    </div>
+    
+    <h2>Image Tests:</h2>
+    
+    <div>
+        <h3>Test 1: Direct API Image</h3>
+        <img src="https://api.thontrangliennhat.com/images/uploads/1747304857516-52837735.jpg" 
+             alt="Test 1" 
+             onload="this.classList.add('success'); console.log('✅ Test 1 OK')"
+             onerror="this.classList.add('error'); console.log('❌ Test 1 FAIL')">
+        <div>URL: https://api.thontrangliennhat.com/images/uploads/1747304857516-52837735.jpg</div>
+    </div>
+    
+    <div>
+        <h3>Test 2: Another Image</h3>
+        <img src="https://api.thontrangliennhat.com/images/uploads/1747307205185-546664124.jpg" 
+             alt="Test 2" 
+             onload="this.classList.add('success'); console.log('✅ Test 2 OK')"
+             onerror="this.classList.add('error'); console.log('❌ Test 2 FAIL')">
+        <div>URL: https://api.thontrangliennhat.com/images/uploads/1747307205185-546664124.jpg</div>
+    </div>
+    
+    <div>
+        <h3>Test 3: Placeholder (Control)</h3>
+        <img src="https://via.placeholder.com/300x200?text=Control+Test" 
+             alt="Control" 
+             onload="this.classList.add('success'); console.log('✅ Control OK')"
+             onerror="this.classList.add('error'); console.log('❌ Control FAIL')">
+        <div>URL: https://via.placeholder.com/300x200?text=Control+Test</div>
+    </div>
+
+    <script>
+        document.getElementById('time').textContent = new Date().toLocaleString();
+        document.getElementById('url').textContent = window.location.href;
+        
+        console.log('🚀 Quick test page loaded');
+        console.log('Current URL:', window.location.href);
+    </script>
+</body>
+</html> 
