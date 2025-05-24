@@ -8,6 +8,7 @@ import Login from './pages/Admin/Login/Login';
 import ScrollToTop from './components/ScrollToTop/ScrollToTop';
 import Error404 from './pages/Error404/Error404';
 import { clearExperienceCache, clearCategoryCache } from './services/utils';
+import { installAllFixers } from './utils/urlFixer';
 
 // RouteLogger component to log route changes
 function RouteLogger() {
@@ -21,6 +22,12 @@ function RouteLogger() {
 }
 
 function App() {
+    // Install URL fixers immediately when app starts
+    useEffect(() => {
+        console.log('[App] Installing URL fixers...');
+        installAllFixers();
+    }, []);
+
     // Clear experience and category cache when the app starts
     useEffect(() => {
         clearExperienceCache();
