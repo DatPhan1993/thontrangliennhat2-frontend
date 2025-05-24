@@ -11,32 +11,12 @@
   },
   "routes": [
     {
-      "src": "/(logo192|logo512|thontrangliennhat-logo|favicon|apple-touch-icon)\\.png$",
-      "dest": "/$1.png"
-    },
-    {
-      "src": "/(manifest\\.json|robots\\.txt|sitemap\\.xml)$",
-      "dest": "/$1"
-    },
-    {
       "src": "/static/(.*)",
       "dest": "/static/$1"
     },
     {
-      "src": "/(.*\\.(js|css|png|jpg|jpeg|gif|webp|svg|ico|woff|woff2|ttf|eot))$",
+      "src": "/(.*\\.(png|jpg|jpeg|gif|webp|svg|ico|js|css|woff|woff2|ttf|eot))$",
       "dest": "/$1"
-    },
-    {
-      "src": "/images/(.*)",
-      "dest": "/images/$1"
-    },
-    {
-      "src": "/uploads/(.*)",
-      "dest": "/uploads/$1"
-    },
-    {
-      "src": "/api/(.*)",
-      "dest": "/api/$1"
     },
     {
       "src": "/(.*)",
