@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎯 Test Final - Image Display System</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .test-section {
+            background: white;
+            margin: 20px 0;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .test-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        .product-card {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            overflow: hidden;
+            background: white;
+        }
+        .product-card.success { border-color: #4CAF50; }
+        .product-card.error { border-color: #f44336; }
+        .product-image {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+        .product-info {
+            padding: 10px;
+        }
+        .product-name {
+            font-weight: bold;
+            margin: 0 0 5px 0;
+        }
+        .product-url {
+            font-size: 11px;
+            color: #666;
+            word-break: break-all;
+        }
+        .status {
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            color: white;
+            display: inline-block;
+        }
+        .status.success { background: #4CAF50; }
+        .status.error { background: #f44336; }
+        .status.loading { background: #2196F3; }
+        .api-test {
+            background: #e8f5e8;
+            padding: 15px;
+            border-radius: 6px;
+            margin: 10px 0;
+        }
+        .summary {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            padding: 15px;
+            border-radius: 6px;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>🎯 Test Final - Image Display System</h1>
+    <p>Kiểm tra toàn bộ hệ thống hiển thị hình ảnh sau khi fix structure</p>
+    
+    <div class="test-section">
+        <h2>📡 1. API Connection Test</h2>
+        <div id="api-results">Testing API connection...</div>
+    </div>
+    
+    <div class="test-section">
+        <h2>🖼️ 2. Image Loading Test</h2>
+        <div id="image-results">Loading images...</div>
+    </div>
+    
+    <div class="test-section">
+        <h2>📊 3. Summary</h2>
+        <div id="summary">Calculating results...</div>
+    </div>
+
+    <script>
+        const API_BASE = 'https://api.thontrangliennhat.com';
+        
+        // Simulate the imageUtils normalizeImageUrl logic
+        function normalizeImageUrl(imageUrl) {
+            if (!imageUrl || typeof imageUrl !== 'string' || imageUrl.trim() === '') {
+                return 'https://via.placeholder.com/300x200?text=No+Image+Available';
+            }
+            
+            if (imageUrl.startsWith('http://') || imageUrl.startsWith('https://')) {
+                return imageUrl;
+            }
+            
+            if (imageUrl.startsWith('/')) {
+                return `${API_BASE}${imageUrl}`;
+            }
+            
+            const filename = imageUrl.split('/').pop();
+            return `${API_BASE}/images/uploads/${filename}`;
+        }
+        
+        // Test API connection
+        async function testApiConnection() {
+            const apiResults = document.getElementById('api-results');
+            
+            try {
+                console.log('Testing API connection...');
+                const response = await fetch(`${API_BASE}/api/products`);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                const data = await response.json();
+                const products = data.data;
+                
+                apiResults.innerHTML = `
+                    <div class="api-test">
+                        ✅ API Connection: <strong>SUCCESS</strong><br>
+                        📦 Products Found: <strong>${products.length}</strong><br>
+                        🌐 API URL: <code>${API_BASE}/api/products</code><br>
+                        ⏱️ Response Time: <strong>~${Date.now() - window.startTime}ms</strong>
+                    </div>
+                `;
+                
+                return products;
+                
+            } catch (error) {
+                console.error('API Test Failed:', error);
+                apiResults.innerHTML = `
+                    <div class="api-test" style="background: #ffebee;">
+                        ❌ API Connection: <strong>FAILED</strong><br>
+                        🚨 Error: <code>${error.message}</code><br>
+                        🌐 API URL: <code>${API_BASE}/api/products</code>
+                    </div>
+                `;
+                return [];
+            }
+        }
+        
+        // Test image loading
+        async function testImageLoading(products) {
+            const imageResults = document.getElementById('image-results');
+            
+            if (products.length === 0) {
+                imageResults.innerHTML = '<p>❌ No products to test images</p>';
+                return { success: 0, error: 0 };
+            }
+            
+            const testProducts = products.slice(0, 8); // Test first 8 products
+            let successCount = 0;
+            let errorCount = 0;
+            
+            const grid = document.createElement('div');
+            grid.className = 'test-grid';
+            
+            for (let product of testProducts) {
+                const card = document.createElement('div');
+                card.className = 'product-card';
+                
+                const imageUrl = Array.isArray(product.images) && product.images.length > 0 
+                    ? normalizeImageUrl(product.images[0])
+                    : normalizeImageUrl(product.images);
+                
+                console.log(`Testing image for ${product.name}:`, imageUrl);
+                
+                try {
+                    const imageLoadTest = await testSingleImage(imageUrl);
+                    
+                    if (imageLoadTest.success) {
+                        successCount++;
+                        card.className += ' success';
+                    } else {
+                        errorCount++;
+                        card.className += ' error';
+                    }
+                    
+                    card.innerHTML = `
+                        <img src="${imageUrl}" alt="${product.name}" class="product-image" 
+                             onerror="this.src='https://via.placeholder.com/300x200?text=Image+Error'">
+                        <div class="product-info">
+                            <div class="product-name">${product.name}</div>
+                            <div class="status ${imageLoadTest.success ? 'success' : 'error'}">
+                                ${imageLoadTest.success ? '✅ LOADED' : '❌ FAILED'}
+                            </div>
+                            <div class="product-url">${imageUrl}</div>
+                        </div>
+                    `;
+                    
+                } catch (error) {
+                    errorCount++;
+                    card.className += ' error';
+                    card.innerHTML = `
+                        <div class="product-info">
+                            <div class="product-name">${product.name}</div>
+                            <div class="status error">❌ ERROR</div>
+                            <div class="product-url">Error: ${error.message}</div>
+                        </div>
+                    `;
+                }
+                
+                grid.appendChild(card);
+            }
+            
+            imageResults.innerHTML = '';
+            imageResults.appendChild(grid);
+            
+            return { success: successCount, error: errorCount, total: testProducts.length };
+        }
+        
+        // Test loading a single image
+        function testSingleImage(url) {
+            return new Promise((resolve) => {
+                const img = new Image();
+                const timeout = setTimeout(() => {
+                    resolve({ success: false, error: 'timeout' });
+                }, 5000);
+                
+                img.onload = () => {
+                    clearTimeout(timeout);
+                    resolve({ success: true });
+                };
+                
+                img.onerror = () => {
+                    clearTimeout(timeout);
+                    resolve({ success: false, error: 'load_error' });
+                };
+                
+                img.src = url;
+            });
+        }
+        
+        // Run all tests
+        async function runAllTests() {
+            window.startTime = Date.now();
+            
+            try {
+                // Test 1: API Connection
+                const products = await testApiConnection();
+                
+                // Test 2: Image Loading
+                const imageResults = await testImageLoading(products);
+                
+                // Test 3: Summary
+                const summary = document.getElementById('summary');
+                const totalTime = Date.now() - window.startTime;
+                const successRate = imageResults.total > 0 
+                    ? Math.round((imageResults.success / imageResults.total) * 100) 
+                    : 0;
+                
+                summary.innerHTML = `
+                    <h3>📊 Test Results Summary</h3>
+                    <p><strong>🌐 API Connection:</strong> ${products.length > 0 ? '✅ Working' : '❌ Failed'}</p>
+                    <p><strong>📦 Products Found:</strong> ${products.length}</p>
+                    <p><strong>🖼️ Images Tested:</strong> ${imageResults.total}</p>
+                    <p><strong>✅ Images Loaded:</strong> ${imageResults.success}</p>
+                    <p><strong>❌ Images Failed:</strong> ${imageResults.error}</p>
+                    <p><strong>📈 Success Rate:</strong> ${successRate}%</p>
+                    <p><strong>⏱️ Total Test Time:</strong> ${totalTime}ms</p>
+                    <hr>
+                    <h4>🎯 Conclusion:</h4>
+                    ${successRate >= 80 
+                        ? '<p style="color: green;">✅ <strong>Image system is working properly!</strong> Ready for production.</p>'
+                        : '<p style="color: orange;">⚠️ <strong>Some issues detected.</strong> Please check failed images and fix URLs.</p>'
+                    }
+                `;
+                
+            } catch (error) {
+                console.error('Test failed:', error);
+                document.getElementById('summary').innerHTML = `
+                    <h3>❌ Test Failed</h3>
+                    <p>Error: ${error.message}</p>
+                `;
+            }
+        }
+        
+        // Start tests when page loads
+        document.addEventListener('DOMContentLoaded', runAllTests);
+    </script>
+</body>
+</html> 
