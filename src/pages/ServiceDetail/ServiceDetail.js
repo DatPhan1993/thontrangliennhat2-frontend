@@ -7,6 +7,7 @@ import PushNotification from '~/components/PushNotification/PushNotification';
 import DateTime from '~/components/DateTime/DateTime';
 import Title from '~/components/Title/Title';
 import { getServiceById } from '~/services/serviceService';
+import { normalizeImageUrl } from '~/utils/imageUtils';
 import { Helmet } from 'react-helmet';
 import DOMPurify from 'dompurify';
 
@@ -34,6 +35,20 @@ const ServiceDetail = () => {
                 .map(paragraph => `<p>${paragraph.replace(/\n/g, '<br>')}</p>`)
                 .join('')
         );
+    };
+
+    // Get the correct image URL with normalization
+    const getServiceImageUrl = (service) => {
+        if (!service) return '';
+        
+        let imageUrl = '';
+        if (service.images && service.images.length > 0) {
+            imageUrl = Array.isArray(service.images) ? service.images[0] : service.images;
+        } else if (service.image) {
+            imageUrl = service.image;
+        }
+        
+        return normalizeImageUrl(imageUrl);
     };
 
     useEffect(() => {
@@ -73,6 +88,9 @@ const ServiceDetail = () => {
 
     // Format the content to ensure proper line breaks
     const formattedContent = formatContent(serviceDetail.content);
+    
+    // Get normalized image URL
+    const serviceImageUrl = getServiceImageUrl(serviceDetail);
 
     return (
         <article className={cx('wrapper')}>
@@ -86,11 +104,15 @@ const ServiceDetail = () => {
                 <Title text={`${serviceDetail.name || serviceDetail.title || 'Chi tiết dịch vụ'}`} className={cx('title')} />
             </div>
             
-            {serviceDetail.images && serviceDetail.images.length > 0 && (
+            {serviceImageUrl && (
                 <div className={cx('service-image')}>
                     <img 
-                        src={Array.isArray(serviceDetail.images) ? serviceDetail.images[0] : serviceDetail.images} 
-                        alt={serviceDetail.name || serviceDetail.title} 
+                        src={serviceImageUrl}
+                        alt={serviceDetail.name || serviceDetail.title}
+                        onError={(e) => {
+                            console.log('[ServiceDetail] Image failed to load:', e.target.src);
+                            e.target.style.display = 'none';
+                        }}
                     />
                 </div>
             )}

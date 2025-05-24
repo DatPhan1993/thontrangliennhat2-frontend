@@ -1,4 +1,5 @@
 import httpRequest from '~/utils/httpRequest';
+import { normalizeImageUrl } from '~/utils/imageUtils';
 
 // Helper functions for sessionStorage
 const saveToSessionStorage = (key, data) => {
@@ -8,6 +9,34 @@ const saveToSessionStorage = (key, data) => {
 const getFromSessionStorage = (key) => {
     const storedData = sessionStorage.getItem(key);
     return storedData ? JSON.parse(storedData) : null;
+};
+
+// Helper function to normalize service images
+const normalizeServiceImages = (service) => {
+    if (!service) return service;
+    
+    // Handle single image field
+    if (service.image) {
+        service.image = normalizeImageUrl(service.image);
+    }
+    
+    // Handle images array
+    if (service.images) {
+        if (Array.isArray(service.images)) {
+            service.images = service.images.map(img => normalizeImageUrl(img));
+        } else if (typeof service.images === 'string') {
+            // Handle comma-separated string of images
+            service.images = service.images.split(',').map(img => normalizeImageUrl(img.trim()));
+        }
+    }
+    
+    return service;
+};
+
+// Helper function to normalize array of services
+const normalizeServiceArray = (services) => {
+    if (!Array.isArray(services)) return services;
+    return services.map(service => normalizeServiceImages(service));
 };
 
 // Get paginated services and cache the result
@@ -21,7 +50,10 @@ export const getServicePagination = async (page = 1, limit = 4) => {
 
     try {
         const response = await httpRequest.get(`/services?page=${page}&limit=${limit}`);
-        const servicesData = response.data.data;
+        let servicesData = response.data.data;
+
+        // Normalize image URLs for all services
+        servicesData = normalizeServiceArray(servicesData);
 
         // Save to sessionStorage
         saveToSessionStorage(sessionKey, servicesData);
@@ -44,7 +76,10 @@ export const getServices = async () => {
 
     try {
         const response = await httpRequest.get('/services');
-        const servicesData = response.data.data;
+        let servicesData = response.data.data;
+
+        // Normalize image URLs for all services
+        servicesData = normalizeServiceArray(servicesData);
 
         // Save to sessionStorage
         saveToSessionStorage(sessionKey, servicesData);
@@ -77,6 +112,9 @@ export const getServiceById = async (id) => {
             }
         }
 
+        // Normalize image URLs
+        serviceData = normalizeServiceImages(serviceData);
+
         // Save to sessionStorage
         saveToSessionStorage(sessionKey, serviceData);
 
@@ -98,7 +136,10 @@ export const getServiceByCategory = async (categoryId) => {
 
     try {
         const response = await httpRequest.get(`/services?child_nav_id=${categoryId}`);
-        const servicesData = response.data.data;
+        let servicesData = response.data.data;
+
+        // Normalize image URLs for all services
+        servicesData = normalizeServiceArray(servicesData);
 
         // Save to sessionStorage
         saveToSessionStorage(sessionKey, servicesData);
