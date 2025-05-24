@@ -25,7 +25,7 @@ export const DEFAULT_ERROR_IMAGE = 'https://via.placeholder.com/300x200?text=Ima
 export const normalizeImageUrl = (imageUrl, defaultImage = DEFAULT_IMAGE) => {
     // Nếu không có URL hoặc URL không hợp lệ
     if (!imageUrl || typeof imageUrl !== 'string' || imageUrl.trim() === '') {
-        debugLog('Invalid or empty image URL, using default', { imageUrl, defaultImage });
+        console.log('[ImageUtil] Invalid or empty image URL, using default');
         return defaultImage;
     }
     
@@ -33,17 +33,17 @@ export const normalizeImageUrl = (imageUrl, defaultImage = DEFAULT_IMAGE) => {
     imageUrl = imageUrl.split('?')[0];
     
     // Log để debug
-    debugLog('Processing image URL', imageUrl);
+    console.log('[ImageUtil] Processing image URL:', imageUrl);
 
     // Nếu là URL đầy đủ, trả về ngay
     if (imageUrl.startsWith('http://') || imageUrl.startsWith('https://')) {
-        debugLog('Using existing full URL', imageUrl);
+        console.log('[ImageUtil] Using existing full URL:', imageUrl);
         return imageUrl;
     }
     
     // Get base API URL from config
     const apiBaseUrl = config.apiUrl || 'https://api.thontrangliennhat.com';
-    debugLog('API Base URL', apiBaseUrl);
+    console.log('[ImageUtil] API Base URL:', apiBaseUrl);
     
     // Normalize path separators to forward slashes
     imageUrl = imageUrl.replace(/\\/g, '/');
@@ -52,7 +52,7 @@ export const normalizeImageUrl = (imageUrl, defaultImage = DEFAULT_IMAGE) => {
     if (imageUrl.startsWith('/')) {
         // Handle uploads paths directly - this is for images uploaded via admin
         const fullUrl = `${apiBaseUrl}${imageUrl}`;
-        debugLog('Converting relative path to full URL', fullUrl);
+        console.log('[ImageUtil] Converting relative path to full URL:', fullUrl);
         return fullUrl;
     }
     
@@ -61,7 +61,7 @@ export const normalizeImageUrl = (imageUrl, defaultImage = DEFAULT_IMAGE) => {
     
     // Create a proper API URL with the uploads path
     const fullUrl = `${apiBaseUrl}/images/uploads/${filename}`;
-    debugLog('Created full URL with uploads path', fullUrl);
+    console.log('[ImageUtil] Created full URL with uploads path:', fullUrl);
     return fullUrl;
 };
 
@@ -125,7 +125,7 @@ export const getImageUrlWithFallback = async (imageUrl, fallbackUrl = DEFAULT_IM
         return normalizedUrl;
     }
     
-    debugLog('Primary image failed, using fallback', { primary: normalizedUrl, fallback: fallbackUrl });
+    console.log('[ImageUtil] Primary image failed, using fallback');
     return fallbackUrl;
 };
 
@@ -166,7 +166,7 @@ export const getImageUrl = (imagePath) => {
                 }
             } catch (e) {
                 // Nếu không phải JSON hợp lệ, tiếp tục xử lý bình thường
-                debugLog('Failed to parse JSON image path', { imagePath, error: e.message });
+                console.log('[ImageUtil] Failed to parse JSON image path');
             }
         }
         

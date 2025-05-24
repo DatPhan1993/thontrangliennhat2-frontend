@@ -1,6 +1,6 @@
 {
   "short_name": "Thôn Trang Liên Nhật",
-  "name": "HTX Nông Nghiệp - Dịch Vụ Tổng Hợp Liên Nhật",
+  "name": "Trang web Thôn Trang Liên Nhật",
   "icons": [
     {
       "src": "favicon.ico",
@@ -8,24 +8,18 @@
       "type": "image/x-icon"
     },
     {
-      "src": "thontrangliennhat-logo.png",
+      "src": "logo192.png",
       "type": "image/png",
       "sizes": "192x192"
     },
     {
-      "src": "thontrangliennhat-logo.png",
+      "src": "logo512.png",
       "type": "image/png",
       "sizes": "512x512"
-    },
-    {
-      "src": "apple-touch-icon.png",
-      "type": "image/png",
-      "sizes": "180x180"
     }
   ],
   "start_url": ".",
   "display": "standalone",
-  "theme_color": "#087436",
-  "background_color": "#ffffff",
-  "description": "HTX Nông Nghiệp - Dịch Vụ Tổng Hợp Liên Nhật cung cấp dịch vụ du lịch sinh thái, nuôi cá lồng, sản xuất thực phẩm sạch, tinh dầu tự nhiên."
+  "theme_color": "#000000",
+  "background_color": "#ffffff"
 }

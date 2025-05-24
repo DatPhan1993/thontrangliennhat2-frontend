@@ -50,48 +50,39 @@ function Services() {
         return <LoadingScreen isLoading={loading} />;
     }
 
-    // Only enable loop mode if we have enough slides
-    const shouldUseLoop = services.length >= 3;
-
     return (
         <div className={cx('wrapper')}>
             <div className={cx('inner')}>
                 <Title text="Sản Xuất Liên Nhật" showSeeAll={true} slug={`${routes.services}`} />
-                {services.length > 0 ? (
-                    <Swiper
-                        spaceBetween={10}
-                        slidesPerView={3}
-                        breakpoints={{
-                            1280: { slidesPerView: 3 },
-                            1024: { slidesPerView: 3 },
-                            768: { slidesPerView: 2 },
-                            0: { slidesPerView: 1 },
-                        }}
-                        loop={shouldUseLoop}
-                        modules={[Autoplay]}
-                        autoplay={shouldUseLoop ? {
-                            delay: 2000,
-                            disableOnInteraction: false,
-                        } : false}
-                    >
-                        {services.map((service, index) => (
-                            <SwiperSlide key={service.id || index} className={cx('slide')}>
-                                <Link to={`${routes.services}/san-xuat/${service.id}`}>
-                                    <CardService
-                                        title={service.name}
-                                        summary={service.summary}
-                                        image={Array.isArray(service.images) && service.images.length > 0 ? service.images[0] : service.images}
-                                        createdAt={service.created_at}
-                                    />
-                                </Link>
-                            </SwiperSlide>
-                        ))}
-                    </Swiper>
-                ) : (
-                    <div className={cx('no-services')}>
-                        <p>Không có dịch vụ nào để hiển thị.</p>
-                    </div>
-                )}
+                <Swiper
+                    spaceBetween={10}
+                    slidesPerView={3}
+                    breakpoints={{
+                        1280: { slidesPerView: 3 },
+                        1024: { slidesPerView: 3 },
+                        768: { slidesPerView: 2 },
+                        0: { slidesPerView: 1 },
+                    }}
+                    loop={true}
+                    modules={[Autoplay]}
+                    autoplay={{
+                        delay: 2000,
+                        disableOnInteraction: false,
+                    }}
+                >
+                    {services.map((service, index) => (
+                        <SwiperSlide key={index} className={cx('slide')}>
+                            <Link to={`${routes.services}/san-xuat/${service.id}`}>
+                                <CardService
+                                    title={service.name}
+                                    summary={service.summary}
+                                    image={Array.isArray(service.images) && service.images.length > 0 ? service.images[0] : service.images}
+                                    createdAt={service.created_at}
+                                />
+                            </Link>
+                        </SwiperSlide>
+                    ))}
+                </Swiper>
             </div>
         </div>
     );
