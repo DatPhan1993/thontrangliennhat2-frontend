@@ -17,20 +17,20 @@ const Footer = () => {
                 <div className={cx('footerLeft', 'footerColumnWide')}>
                     <Link to="/">
                         <img 
-                            src="/thontrangliennhat-logo.png" 
+                            src={companyLogo} 
                             alt="HỢP TÁC XÃ LIÊN NHẬT" 
                             className={cx('logo')} 
                             onError={(e) => {
-                                console.error('Footer logo failed to load from public directory');
-                                // Fallback to assets if public fails
-                                e.target.src = companyLogo;
+                                console.error('Footer logo failed to load from assets');
+                                // Fallback to public if assets fail
+                                e.target.src = '/thontrangliennhat-logo.png';
                                 e.target.onerror = () => {
                                     console.error('Footer: Both logo sources failed');
                                     e.target.style.display = 'none';
                                 };
                             }}
                             onLoad={() => {
-                                console.log('Footer logo loaded successfully from public directory');
+                                console.log('Footer logo loaded successfully from assets');
                             }}
                         />
                     </Link>
