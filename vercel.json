@@ -11,11 +11,11 @@
   },
   "routes": [
     {
-      "src": "/(logo192|logo512|thontrangliennhat-logo|favicon|apple-touch-icon)\\.png",
+      "src": "/(logo192|logo512|thontrangliennhat-logo|favicon|apple-touch-icon)\\.png$",
       "dest": "/$1.png"
     },
     {
-      "src": "/(manifest\\.json|robots\\.txt|sitemap\\.xml)",
+      "src": "/(manifest\\.json|robots\\.txt|sitemap\\.xml)$",
       "dest": "/$1"
     },
     {
