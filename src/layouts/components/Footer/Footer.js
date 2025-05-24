@@ -16,7 +16,22 @@ const Footer = () => {
             <div className={cx('inner')}>
                 <div className={cx('footerLeft', 'footerColumnWide')}>
                     <Link to="/">
-                        <img src={companyLogo} alt="Company Logo" className={cx('logo')} />
+                        <img 
+                            src={companyLogo} 
+                            alt="Company Logo" 
+                            className={cx('logo')} 
+                            onError={(e) => {
+                                console.error('Footer logo failed to load, trying public logo:', companyLogo);
+                                e.target.src = '/thontrangliennhat-logo.png';
+                                e.target.onerror = () => {
+                                    console.error('Footer public logo also failed to load');
+                                    e.target.style.display = 'none';
+                                };
+                            }}
+                            onLoad={() => {
+                                console.log('Footer logo loaded successfully:', companyLogo);
+                            }}
+                        />
                     </Link>
                     <h5>HỢP TÁC XÃ LIÊN NHẬT</h5>
                     <div className={cx('contactInfo')}>

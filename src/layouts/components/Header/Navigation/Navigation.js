@@ -155,7 +155,22 @@ function Navigation({ isFixed }) {
                     <FontAwesomeIcon icon={isMenuOpen ? faTimes : faBars} />
                 </div>
                     <Link to="/" className={cx('logo-link')}>
-                    <img src={images.logo} alt="Logo" className={cx('logo')} />
+                    <img 
+                        src={images.logo} 
+                        alt="Logo" 
+                        className={cx('logo')} 
+                        onError={(e) => {
+                            console.error('Assets logo failed to load, trying public logo:', images.logo);
+                            e.target.src = '/thontrangliennhat-logo.png';
+                            e.target.onerror = () => {
+                                console.error('Public logo also failed to load');
+                                e.target.style.display = 'none';
+                            };
+                        }}
+                        onLoad={() => {
+                            console.log('Logo loaded successfully:', images.logo);
+                        }}
+                    />
                 </Link>
                     <div className={cx('company-name')}>
                         <Link to="/">THÔN TRANG LIÊN NHẬT</Link>
