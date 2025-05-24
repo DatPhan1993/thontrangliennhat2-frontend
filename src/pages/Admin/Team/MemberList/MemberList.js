@@ -85,7 +85,19 @@ const MemberList = () => {
                             currentMembers.map((member) => (
                                 <tr key={member.id}>
                                     <td>
-                                        <img src={member.image} alt={member.name} className={styles.memberImage} />
+                                        <img 
+                                            src={member.image} 
+                                            alt={member.name} 
+                                            className={styles.memberImage}
+                                            onError={(e) => {
+                                                console.warn(`[MemberList] Image failed for ${member.name}: ${member.image}`);
+                                                e.target.onerror = null;
+                                                e.target.src = 'https://via.placeholder.com/100x100?text=' + encodeURIComponent(member.name.charAt(0));
+                                            }}
+                                            onLoad={() => {
+                                                console.log(`[MemberList] Image loaded successfully for ${member.name}: ${member.image}`);
+                                            }}
+                                        />
                                     </td>
                                     <td>{member.name}</td>
                                     <td>{member.position}</td>

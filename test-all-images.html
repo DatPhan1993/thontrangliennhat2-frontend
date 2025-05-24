@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎯 Test All Images - Complete System</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .test-section {
+            background: white;
+            margin: 20px 0;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .test-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        .item-card {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            overflow: hidden;
+            background: white;
+        }
+        .item-card.success { border-color: #4CAF50; }
+        .item-card.error { border-color: #f44336; }
+        .item-image {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+        .item-info {
+            padding: 10px;
+        }
+        .item-name {
+            font-weight: bold;
+            margin: 0 0 5px 0;
+        }
+        .item-url {
+            font-size: 11px;
+            color: #666;
+            word-break: break-all;
+        }
+        .status {
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            color: white;
+            display: inline-block;
+        }
+        .status.success { background: #4CAF50; }
+        .status.error { background: #f44336; }
+        .status.loading { background: #2196F3; }
+        .api-test {
+            background: #e8f5e8;
+            padding: 15px;
+            border-radius: 6px;
+            margin: 10px 0;
+        }
+        .summary {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            padding: 15px;
+            border-radius: 6px;
+            margin: 20px 0;
+        }
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+            margin: 15px 0;
+        }
+        .stat-item {
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 4px;
+            text-align: center;
+        }
+        .loading {
+            text-align: center;
+            color: #666;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+    <h1>🎯 Test All Images - Complete System</h1>
+    <p>Kiểm tra toàn bộ hệ thống hiển thị hình ảnh cho Products, Teams, và Services</p>
+    
+    <div class="test-section">
+        <h2>📊 Quick Stats</h2>
+        <div id="quick-stats" class="stats">
+            <div class="stat-item">
+                <div>API Status</div>
+                <div id="api-status">Testing...</div>
+            </div>
+            <div class="stat-item">
+                <div>Products</div>
+                <div id="products-count">Loading...</div>
+            </div>
+            <div class="stat-item">
+                <div>Teams</div>
+                <div id="teams-count">Loading...</div>
+            </div>
+            <div class="stat-item">
+                <div>Services</div>
+                <div id="services-count">Loading...</div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="test-section">
+        <h2>🛍️ Products Images</h2>
+        <div id="products-results" class="loading">Loading products...</div>
+    </div>
+    
+    <div class="test-section">
+        <h2>👥 Team Members Images</h2>
+        <div id="teams-results" class="loading">Loading team members...</div>
+    </div>
+    
+    <div class="test-section">
+        <h2>🔧 Services Images</h2>
+        <div id="services-results" class="loading">Loading services...</div>
+    </div>
+    
+    <div class="test-section">
+        <h2>📊 Final Summary</h2>
+        <div id="final-summary">Calculating results...</div>
+    </div>
+
+    <script>
+        const API_BASE = 'https://api.thontrangliennhat.com';
+        
+        // Global stats
+        let globalStats = {
+            products: { total: 0, success: 0, error: 0 },
+            teams: { total: 0, success: 0, error: 0 },
+            services: { total: 0, success: 0, error: 0 }
+        };
+        
+        // Simulate the imageUtils normalizeImageUrl logic
+        function normalizeImageUrl(imageUrl) {
+            if (!imageUrl || typeof imageUrl !== 'string' || imageUrl.trim() === '') {
+                return 'https://via.placeholder.com/300x200?text=No+Image+Available';
+            }
+            
+            if (imageUrl.startsWith('http://') || imageUrl.startsWith('https://')) {
+                return imageUrl;
+            }
+            
+            if (imageUrl.startsWith('/')) {
+                return `${API_BASE}${imageUrl}`;
+            }
+            
+            const filename = imageUrl.split('/').pop();
+            return `${API_BASE}/images/uploads/${filename}`;
+        }
+        
+        // Test single image loading
+        function testSingleImage(url) {
+            return new Promise((resolve) => {
+                const img = new Image();
+                const timeout = setTimeout(() => {
+                    resolve({ success: false, error: 'timeout' });
+                }, 10000);
+                
+                img.onload = () => {
+                    clearTimeout(timeout);
+                    resolve({ success: true });
+                };
+                
+                img.onerror = () => {
+                    clearTimeout(timeout);
+                    resolve({ success: false, error: 'load_error' });
+                };
+                
+                img.src = url;
+            });
+        }
+        
+        // Update quick stats
+        function updateQuickStats() {
+            document.getElementById('api-status').textContent = '✅ Connected';
+            document.getElementById('products-count').textContent = `${globalStats.products.success}/${globalStats.products.total}`;
+            document.getElementById('teams-count').textContent = `${globalStats.teams.success}/${globalStats.teams.total}`;
+            document.getElementById('services-count').textContent = `${globalStats.services.success}/${globalStats.services.total}`;
+        }
+        
+        // Test API endpoint
+        async function testEndpoint(endpoint, type) {
+            try {
+                const response = await fetch(`${API_BASE}/api/${endpoint}`);
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                
+                const data = await response.json();
+                return data.data || [];
+            } catch (error) {
+                console.error(`Error fetching ${type}:`, error);
+                return [];
+            }
+        }
+        
+        // Test products images
+        async function testProducts() {
+            const products = await testEndpoint('products', 'products');
+            globalStats.products.total = products.length;
+            
+            if (products.length === 0) {
+                document.getElementById('products-results').innerHTML = '<p>❌ No products found</p>';
+                return;
+            }
+            
+            const grid = document.createElement('div');
+            grid.className = 'test-grid';
+            
+            for (let product of products.slice(0, 6)) { // Test first 6
+                const card = document.createElement('div');
+                card.className = 'item-card';
+                
+                // Handle both string and array images
+                let imageUrl;
+                if (Array.isArray(product.images) && product.images.length > 0) {
+                    imageUrl = normalizeImageUrl(product.images[0]);
+                } else if (typeof product.images === 'string') {
+                    imageUrl = normalizeImageUrl(product.images);
+                } else {
+                    imageUrl = 'https://via.placeholder.com/300x200?text=No+Image';
+                }
+                
+                const imageTest = await testSingleImage(imageUrl);
+                
+                if (imageTest.success) {
+                    globalStats.products.success++;
+                    card.className += ' success';
+                } else {
+                    globalStats.products.error++;
+                    card.className += ' error';
+                }
+                
+                card.innerHTML = `
+                    <img src="${imageUrl}" alt="${product.name}" class="item-image" 
+                         onerror="this.src='https://via.placeholder.com/300x200?text=Product+Error'">
+                    <div class="item-info">
+                        <div class="item-name">${product.name}</div>
+                        <div class="status ${imageTest.success ? 'success' : 'error'}">
+                            ${imageTest.success ? '✅ LOADED' : '❌ FAILED'}
+                        </div>
+                        <div class="item-url">${imageUrl}</div>
+                    </div>
+                `;
+                
+                grid.appendChild(card);
+            }
+            
+            document.getElementById('products-results').innerHTML = '';
+            document.getElementById('products-results').appendChild(grid);
+            updateQuickStats();
+        }
+        
+        // Test teams images
+        async function testTeams() {
+            const teams = await testEndpoint('teams', 'teams');
+            globalStats.teams.total = teams.length;
+            
+            if (teams.length === 0) {
+                document.getElementById('teams-results').innerHTML = '<p>❌ No teams found</p>';
+                return;
+            }
+            
+            const grid = document.createElement('div');
+            grid.className = 'test-grid';
+            
+            for (let team of teams) {
+                const card = document.createElement('div');
+                card.className = 'item-card';
+                
+                const imageUrl = normalizeImageUrl(team.image || team.avatar);
+                const imageTest = await testSingleImage(imageUrl);
+                
+                if (imageTest.success) {
+                    globalStats.teams.success++;
+                    card.className += ' success';
+                } else {
+                    globalStats.teams.error++;
+                    card.className += ' error';
+                }
+                
+                card.innerHTML = `
+                    <img src="${imageUrl}" alt="${team.name}" class="item-image" 
+                         onerror="this.src='https://via.placeholder.com/300x200?text=Team+Error'">
+                    <div class="item-info">
+                        <div class="item-name">${team.name}</div>
+                        <div class="status ${imageTest.success ? 'success' : 'error'}">
+                            ${imageTest.success ? '✅ LOADED' : '❌ FAILED'}
+                        </div>
+                        <div class="item-url">${imageUrl}</div>
+                    </div>
+                `;
+                
+                grid.appendChild(card);
+            }
+            
+            document.getElementById('teams-results').innerHTML = '';
+            document.getElementById('teams-results').appendChild(grid);
+            updateQuickStats();
+        }
+        
+        // Test services images
+        async function testServices() {
+            const services = await testEndpoint('services', 'services');
+            globalStats.services.total = services.length;
+            
+            if (services.length === 0) {
+                document.getElementById('services-results').innerHTML = '<p>❌ No services found</p>';
+                return;
+            }
+            
+            const grid = document.createElement('div');
+            grid.className = 'test-grid';
+            
+            for (let service of services) {
+                const card = document.createElement('div');
+                card.className = 'item-card';
+                
+                // Handle both string and array images for services
+                let imageUrl;
+                if (Array.isArray(service.images) && service.images.length > 0) {
+                    imageUrl = normalizeImageUrl(service.images[0]);
+                } else if (typeof service.images === 'string') {
+                    imageUrl = normalizeImageUrl(service.images);
+                } else if (service.image) {
+                    imageUrl = normalizeImageUrl(service.image);
+                } else {
+                    imageUrl = 'https://via.placeholder.com/300x200?text=No+Image';
+                }
+                
+                const imageTest = await testSingleImage(imageUrl);
+                
+                if (imageTest.success) {
+                    globalStats.services.success++;
+                    card.className += ' success';
+                } else {
+                    globalStats.services.error++;
+                    card.className += ' error';
+                }
+                
+                card.innerHTML = `
+                    <img src="${imageUrl}" alt="${service.name}" class="item-image" 
+                         onerror="this.src='https://via.placeholder.com/300x200?text=Service+Error'">
+                    <div class="item-info">
+                        <div class="item-name">${service.name || service.title}</div>
+                        <div class="status ${imageTest.success ? 'success' : 'error'}">
+                            ${imageTest.success ? '✅ LOADED' : '❌ FAILED'}
+                        </div>
+                        <div class="item-url">${imageUrl}</div>
+                    </div>
+                `;
+                
+                grid.appendChild(card);
+            }
+            
+            document.getElementById('services-results').innerHTML = '';
+            document.getElementById('services-results').appendChild(grid);
+            updateQuickStats();
+        }
+        
+        // Generate final summary
+        function generateFinalSummary() {
+            const totalItems = globalStats.products.total + globalStats.teams.total + globalStats.services.total;
+            const totalSuccess = globalStats.products.success + globalStats.teams.success + globalStats.services.success;
+            const totalError = globalStats.products.error + globalStats.teams.error + globalStats.services.error;
+            const successRate = totalItems > 0 ? Math.round((totalSuccess / totalItems) * 100) : 0;
+            
+            const summary = document.getElementById('final-summary');
+            summary.innerHTML = `
+                <h3>📊 Overall Results</h3>
+                <div class="stats">
+                    <div class="stat-item">
+                        <div><strong>Total Items</strong></div>
+                        <div>${totalItems}</div>
+                    </div>
+                    <div class="stat-item">
+                        <div><strong>Images Loaded</strong></div>
+                        <div style="color: green;">${totalSuccess}</div>
+                    </div>
+                    <div class="stat-item">
+                        <div><strong>Images Failed</strong></div>
+                        <div style="color: red;">${totalError}</div>
+                    </div>
+                    <div class="stat-item">
+                        <div><strong>Success Rate</strong></div>
+                        <div style="color: ${successRate >= 80 ? 'green' : 'orange'};">${successRate}%</div>
+                    </div>
+                </div>
+                
+                <h4>📝 Detailed Breakdown:</h4>
+                <ul>
+                    <li><strong>Products:</strong> ${globalStats.products.success}/${globalStats.products.total} (${globalStats.products.total > 0 ? Math.round((globalStats.products.success/globalStats.products.total)*100) : 0}%)</li>
+                    <li><strong>Teams:</strong> ${globalStats.teams.success}/${globalStats.teams.total} (${globalStats.teams.total > 0 ? Math.round((globalStats.teams.success/globalStats.teams.total)*100) : 0}%)</li>
+                    <li><strong>Services:</strong> ${globalStats.services.success}/${globalStats.services.total} (${globalStats.services.total > 0 ? Math.round((globalStats.services.success/globalStats.services.total)*100) : 0}%)</li>
+                </ul>
+                
+                <h4>🎯 Conclusion:</h4>
+                ${successRate >= 90 
+                    ? '<p style="color: green; font-weight: bold;">🎉 Excellent! Image system is working perfectly!</p>'
+                    : successRate >= 70 
+                    ? '<p style="color: orange; font-weight: bold;">⚠️ Good, but some images need attention.</p>'
+                    : '<p style="color: red; font-weight: bold;">❌ Multiple image issues detected. Needs investigation.</p>'
+                }
+            `;
+        }
+        
+        // Run all tests
+        async function runAllTests() {
+            try {
+                await testProducts();
+                await testTeams();
+                await testServices();
+                generateFinalSummary();
+            } catch (error) {
+                console.error('Test failed:', error);
+                document.getElementById('final-summary').innerHTML = `
+                    <h3>❌ Test Failed</h3>
+                    <p>Error: ${error.message}</p>
+                `;
+            }
+        }
+        
+        // Start tests when page loads
+        document.addEventListener('DOMContentLoaded', runAllTests);
+    </script>
+</body>
+</html> 
