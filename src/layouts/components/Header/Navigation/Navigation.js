@@ -21,7 +21,7 @@ import {
     // faUsers,
     // faEnvelope,
 } from '@fortawesome/free-solid-svg-icons';
-import images from '~/assets/images';
+import Logo from '~/components/Logo/Logo';
 
 // const iconsData = [
 //     { position: 1, icon: faInfoCircle },
@@ -155,26 +155,9 @@ function Navigation({ isFixed }) {
                     <FontAwesomeIcon icon={isMenuOpen ? faTimes : faBars} />
                 </div>
                     <Link to="/" className={cx('logo-link')}>
-                    <img 
-                        src={images.logo} 
+                    <Logo 
                         alt="THÔN TRANG LIÊN NHẬT" 
                         className={cx('logo')} 
-                        onError={(e) => {
-                            console.error('Navigation: Assets logo failed, trying public directory');
-                            e.target.src = '/thontrangliennhat-logo.png';
-                            e.target.onerror = (e2) => {
-                                console.error('Navigation: Public logo failed, trying static media');
-                                e2.target.src = '/static/media/thontrangliennhat-logo.png';
-                                e2.target.onerror = (e3) => {
-                                    console.error('Navigation: Static media failed, trying API server');
-                                    e3.target.src = 'https://api.thontrangliennhat.com/images/thontrangliennhat-logo.png';
-                                    e3.target.onerror = () => {
-                                        console.error('Navigation: All logo sources failed, hiding logo');
-                                        e3.target.style.display = 'none';
-                                    };
-                                };
-                            };
-                        }}
                     />
                 </Link>
                     <div className={cx('company-name')}>

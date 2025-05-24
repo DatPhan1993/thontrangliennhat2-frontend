@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPhone, faEnvelope, faChevronRight, faMapMarkerAlt } from '@fortawesome/free-solid-svg-icons';
 import { faYoutube, faFacebook } from '@fortawesome/free-brands-svg-icons';
-import companyLogo from '~/assets/images/thontrangliennhat-logo.png';
+import Logo from '~/components/Logo/Logo';
 import styles from './Footer.module.scss';
 import classNames from 'classnames/bind';
 import routes from '~/config/routes';
@@ -16,26 +16,9 @@ const Footer = () => {
             <div className={cx('inner')}>
                 <div className={cx('footerLeft', 'footerColumnWide')}>
                     <Link to="/">
-                        <img 
-                            src={companyLogo} 
+                        <Logo 
                             alt="HỢP TÁC XÃ LIÊN NHẬT" 
                             className={cx('logo')} 
-                            onError={(e) => {
-                                console.error('Footer: Assets logo failed, trying public directory');
-                                e.target.src = '/thontrangliennhat-logo.png';
-                                e.target.onerror = (e2) => {
-                                    console.error('Footer: Public logo failed, trying static media');
-                                    e2.target.src = '/static/media/thontrangliennhat-logo.png';
-                                    e2.target.onerror = (e3) => {
-                                        console.error('Footer: Static media failed, trying API server');
-                                        e3.target.src = 'https://api.thontrangliennhat.com/images/thontrangliennhat-logo.png';
-                                        e3.target.onerror = () => {
-                                            console.error('Footer: All logo sources failed, hiding logo');
-                                            e3.target.style.display = 'none';
-                                        };
-                                    };
-                                };
-                            }}
                         />
                     </Link>
                     <h5>HỢP TÁC XÃ LIÊN NHẬT</h5>
