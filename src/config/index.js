@@ -19,9 +19,9 @@ const staticBaseUrl = process.env.REACT_APP_PUBLIC_URL || getBaseUrl();
 const config = {
     routes,
     apiUrl: apiUrl,
-    uploadUrl: `${staticBaseUrl}/uploads`,
-    uploadImageUrl: `${staticBaseUrl}/images/uploads`,
-    imageUrl: `${staticBaseUrl}/images`,
+    uploadUrl: `${apiUrl}/uploads`,
+    uploadImageUrl: `${apiUrl}/images/uploads`,
+    imageUrl: `${apiUrl}/images`,
     publicUrl: process.env.REACT_APP_PUBLIC_URL || 'https://thontrangliennhat.com',
 };
 

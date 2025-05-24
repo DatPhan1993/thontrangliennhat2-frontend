@@ -38,12 +38,7 @@ export const normalizeImageUrl = (imageUrl, defaultImage = DEFAULT_IMAGE) => {
     // Nếu là URL đầy đủ, trả về ngay
     if (imageUrl.startsWith('http://') || imageUrl.startsWith('https://')) {
         console.log('[ImageUtil] Using existing full URL:', imageUrl);
-        // Add cache busting parameter for production debugging
-        const separator = imageUrl.includes('?') ? '&' : '?';
-        const cacheBuster = `_t=${Date.now()}`;
-        const finalUrl = `${imageUrl}${separator}${cacheBuster}`;
-        console.log('[ImageUtil] Final URL with cache buster:', finalUrl);
-        return finalUrl;
+        return imageUrl;
     }
     
     // Get base API URL from config
@@ -56,9 +51,7 @@ export const normalizeImageUrl = (imageUrl, defaultImage = DEFAULT_IMAGE) => {
     // Nếu là đường dẫn tương đối (bắt đầu bằng /)
     if (imageUrl.startsWith('/')) {
         // Handle uploads paths directly - this is for images uploaded via admin
-        const baseUrl = `${apiBaseUrl}${imageUrl}`;
-        const cacheBuster = `?_t=${Date.now()}`;
-        const fullUrl = `${baseUrl}${cacheBuster}`;
+        const fullUrl = `${apiBaseUrl}${imageUrl}`;
         console.log('[ImageUtil] Converting relative path to full URL:', fullUrl);
         return fullUrl;
     }
@@ -67,9 +60,7 @@ export const normalizeImageUrl = (imageUrl, defaultImage = DEFAULT_IMAGE) => {
     const filename = imageUrl.split('/').pop();
     
     // Create a proper API URL with the uploads path
-    const baseUrl = `${apiBaseUrl}/images/uploads/${filename}`;
-    const cacheBuster = `?_t=${Date.now()}`;
-    const fullUrl = `${baseUrl}${cacheBuster}`;
+    const fullUrl = `${apiBaseUrl}/images/uploads/${filename}`;
     console.log('[ImageUtil] Created full URL with uploads path:', fullUrl);
     return fullUrl;
 };

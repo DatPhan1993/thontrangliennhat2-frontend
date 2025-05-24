@@ -8,6 +8,7 @@ import Login from './pages/Admin/Login/Login';
 import ScrollToTop from './components/ScrollToTop/ScrollToTop';
 import Error404 from './pages/Error404/Error404';
 import { clearExperienceCache, clearCategoryCache } from './services/utils';
+import ImageDebugger from './components/ImageDebugger/ImageDebugger';
 
 // RouteLogger component to log route changes
 function RouteLogger() {
@@ -58,6 +59,7 @@ function App() {
                 <div className="App">
                     <ScrollToTop />
                     <RouteLogger />
+                    <ImageDebugger />
                     <Routes>
                         {publicRoutes.map((route, index) => {
                             const Page = route.component;

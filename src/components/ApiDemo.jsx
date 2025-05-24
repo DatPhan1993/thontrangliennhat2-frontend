@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import api, { ImageUtils, CacheUtils } from '../utils/api';
+import { getProducts } from '~/services/productService';
+import { normalizeImageUrl } from '~/utils/imageUtils';
 
 /**
  * 🔧 API Demo Component
@@ -16,9 +17,9 @@ function ApiDemo() {
     setError(null);
     
     try {
-      const response = await api.getProducts();
-      setData(response.data);
-      console.log('✅ Products loaded:', response.data?.length || 0);
+      const response = await getProducts();
+      setData(response);
+      console.log('✅ Products loaded:', response?.length || 0);
     } catch (err) {
       setError(err.message);
       console.error('❌ API Error:', err);
@@ -29,11 +30,12 @@ function ApiDemo() {
 
   // Clear cache function
   const handleClearCache = async () => {
-    const success = await CacheUtils.clearAllCache();
-    if (success) {
+    try {
+      // Clear sessionStorage cache
+      sessionStorage.clear();
       alert('✅ Cache cleared successfully!');
       window.location.reload();
-    } else {
+    } catch (err) {
       alert('❌ Failed to clear cache');
     }
   };
@@ -76,13 +78,17 @@ function ApiDemo() {
           {data.slice(0, 3).map(product => (
             <div key={product.id} style={{ margin: '10px 0', padding: '10px', background: '#f5f5f5' }}>
               <h4>{product.name}</h4>
-              {product.image && (
+              {(product.image || product.images) && (
                 <img 
-                  src={ImageUtils.fixImageUrl(product.image)} 
+                  src={normalizeImageUrl(
+                    Array.isArray(product.images) && product.images.length > 0 
+                      ? product.images[0] 
+                      : product.image || product.images
+                  )} 
                   alt={product.name}
                   style={{ maxWidth: '100px', height: 'auto' }}
                   onError={(e) => {
-                    console.log('🔧 Image error fixed for:', e.target.src);
+                    console.log('🔧 Image error for:', e.target.src);
                     e.target.style.display = 'none';
                   }}
                 />
@@ -94,9 +100,9 @@ function ApiDemo() {
       )}
       
       <div style={{ marginTop: '20px', fontSize: '12px', color: '#666' }}>
-        <p>🌐 API Base: {api.baseURL}</p>
-        <p>🔧 Fix Script: Loaded automatically</p>
-        <p>📝 Guide: <a href="https://api.thontrangliennhat.com/fix-guide.html" target="_blank">Open Fix Guide</a></p>
+        <p>🌐 API Base: https://api.thontrangliennhat.com</p>
+        <p>🔧 Image Utils: Using normalizeImageUrl</p>
+        <p>📝 Cache: SessionStorage based</p>
       </div>
     </div>
   );
