@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Production Image Test</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            margin: 20px; 
+            background: #f5f5f5; 
+        }
+        .test-section { 
+            background: white; 
+            padding: 20px; 
+            margin: 20px 0; 
+            border-radius: 8px; 
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .test-image { 
+            width: 300px; 
+            height: 200px; 
+            border: 3px solid #ddd; 
+            margin: 10px; 
+            object-fit: cover;
+        }
+        .success { border-color: #4CAF50; }
+        .error { border-color: #f44336; }
+        .status { 
+            padding: 10px; 
+            margin: 10px 0; 
+            border-radius: 4px;
+            font-family: monospace;
+        }
+        .status.success { background: #e8f5e8; color: #2e7d32; }
+        .status.error { background: #ffebee; color: #c62828; }
+        .url-display { 
+            font-size: 12px; 
+            color: #666; 
+            margin: 5px 0; 
+            word-break: break-all;
+        }
+    </style>
+</head>
+<body>
+    <h1>🚨 Production Image Test</h1>
+    <p><strong>Current URL:</strong> <span id="current-url"></span></p>
+    <p><strong>Test Time:</strong> <span id="test-time"></span></p>
+    
+    <div class="test-section">
+        <h2>🔧 API Test</h2>
+        <div id="api-status">Testing API...</div>
+    </div>
+    
+    <div class="test-section">
+        <h2>🖼️ Direct Image Tests</h2>
+        
+        <h3>Test 1: API Image</h3>
+        <div class="url-display">https://api.thontrangliennhat.com/images/uploads/1747304857516-52837735.jpg</div>
+        <img class="test-image" 
+             src="https://api.thontrangliennhat.com/images/uploads/1747304857516-52837735.jpg" 
+             alt="API Image Test"
+             onload="this.classList.add('success'); updateStatus('img1', 'success', 'Image loaded successfully!')"
+             onerror="this.classList.add('error'); updateStatus('img1', 'error', 'Failed to load image')">
+        <div id="img1-status" class="status">Loading...</div>
+        
+        <h3>Test 2: Another API Image</h3>
+        <div class="url-display">https://api.thontrangliennhat.com/images/uploads/1747307205185-546664124.jpg</div>
+        <img class="test-image" 
+             src="https://api.thontrangliennhat.com/images/uploads/1747307205185-546664124.jpg" 
+             alt="API Image Test 2"
+             onload="this.classList.add('success'); updateStatus('img2', 'success', 'Image loaded successfully!')"
+             onerror="this.classList.add('error'); updateStatus('img2', 'error', 'Failed to load image')">
+        <div id="img2-status" class="status">Loading...</div>
+        
+        <h3>Test 3: Placeholder (Should Always Work)</h3>
+        <div class="url-display">https://via.placeholder.com/300x200?text=Test+Working</div>
+        <img class="test-image" 
+             src="https://via.placeholder.com/300x200?text=Test+Working" 
+             alt="Placeholder Test"
+             onload="this.classList.add('success'); updateStatus('img3', 'success', 'Placeholder loaded successfully!')"
+             onerror="this.classList.add('error'); updateStatus('img3', 'error', 'Even placeholder failed!')">
+        <div id="img3-status" class="status">Loading...</div>
+    </div>
+    
+    <div class="test-section">
+        <h2>🍽️ Product Data Test</h2>
+        <div id="product-data">Loading products...</div>
+    </div>
+
+    <script>
+        // Display current info
+        document.getElementById('current-url').textContent = window.location.href;
+        document.getElementById('test-time').textContent = new Date().toLocaleString();
+        
+        function updateStatus(elementId, type, message) {
+            const statusEl = document.getElementById(elementId + '-status');
+            statusEl.textContent = message;
+            statusEl.className = 'status ' + type;
+            console.log(`[${elementId}] ${type}: ${message}`);
+        }
+        
+        // Test API
+        async function testAPI() {
+            const statusDiv = document.getElementById('api-status');
+            
+            try {
+                console.log('🔍 Testing API from production...');
+                const response = await fetch('https://api.thontrangliennhat.com/api/products');
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    statusDiv.innerHTML = `
+                        <div class="status success">
+                            ✅ API Response: ${response.status}<br>
+                            📊 Products Count: ${data.data?.length || 0}<br>
+                            🔗 API URL: https://api.thontrangliennhat.com/api/products
+                        </div>
+                    `;
+                    
+                    // Show product data
+                    showProductData(data.data?.slice(0, 3) || []);
+                    
+                    return data;
+                } else {
+                    statusDiv.innerHTML = `<div class="status error">❌ API Error: ${response.status}</div>`;
+                    return null;
+                }
+            } catch (error) {
+                statusDiv.innerHTML = `<div class="status error">💥 Network Error: ${error.message}</div>`;
+                console.error('API Error:', error);
+                return null;
+            }
+        }
+        
+        function showProductData(products) {
+            const productDiv = document.getElementById('product-data');
+            
+            if (products.length === 0) {
+                productDiv.innerHTML = '<div class="status error">No products found</div>';
+                return;
+            }
+            
+            let html = '<h3>First 3 Products:</h3>';
+            
+            products.forEach((product, index) => {
+                const imageUrl = Array.isArray(product.images) && product.images.length > 0 
+                    ? product.images[0] 
+                    : product.images;
+                
+                html += `
+                    <div style="border: 1px solid #ddd; padding: 10px; margin: 10px 0; border-radius: 4px;">
+                        <h4>${product.name} (ID: ${product.id})</h4>
+                        <div class="url-display">
+                            <strong>Raw images:</strong> ${JSON.stringify(product.images)}<br>
+                            <strong>Selected image:</strong> ${imageUrl}
+                        </div>
+                    </div>
+                `;
+            });
+            
+            productDiv.innerHTML = html;
+        }
+        
+        // Auto-run tests when page loads
+        window.addEventListener('load', () => {
+            console.log('🚀 Starting production tests...');
+            testAPI();
+        });
+        
+        // Log all errors
+        window.addEventListener('error', (e) => {
+            console.error('Global error:', e.error);
+        });
+    </script>
+</body>
+</html> 
