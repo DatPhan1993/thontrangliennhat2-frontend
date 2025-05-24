@@ -1,4 +1,5 @@
 import httpRequest from '~/utils/httpRequest';
+import { normalizeImageUrl } from '~/utils/imageUtils';
 
 // Helper functions for sessionStorage
 const saveToSessionStorage = (key, data) => {
@@ -16,19 +17,36 @@ export const getMembers = async () => {
 
     const cachedData = getFromSessionStorage(sessionKey);
     if (cachedData) {
+        console.log('[teamService] Using cached team members data');
         return cachedData;
     }
 
     try {
+        console.log('[teamService] Fetching fresh team members data from API...');
         const response = await httpRequest.get('/teams');
         const membersData = response.data.data;
+        
+        console.log(`[teamService] Received ${membersData.length} team members from API`);
+        
+        // Normalize image URLs for all members
+        const normalizedMembers = membersData.map(member => {
+            const processedMember = {
+                ...member,
+                image: normalizeImageUrl(member.image || member.avatar),
+                avatar: normalizeImageUrl(member.avatar || member.image)
+            };
+            
+            console.log(`[teamService] Member ${member.name} - Original: ${member.image}, Normalized: ${processedMember.image}`);
+            return processedMember;
+        });
 
         // Save to sessionStorage
-        saveToSessionStorage(sessionKey, membersData);
+        saveToSessionStorage(sessionKey, normalizedMembers);
+        console.log(`[teamService] Cached ${normalizedMembers.length} team members in sessionStorage`);
 
-        return membersData;
+        return normalizedMembers;
     } catch (error) {
-        console.error('Error fetching members', error);
+        console.error('[teamService] Error fetching members', error);
         throw error;
     }
 };

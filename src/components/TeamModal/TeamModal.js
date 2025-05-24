@@ -35,11 +35,26 @@ const TeamModal = ({ visible, onClose, team }) => {
                 {team && (
                     <div className={cx('team-detail')}>
                         <div className={cx('team-image-container')}>
-                            <img src={team.image} alt={team.name} className={cx('team-image')} />
+                            <img 
+                                src={team.image} 
+                                alt={team.name} 
+                                className={cx('team-image')}
+                                onError={(e) => {
+                                    console.warn(`[TeamModal] Image failed for ${team.name}: ${team.image}`);
+                                    e.target.onerror = null;
+                                    e.target.src = 'https://via.placeholder.com/300x300?text=' + encodeURIComponent(team.name.charAt(0));
+                                }}
+                                onLoad={() => {
+                                    console.log(`[TeamModal] Image loaded successfully for ${team.name}: ${team.image}`);
+                                }}
+                            />
                         </div>
                         <div className={cx('team-info')}>
                             <h2 className={cx('team-name')}>{team.name}</h2>
                             <p className={cx('team-position')}>{team.position}</p>
+                            {team.description && (
+                                <p className={cx('team-description')}>{team.description}</p>
+                            )}
                         </div>
                     </div>
                 )}

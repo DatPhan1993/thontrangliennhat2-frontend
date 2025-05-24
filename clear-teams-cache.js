@@ -1,0 +1,1 @@
+console.log('Clearing sessionStorage...'); Object.keys(sessionStorage).forEach(key => { if(key.includes('Member') || key.includes('team') || key.includes('Team')) { console.log('Removing:', key); sessionStorage.removeItem(key); } }); console.log('Cache cleared!');

@@ -10,6 +10,7 @@ import { Autoplay } from 'swiper/modules';
 import 'swiper/css';
 import 'swiper/css/autoplay';
 import { getMembers } from '~/services/teamService';
+import { normalizeImageUrl } from '~/utils/imageUtils';
 
 const cx = classNames.bind(styles);
 
@@ -25,9 +26,27 @@ function Teams() {
             setLoading(true);
             try {
                 const members = await getMembers();
-                members.sort((a, b) => b.name.localeCompare(a.name));
-                setTeams(members);
+                
+                // Log để debug
+                console.log('[Teams] Original members data:', members);
+                
+                // Normalize image URLs for all members
+                const processedMembers = members.map(member => {
+                    const processedMember = {
+                        ...member,
+                        // Use image field first, fallback to avatar
+                        image: normalizeImageUrl(member.image || member.avatar),
+                        avatar: normalizeImageUrl(member.avatar || member.image)
+                    };
+                    
+                    console.log(`[Teams] Member ${member.name} - Original image: ${member.image}, Processed: ${processedMember.image}`);
+                    return processedMember;
+                });
+                
+                processedMembers.sort((a, b) => b.name.localeCompare(a.name));
+                setTeams(processedMembers);
             } catch (error) {
+                console.error('[Teams] Error loading teams:', error);
                 setError(error);
             } finally {
                 setLoading(false);
@@ -99,7 +118,19 @@ function Teams() {
                         {teamsArr?.map((team, index) => (
                             <SwiperSlide key={index} className={cx('slide')} onClick={() => handleOpenDetail(team)}>
                                 <div className={cx('team-card')}>
-                                    <img src={team.image} alt={team.name} className={cx('team-image')} />
+                                    <img 
+                                        src={team.image} 
+                                        alt={team.name} 
+                                        className={cx('team-image')}
+                                        onError={(e) => {
+                                            console.warn(`[Teams] Image failed for ${team.name}: ${team.image}`);
+                                            e.target.onerror = null; // Prevent infinite loop
+                                            e.target.src = 'https://via.placeholder.com/200x200?text=' + encodeURIComponent(team.name.charAt(0));
+                                        }}
+                                        onLoad={() => {
+                                            console.log(`[Teams] Image loaded successfully for ${team.name}: ${team.image}`);
+                                        }}
+                                    />
                                     <div className={cx('team-info')}>
                                         <h3 className={cx('team-name')}>{team.name}</h3>
                                         <p className={cx('team-position')}>{team.position}</p>
