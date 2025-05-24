@@ -1,29 +1,30 @@
-<IfModule mod_rewrite.c>
-  RewriteEngine On
-  RewriteBase /
-  
-  # Phục vụ manifest.json trực tiếp
-  RewriteRule ^manifest\.json$ - [L]
-  
-  # Phục vụ các file static trực tiếp
-  RewriteRule ^static/(.*)$ static/$1 [L]
-  
-  # Phục vụ các file asset trực tiếp
-  RewriteRule ^(.+\.[a-zA-Z0-9]{5,}\.(js|css))$ $1 [L]
-  RewriteRule ^(.*\.(js|css|json|png|jpg|jpeg|gif|ico|svg|webp))$ $1 [L]
-  
-  # Các request còn lại chuyển về index.html
-  RewriteRule ^index\.html$ - [L]
-  RewriteCond %{REQUEST_FILENAME} !-f
-  RewriteCond %{REQUEST_FILENAME} !-d
-  RewriteCond %{REQUEST_FILENAME} !-l
-  RewriteRule . /index.html [L]
+# Cache static assets
+<IfModule mod_expires.c>
+    ExpiresActive on
+    ExpiresByType text/css "access plus 1 year"
+    ExpiresByType application/javascript "access plus 1 year"
+    ExpiresByType image/png "access plus 1 year"
+    ExpiresByType image/jpg "access plus 1 year"
+    ExpiresByType image/jpeg "access plus 1 year"
+    ExpiresByType image/gif "access plus 1 year"
+    ExpiresByType image/webp "access plus 1 year"
 </IfModule>
 
-# Đặt các header bảo mật
+# Prevent access to source files
+<FilesMatch "\.(env|log|config)$">
+    Deny from all
+</FilesMatch>
+
+# Handle React Router
+RewriteEngine On
+RewriteBase /
+
+# Handle Angular and React Routes
+RewriteRule ^(?!.*\.).*$ /index.html [L]
+
+# Security headers
 <IfModule mod_headers.c>
-  Header set X-Content-Type-Options "nosniff"
-  Header set X-Frame-Options "DENY"
-  Header set X-XSS-Protection "1; mode=block"
-  Header set Strict-Transport-Security "max-age=31536000; includeSubDomains"
+    Header always set X-Content-Type-Options nosniff
+    Header always set X-Frame-Options DENY
+    Header always set X-XSS-Protection "1; mode=block"
 </IfModule>

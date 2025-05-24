@@ -25,13 +25,14 @@ export const DEFAULT_ERROR_IMAGE = 'https://via.placeholder.com/300x200?text=Ima
 export const normalizeImageUrl = (imageUrl, defaultImage = DEFAULT_IMAGE) => {
     // Nếu không có URL hoặc URL không hợp lệ
     if (!imageUrl || typeof imageUrl !== 'string' || imageUrl.trim() === '') {
-        debugLog('Invalid or empty image URL, using default', imageUrl);
+        debugLog('Invalid or empty image URL, using default', { imageUrl, defaultImage });
         return defaultImage;
     }
     
     // Remove any query parameters to avoid caching issues
     imageUrl = imageUrl.split('?')[0];
     
+    // Log để debug
     debugLog('Processing image URL', imageUrl);
 
     // Nếu là URL đầy đủ, trả về ngay
@@ -49,21 +50,12 @@ export const normalizeImageUrl = (imageUrl, defaultImage = DEFAULT_IMAGE) => {
     
     // Nếu là đường dẫn tương đối (bắt đầu bằng /)
     if (imageUrl.startsWith('/')) {
-        // Handle different path patterns
-        if (imageUrl.includes('/uploads/') || imageUrl.includes('/images/')) {
-            // Already has proper path structure
-            const fullUrl = `${apiBaseUrl}${imageUrl}`;
-            debugLog('Converting relative path to full URL', fullUrl);
-            return fullUrl;
-        } else {
-            // Add uploads path if missing
-            const fullUrl = `${apiBaseUrl}/images${imageUrl}`;
-            debugLog('Adding uploads path to relative URL', fullUrl);
-            return fullUrl;
-        }
+        // Handle uploads paths directly - this is for images uploaded via admin
+        const fullUrl = `${apiBaseUrl}${imageUrl}`;
+        debugLog('Converting relative path to full URL', fullUrl);
+        return fullUrl;
     }
     
-    // Handle case where imageUrl is just a filename or partial path
     // Extract filename from path
     const filename = imageUrl.split('/').pop();
     
@@ -104,6 +96,40 @@ export const normalizeImageArray = (images) => {
 };
 
 /**
+ * Test if an image URL can be loaded
+ * @param {string} url - The image URL to test
+ * @returns {Promise<boolean>} Promise that resolves to true if image loads successfully
+ */
+export const testImageUrl = (url) => {
+    return new Promise((resolve) => {
+        const img = new Image();
+        img.onload = () => resolve(true);
+        img.onerror = () => resolve(false);
+        img.src = url;
+        
+        // Timeout after 5 seconds
+        setTimeout(() => resolve(false), 5000);
+    });
+};
+
+/**
+ * Get image URL with fallback testing
+ * @param {string} imageUrl - The primary image URL
+ * @param {string} fallbackUrl - The fallback image URL
+ * @returns {Promise<string>} Promise that resolves to a working image URL
+ */
+export const getImageUrlWithFallback = async (imageUrl, fallbackUrl = DEFAULT_IMAGE) => {
+    const normalizedUrl = normalizeImageUrl(imageUrl);
+    
+    if (await testImageUrl(normalizedUrl)) {
+        return normalizedUrl;
+    }
+    
+    debugLog('Primary image failed, using fallback', { primary: normalizedUrl, fallback: fallbackUrl });
+    return fallbackUrl;
+};
+
+/**
  * Hàm tương thích ngược cho các component cũ
  * @param {string|Array} imagePath - Đường dẫn ảnh hoặc mảng đường dẫn
  * @returns {string} URL ảnh đã chuẩn hóa
@@ -140,6 +166,7 @@ export const getImageUrl = (imagePath) => {
                 }
             } catch (e) {
                 // Nếu không phải JSON hợp lệ, tiếp tục xử lý bình thường
+                debugLog('Failed to parse JSON image path', { imagePath, error: e.message });
             }
         }
         

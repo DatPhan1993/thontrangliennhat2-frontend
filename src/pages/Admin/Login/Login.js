@@ -7,17 +7,6 @@ import companyLogo from '~/assets/images/thontrangliennhat-logo.png';
 const Login = () => {
     const { signin } = useAuth();
 
-    const handleLogoError = (e) => {
-        // Try public directory fallback first
-        if (e.target.src !== `${process.env.PUBLIC_URL}/thontrangliennhat-logo.png`) {
-            e.target.src = `${process.env.PUBLIC_URL}/thontrangliennhat-logo.png`;
-        } else {
-            // If both sources fail, hide the logo
-            e.target.style.display = 'none';
-            console.warn('Admin Login logo could not be loaded from any source');
-        }
-    };
-
     const handleLogin = async (values, { setSubmitting, setErrors }) => {
         try {
             await signin(values);
@@ -31,12 +20,7 @@ const Login = () => {
     return (
         <div className={styles.loginContainer}>
             <div className={styles.loginBox}>
-                <img 
-                    src={companyLogo} 
-                    alt="Company Logo" 
-                    className={styles.logo}
-                    onError={handleLogoError}
-                />
+                <img src={companyLogo} alt="Company Logo" className={styles.logo} />
                 <h1>Đăng Nhập</h1>
                 <Formik
                     initialValues={{ email: '', password: '' }}

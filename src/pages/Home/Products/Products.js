@@ -22,68 +22,77 @@ function Products() {
     const [error, setError] = useState(null);
 
     useEffect(() => {
-        const fetchProductsAndCategories = async () => {
+        const loadProducts = async () => {
             try {
-                const [categoriesData, productsData] = await Promise.all([
-                    getCategoriesBySlug('san-pham'),
+                const [productsData, categoriesData] = await Promise.all([
                     getProducts(),
+                    getCategoriesBySlug('san-pham'),
                 ]);
 
-                setCategories(categoriesData);
                 setProducts(productsData);
-            } catch (err) {
-                setError(err);
-                console.error('Error fetching data:', err);
+                setCategories(categoriesData);
+            } catch (error) {
+                setError(error);
             } finally {
                 setLoading(false);
             }
         };
 
-        fetchProductsAndCategories();
+        loadProducts();
     }, []);
 
     if (error) {
-        return <PushNotification message={error.message} />;
+        const errorMessage = error.response ? error.response.data.message : 'Network Error';
+        return <PushNotification message={errorMessage} />;
     }
 
     if (loading) {
         return <LoadingScreen isLoading={loading} />;
     }
 
+    // Only enable loop mode if we have enough slides
+    const shouldUseLoop = products.length >= 3;
+
     return (
         <div className={cx('wrapper')}>
             <div className={cx('inner')}>
                 <Title text="Sản phẩm" showSeeAll={true} slug={`${routes.products}`} />
-                <Swiper
-                    spaceBetween={10}
-                    slidesPerView={3}
-                    breakpoints={{
-                        1280: { slidesPerView: 3 },
-                        1024: { slidesPerView: 2 },
-                        768: { slidesPerView: 2 },
-                        0: { slidesPerView: 1 },
-                    }}
-                    loop={true}
-                    modules={[Autoplay]}
-                    autoplay={{
-                        delay: 2000,
-                        disableOnInteraction: false,
-                    }}
-                >
-                    {products.map((product) => {
-                        return (
-                            <SwiperSlide key={product.id} className={cx('slide')}>
-                                <Product
-                                    image={product.images && product.images.length > 0 ? product.images[0] : ''}
-                                    name={product.name}
-                                    productId={product.id}
-                                    category="san-pham"
-                                    link={`${routes.products}/san-pham/${product.id}`}
-                                />
-                            </SwiperSlide>
-                        );
-                    })}
-                </Swiper>
+                {products.length > 0 ? (
+                    <Swiper
+                        spaceBetween={10}
+                        slidesPerView={3}
+                        breakpoints={{
+                            1280: { slidesPerView: 3 },
+                            1024: { slidesPerView: 2 },
+                            768: { slidesPerView: 2 },
+                            0: { slidesPerView: 1 },
+                        }}
+                        loop={shouldUseLoop}
+                        modules={[Autoplay]}
+                        autoplay={shouldUseLoop ? {
+                            delay: 2000,
+                            disableOnInteraction: false,
+                        } : false}
+                    >
+                        {products.map((product) => {
+                            return (
+                                <SwiperSlide key={product.id} className={cx('slide')}>
+                                    <Product
+                                        image={product.images && product.images.length > 0 ? product.images[0] : ''}
+                                        name={product.name}
+                                        productId={product.id}
+                                        category="san-pham"
+                                        link={`${routes.products}/san-pham/${product.id}`}
+                                    />
+                                </SwiperSlide>
+                            );
+                        })}
+                    </Swiper>
+                ) : (
+                    <div className={cx('no-products')}>
+                        <p>Không có sản phẩm nào để hiển thị.</p>
+                    </div>
+                )}
             </div>
         </div>
     );

@@ -1,14 +1,19 @@
-# https://www.robotstxt.org/robotstxt.html
 User-agent: *
-Disallow: /admin
-Disallow: /login
-Disallow: /dashboard
-Disallow: /temp
-Disallow: /node_modules
+Allow: /
 
-# Allow access to public assets
-Allow: /*.css
-Allow: /*.js  
-Allow: /static
+# Sitemaps
+Sitemap: https://thontrangliennhat.com/sitemap.xml
 
-Sitemap: https://thontrangliennhat.com/sitemap.xml 
+# Disallow admin areas
+Disallow: /admin/
+Disallow: /api/
+Disallow: /static/
+Disallow: /.well-known/
+
+# Allow important pages
+Allow: /san-pham/
+Allow: /san-xuat/
+Allow: /trai-nghiem/
+Allow: /tin-tuc/
+Allow: /gioi-thieu/
+Allow: /lien-he/
