@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Image Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .test-image { width: 300px; height: 200px; border: 2px solid #ddd; margin: 10px; }
+        .success { border-color: green; }
+        .error { border-color: red; }
+        .info { background: #f0f0f0; padding: 10px; margin: 10px 0; }
+    </style>
+</head>
+<body>
+    <h1>🖼️ Simple Image Test</h1>
+    
+    <div class="info">
+        <h3>Test 1: Direct API Image</h3>
+        <p>URL: https://api.thontrangliennhat.com/images/uploads/1747304857516-52837735.jpg</p>
+        <img class="test-image" 
+             src="https://api.thontrangliennhat.com/images/uploads/1747304857516-52837735.jpg" 
+             alt="Test 1"
+             onload="this.classList.add('success'); console.log('✅ Test 1 loaded')"
+             onerror="this.classList.add('error'); console.error('❌ Test 1 failed')">
+    </div>
+    
+    <div class="info">
+        <h3>Test 2: Another API Image</h3>
+        <p>URL: https://api.thontrangliennhat.com/images/uploads/1747307205185-546664124.jpg</p>
+        <img class="test-image" 
+             src="https://api.thontrangliennhat.com/images/uploads/1747307205185-546664124.jpg" 
+             alt="Test 2"
+             onload="this.classList.add('success'); console.log('✅ Test 2 loaded')"
+             onerror="this.classList.add('error'); console.error('❌ Test 2 failed')">
+    </div>
+    
+    <div class="info">
+        <h3>Test 3: Placeholder Image</h3>
+        <p>URL: https://via.placeholder.com/300x200?text=Test+Image</p>
+        <img class="test-image" 
+             src="https://via.placeholder.com/300x200?text=Test+Image" 
+             alt="Test 3"
+             onload="this.classList.add('success'); console.log('✅ Test 3 loaded')"
+             onerror="this.classList.add('error'); console.error('❌ Test 3 failed')">
+    </div>
+
+    <script>
+        console.log('🚀 Simple image test started');
+        
+        // Test API endpoint
+        fetch('https://api.thontrangliennhat.com/api/products')
+            .then(response => response.json())
+            .then(data => {
+                console.log('✅ API accessible, products count:', data.data?.length || 0);
+                if (data.data && data.data.length > 0) {
+                    console.log('📸 First product images:', data.data[0].images);
+                }
+            })
+            .catch(error => {
+                console.error('❌ API error:', error);
+            });
+    </script>
+</body>
+</html> 

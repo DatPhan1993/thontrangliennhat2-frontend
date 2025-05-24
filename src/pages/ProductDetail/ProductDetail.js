@@ -44,7 +44,8 @@ const ProductDetail = () => {
                 } else {
                     setProductDetail(response);
                 }
-                console.log('Product detail:', productDetail);
+                // Log the response instead of productDetail to avoid dependency issue
+                console.log('Product detail response:', response);
             } catch (error) {
                 setError(error);
                 console.error('Error fetching product detail:', error);

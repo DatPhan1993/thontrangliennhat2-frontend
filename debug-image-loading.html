@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🐛 Debug Image Loading</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f5f5f5;
+        }
+        .section {
+            background: white;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .test-image {
+            width: 200px;
+            height: 150px;
+            object-fit: cover;
+            border: 2px solid #ddd;
+            margin: 10px;
+            border-radius: 4px;
+        }
+        .error {
+            border-color: #f44336;
+            background-color: #fff5f5;
+        }
+        .success {
+            border-color: #4caf50;
+        }
+        .log {
+            background: #f8f9fa;
+            padding: 10px;
+            border-left: 4px solid #007bff;
+            margin: 10px 0;
+            font-family: monospace;
+        }
+        .url-info {
+            font-size: 12px;
+            color: #666;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <h1>🐛 Debug Image Loading</h1>
+    
+    <div class="section">
+        <h2>🔧 Function Test</h2>
+        <button onclick="testNormalizeFunction()">Test normalizeImageUrl Function</button>
+        <div id="function-results"></div>
+    </div>
+    
+    <div class="section">
+        <h2>🌐 API Test</h2>
+        <button onclick="testApiImages()">Test Images from API</button>
+        <div id="api-results"></div>
+    </div>
+    
+    <div class="section">
+        <h2>🖼️ Direct Image Test</h2>
+        <div id="direct-test"></div>
+    </div>
+
+    <script>
+        // Simulate the frontend config
+        const config = {
+            apiUrl: 'https://api.thontrangliennhat.com'
+        };
+        
+        // Copy of normalizeImageUrl function from src/utils/imageUtils.js
+        const DEFAULT_IMAGE = 'https://via.placeholder.com/300x200?text=No+Image+Available';
+        
+        const normalizeImageUrl = (imageUrl, defaultImage = DEFAULT_IMAGE) => {
+            console.log('[DEBUG] normalizeImageUrl called with:', imageUrl);
+            
+            if (!imageUrl || typeof imageUrl !== 'string' || imageUrl.trim() === '') {
+                console.log('[DEBUG] Invalid or empty image URL, using default');
+                return defaultImage;
+            }
+            
+            // Remove any query parameters to avoid caching issues
+            imageUrl = imageUrl.split('?')[0];
+            
+            console.log('[DEBUG] Processing image URL:', imageUrl);
+
+            // If it's a full URL, return it as is
+            if (imageUrl.startsWith('http://') || imageUrl.startsWith('https://')) {
+                console.log('[DEBUG] Using existing full URL:', imageUrl);
+                return imageUrl;
+            }
+            
+            // Get base API URL from config
+            const apiBaseUrl = config.apiUrl || 'https://api.thontrangliennhat.com';
+            console.log('[DEBUG] API Base URL:', apiBaseUrl);
+            
+            // Normalize path separators to forward slashes
+            imageUrl = imageUrl.replace(/\\/g, '/');
+            
+            // If it's a relative path (starts with /)
+            if (imageUrl.startsWith('/')) {
+                const fullUrl = `${apiBaseUrl}${imageUrl}`;
+                console.log('[DEBUG] Converting relative path to full URL:', fullUrl);
+                return fullUrl;
+            }
+            
+            // Extract filename from path
+            const filename = imageUrl.split('/').pop();
+            
+            // Create a proper API URL with the uploads path
+            const fullUrl = `${apiBaseUrl}/images/uploads/${filename}`;
+            console.log('[DEBUG] Created full URL with uploads path:', fullUrl);
+            return fullUrl;
+        };
+        
+        function log(message, type = 'info') {
+            console.log(`[${type.toUpperCase()}] ${message}`);
+        }
+        
+        function testNormalizeFunction() {
+            const results = document.getElementById('function-results');
+            results.innerHTML = '<h3>🧪 Function Tests</h3>';
+            
+            const testCases = [
+                '/images/uploads/1747304857516-52837735.jpg',
+                'https://api.thontrangliennhat.com/images/uploads/1747304857516-52837735.jpg',
+                '1747304857516-52837735.jpg',
+                '',
+                null,
+                undefined,
+                'invalid-path'
+            ];
+            
+            testCases.forEach((testCase, index) => {
+                const result = normalizeImageUrl(testCase);
+                const div = document.createElement('div');
+                div.className = 'log';
+                div.innerHTML = `
+                    <strong>Test ${index + 1}:</strong><br>
+                    Input: <code>${testCase}</code><br>
+                    Output: <code>${result}</code>
+                `;
+                results.appendChild(div);
+            });
+        }
+        
+        async function testApiImages() {
+            const results = document.getElementById('api-results');
+            results.innerHTML = '<h3>🌐 Loading API data...</h3>';
+            
+            try {
+                const response = await fetch('https://api.thontrangliennhat.com/api/products');
+                const data = await response.json();
+                
+                if (data.data && Array.isArray(data.data) && data.data.length > 0) {
+                    results.innerHTML = '<h3>🍽️ First 5 Products from API</h3>';
+                    
+                    const firstFive = data.data.slice(0, 5);
+                    
+                    firstFive.forEach(product => {
+                        const productDiv = document.createElement('div');
+                        productDiv.style.margin = '20px 0';
+                        productDiv.style.padding = '15px';
+                        productDiv.style.border = '1px solid #ddd';
+                        productDiv.style.borderRadius = '8px';
+                        
+                        const imageUrl = Array.isArray(product.images) && product.images.length > 0 
+                            ? product.images[0] 
+                            : product.images;
+                        
+                        const normalizedUrl = normalizeImageUrl(imageUrl);
+                        
+                        productDiv.innerHTML = `
+                            <h4>${product.name} (ID: ${product.id})</h4>
+                            <div class="url-info">
+                                <strong>Raw images:</strong> ${JSON.stringify(product.images)}<br>
+                                <strong>Selected image:</strong> ${imageUrl}<br>
+                                <strong>Normalized URL:</strong> ${normalizedUrl}
+                            </div>
+                            <img class="test-image" src="${normalizedUrl}" 
+                                 alt="${product.name}"
+                                 onload="this.classList.add('success'); console.log('✅ Loaded:', this.src)"
+                                 onerror="this.classList.add('error'); console.error('❌ Failed:', this.src)">
+                        `;
+                        
+                        results.appendChild(productDiv);
+                    });
+                } else {
+                    results.innerHTML = '<div class="log">❌ No products found in API response</div>';
+                }
+            } catch (error) {
+                results.innerHTML = `<div class="log">💥 API Error: ${error.message}</div>`;
+                console.error('API Error:', error);
+            }
+        }
+        
+        function testDirectImages() {
+            const results = document.getElementById('direct-test');
+            results.innerHTML = '<h3>🖼️ Direct Image Tests</h3>';
+            
+            const directUrls = [
+                'https://api.thontrangliennhat.com/images/uploads/1747304857516-52837735.jpg',
+                'https://api.thontrangliennhat.com/images/uploads/1747307205185-546664124.jpg',
+                'https://api.thontrangliennhat.com/images/uploads/1747307338648-246991835.jpg'
+            ];
+            
+            directUrls.forEach((url, index) => {
+                const div = document.createElement('div');
+                div.style.margin = '10px 0';
+                div.innerHTML = `
+                    <h4>Direct Test ${index + 1}</h4>
+                    <div class="url-info">URL: ${url}</div>
+                    <img class="test-image" src="${url}" 
+                         alt="Direct test ${index + 1}"
+                         onload="this.classList.add('success'); console.log('✅ Direct loaded:', this.src)"
+                         onerror="this.classList.add('error'); console.error('❌ Direct failed:', this.src)">
+                `;
+                results.appendChild(div);
+            });
+        }
+        
+        // Auto-run tests when page loads
+        window.addEventListener('load', () => {
+            console.log('🚀 Starting debug tests...');
+            testNormalizeFunction();
+            setTimeout(() => {
+                testApiImages();
+                testDirectImages();
+            }, 1000);
+        });
+    </script>
+</body>
+</html> 

@@ -68,6 +68,8 @@ const routes = {
     error404: '/404',
     contact: '/lien-he',
     privacy: '/dieu-khoan-chinh-sach',
+    // Debug
+    imageDebug: '/debug/images',
 };
 
 export default routes;

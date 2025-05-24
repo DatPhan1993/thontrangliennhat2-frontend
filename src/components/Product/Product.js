@@ -22,11 +22,11 @@ function Product({ image, name, link, productId, category }) {
         if (!image) {
             console.log(`[Product] No image provided for "${name}"`);
             return DEFAULT_IMAGE;
-        }
-        
+            }
+            
         // Handle array of images - use first one
-        if (Array.isArray(image) && image.length > 0) {
-            const firstImage = image[0];
+            if (Array.isArray(image) && image.length > 0) {
+                const firstImage = image[0];
             const url = normalizeImageUrl(firstImage);
             console.log(`[Product] Processed image array for "${name}":`, firstImage, '->', url);
             return url;
@@ -37,12 +37,12 @@ function Product({ image, name, link, productId, category }) {
             const url = normalizeImageUrl(image);
             console.log(`[Product] Processed image string for "${name}":`, image, '->', url);
             return url;
-        }
+                }
         
         console.log(`[Product] Invalid image format for "${name}":`, typeof image, image);
         return DEFAULT_IMAGE;
     }, [image, name]);
-
+    
     // Error handler for image load failures
     const handleImageError = (e) => {
         console.error(`[Product] Image failed to load for "${name}":`, processedImageUrl);
@@ -51,7 +51,7 @@ function Product({ image, name, link, productId, category }) {
     };
 
     return (
-        <div className={cx('product-item')}>
+            <div className={cx('product-item')}>
             <div className={cx('product-image-container')}>
                 {imageError ? (
                     <div className={cx('product-image-error')}>
@@ -67,8 +67,8 @@ function Product({ image, name, link, productId, category }) {
                     />
                 )}
             </div>
-            <div className={cx('product-item-details')}>
-                <h2 className={cx('product-item-name')}>{name}</h2>
+                <div className={cx('product-item-details')}>
+                    <h2 className={cx('product-item-name')}>{name}</h2>
 
                 <Link to={productLink} className={cx('detail-button-link')}>
                     <Button rounded outline rightIcon={<FontAwesomeIcon icon={faChevronRight}/>} className={cx('product-item-button')}>

@@ -38,6 +38,9 @@ export const normalizeImageUrl = (imageUrl, defaultImage = DEFAULT_IMAGE) => {
     // Nếu là URL đầy đủ, trả về ngay
     if (imageUrl.startsWith('http://') || imageUrl.startsWith('https://')) {
         console.log('[ImageUtil] Using existing full URL:', imageUrl);
+        // Temporarily disable cache busting for testing
+        // const separator = imageUrl.includes('?') ? '&' : '?';
+        // return `${imageUrl}${separator}t=${Date.now()}`;
         return imageUrl;
     }
     
@@ -52,6 +55,7 @@ export const normalizeImageUrl = (imageUrl, defaultImage = DEFAULT_IMAGE) => {
     if (imageUrl.startsWith('/')) {
         // Handle uploads paths directly - this is for images uploaded via admin
         const fullUrl = `${apiBaseUrl}${imageUrl}`;
+        // const fullUrl = `${apiBaseUrl}${imageUrl}?t=${Date.now()}`;
         console.log('[ImageUtil] Converting relative path to full URL:', fullUrl);
         return fullUrl;
     }
@@ -61,6 +65,7 @@ export const normalizeImageUrl = (imageUrl, defaultImage = DEFAULT_IMAGE) => {
     
     // Create a proper API URL with the uploads path
     const fullUrl = `${apiBaseUrl}/images/uploads/${filename}`;
+    // const fullUrl = `${apiBaseUrl}/images/uploads/${filename}?t=${Date.now()}`;
     console.log('[ImageUtil] Created full URL with uploads path:', fullUrl);
     return fullUrl;
 };

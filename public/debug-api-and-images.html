@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug API & Images</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background: #f5f5f5; }
+        .section { background: white; padding: 20px; margin: 20px 0; border-radius: 8px; }
+        .product-card { border: 1px solid #ddd; padding: 15px; margin: 10px 0; border-radius: 8px; }
+        .test-image { width: 200px; height: 150px; border: 2px solid #ddd; margin: 10px; }
+        .success { border-color: green; }
+        .error { border-color: red; }
+        .log { background: #f8f9fa; padding: 10px; margin: 10px 0; font-family: monospace; }
+        .url-info { font-size: 12px; color: #666; margin: 5px 0; }
+    </style>
+</head>
+<body>
+    <h1>🔍 Debug API & Images</h1>
+    
+    <div class="section">
+        <h2>📡 API Status</h2>
+        <div id="api-status">Testing...</div>
+    </div>
+    
+    <div class="section">
+        <h2>🖼️ Image Tests</h2>
+        <div id="image-tests">Loading...</div>
+    </div>
+    
+    <div class="section">
+        <h2>🍽️ Products from API</h2>
+        <div id="products-display">Loading...</div>
+    </div>
+
+    <script>
+        // Simulate the normalizeImageUrl function
+        const normalizeImageUrl = (imageUrl) => {
+            if (!imageUrl || typeof imageUrl !== 'string' || imageUrl.trim() === '') {
+                return 'https://via.placeholder.com/300x200?text=No+Image+Available';
+            }
+            
+            if (imageUrl.startsWith('http://') || imageUrl.startsWith('https://')) {
+                return imageUrl;
+            }
+            
+            const apiBaseUrl = 'https://api.thontrangliennhat.com';
+            
+            if (imageUrl.startsWith('/')) {
+                return `${apiBaseUrl}${imageUrl}`;
+            }
+            
+            const filename = imageUrl.split('/').pop();
+            return `${apiBaseUrl}/images/uploads/${filename}`;
+        };
+        
+        async function testAPI() {
+            const statusDiv = document.getElementById('api-status');
+            
+            try {
+                console.log('🔍 Testing API...');
+                const response = await fetch('https://api.thontrangliennhat.com/api/products');
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    statusDiv.innerHTML = `
+                        <div class="log">✅ API Response: ${response.status}</div>
+                        <div class="log">📊 Products Count: ${data.data?.length || 0}</div>
+                        <div class="log">🔗 API URL: https://api.thontrangliennhat.com/api/products</div>
+                    `;
+                    return data;
+                } else {
+                    statusDiv.innerHTML = `<div class="log">❌ API Error: ${response.status}</div>`;
+                    return null;
+                }
+            } catch (error) {
+                statusDiv.innerHTML = `<div class="log">💥 Network Error: ${error.message}</div>`;
+                console.error('API Error:', error);
+                return null;
+            }
+        }
+        
+        function testImages() {
+            const testsDiv = document.getElementById('image-tests');
+            
+            const testUrls = [
+                'https://api.thontrangliennhat.com/images/uploads/1747304857516-52837735.jpg',
+                'https://api.thontrangliennhat.com/images/uploads/1747307205185-546664124.jpg',
+                'https://via.placeholder.com/300x200?text=Placeholder'
+            ];
+            
+            let html = '<h3>Direct Image Tests:</h3>';
+            
+            testUrls.forEach((url, index) => {
+                html += `
+                    <div style="margin: 10px 0;">
+                        <div class="url-info">Test ${index + 1}: ${url}</div>
+                        <img class="test-image" src="${url}" alt="Test ${index + 1}"
+                             onload="this.classList.add('success'); console.log('✅ Image ${index + 1} loaded')"
+                             onerror="this.classList.add('error'); console.error('❌ Image ${index + 1} failed')">
+                    </div>
+                `;
+            });
+            
+            testsDiv.innerHTML = html;
+        }
+        
+        async function displayProducts() {
+            const productsDiv = document.getElementById('products-display');
+            
+            const data = await testAPI();
+            if (!data || !data.data) {
+                productsDiv.innerHTML = '<div class="log">❌ No product data available</div>';
+                return;
+            }
+            
+            const products = data.data.slice(0, 5); // First 5 products
+            let html = '<h3>First 5 Products:</h3>';
+            
+            products.forEach(product => {
+                const imageUrl = Array.isArray(product.images) && product.images.length > 0 
+                    ? product.images[0] 
+                    : product.images;
+                
+                const normalizedUrl = normalizeImageUrl(imageUrl);
+                
+                html += `
+                    <div class="product-card">
+                        <h4>${product.name} (ID: ${product.id})</h4>
+                        <div class="url-info">
+                            <strong>Raw images:</strong> ${JSON.stringify(product.images)}<br>
+                            <strong>Selected image:</strong> ${imageUrl}<br>
+                            <strong>Normalized URL:</strong> ${normalizedUrl}
+                        </div>
+                        <img class="test-image" src="${normalizedUrl}" alt="${product.name}"
+                             onload="this.classList.add('success'); console.log('✅ Product image loaded:', '${product.name}')"
+                             onerror="this.classList.add('error'); console.error('❌ Product image failed:', '${product.name}')">
+                    </div>
+                `;
+            });
+            
+            productsDiv.innerHTML = html;
+        }
+        
+        // Run tests when page loads
+        window.addEventListener('load', async () => {
+            console.log('🚀 Starting comprehensive debug...');
+            
+            // Test images first
+            testImages();
+            
+            // Wait a bit then test products
+            setTimeout(async () => {
+                await displayProducts();
+            }, 1000);
+        });
+    </script>
+</body>
+</html> 

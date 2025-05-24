@@ -70,6 +70,9 @@ import MemberList from '~/pages/Admin/Team/MemberList/MemberList';
 import AddMember from '~/pages/Admin/Team/AddMember/AddMember';
 import UpdateMember from '~/pages/Admin/Team/UpdateMember/UpdateMember';
 
+// Debug components
+import ImageDebug from '~/pages/ImageDebug/ImageDebug';
+
 // Public Routes
 const publicRoutes = [
     {
@@ -134,6 +137,8 @@ const publicRoutes = [
     { path: config.routes.search, component: Search, layout: OnlyHeaderLayout },
     { path: config.routes.error404, component: Error404, layout: NothingLayout },
     { path: config.routes.contact, component: Contact, layout: OnlyHeaderLayout },
+    // Debug route
+    { path: config.routes.imageDebug, component: ImageDebug, layout: OnlyHeaderLayout },
     // {
     //     path: config.routes.recruitment,
     //     component: Recruitment,
