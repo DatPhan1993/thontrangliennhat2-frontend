@@ -11,6 +11,7 @@ import routes from '~/config/routes';
 import Title from '~/components/Title/Title';
 import { Spin } from 'antd';
 import DOMPurify from 'dompurify';
+import { normalizeImageUrl } from '~/utils/imageUtils';
 
 const UpdateService = () => {
     const { id } = useParams();
@@ -56,7 +57,7 @@ const UpdateService = () => {
     useEffect(() => {
         const fetchCategories = async () => {
             try {
-                const fetchedCategories = await getCategoriesBySlug('dich-vu');
+                const fetchedCategories = await getCategoriesBySlug('san-xuat');
                 // Combine fetched categories with custom categories
                 setCategories(fetchedCategories.length > 0 ? fetchedCategories : customCategories);
             } catch (error) {
@@ -207,11 +208,16 @@ const UpdateService = () => {
                                 <img
                                     src={
                                         typeof values.image === 'string'
-                                            ? values.image
+                                            ? normalizeImageUrl(values.image)
                                             : URL.createObjectURL(values.image)
                                     }
                                     alt="Service"
                                     className={styles.serviceImage}
+                                    onError={(e) => {
+                                        console.error('Image preview failed to load:', e.target.src);
+                                        e.target.style.background = '#f0f0f0';
+                                        e.target.style.border = '1px solid #ddd';
+                                    }}
                                 />
                             </div>
                         )}
