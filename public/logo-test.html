@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Logo Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .test-section { margin: 20px 0; padding: 15px; border: 1px solid #ddd; }
+        img { max-width: 200px; margin: 10px; border: 1px solid #ccc; }
+        .error { color: red; }
+        .success { color: green; }
+    </style>
+</head>
+<body>
+    <h1>Logo Loading Test</h1>
+    
+    <div class="test-section">
+        <h3>1. Public Directory Logo</h3>
+        <img src="/thontrangliennhat-logo.png" alt="Public Logo" onload="this.nextSibling.className='success'" onerror="this.nextSibling.className='error'">
+        <span>Loading...</span>
+    </div>
+    
+    <div class="test-section">
+        <h3>2. Static Media Logo (Build)</h3>
+        <img src="/static/media/thontrangliennhat-logo.a114e7ea2696af9d14d8.png" alt="Static Logo" onload="this.nextSibling.className='success'" onerror="this.nextSibling.className='error'">
+        <span>Loading...</span>
+    </div>
+    
+    <div class="test-section">
+        <h3>3. API Server Logo</h3>
+        <img src="https://api.thontrangliennhat.com/images/thontrangliennhat-logo.png" alt="API Logo" onload="this.nextSibling.className='success'" onerror="this.nextSibling.className='error'">
+        <span>Loading...</span>
+    </div>
+    
+    <script>
+        console.log('Logo test page loaded at:', new Date().toISOString());
+        
+        // Test all image sources
+        document.querySelectorAll('img').forEach((img, index) => {
+            img.addEventListener('load', () => {
+                console.log(`Image ${index + 1} loaded successfully: ${img.src}`);
+            });
+            
+            img.addEventListener('error', () => {
+                console.error(`Image ${index + 1} failed to load: ${img.src}`);
+            });
+        });
+    </script>
+</body>
+</html>

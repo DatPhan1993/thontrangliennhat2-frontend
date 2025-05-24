@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useMemo } from 'react';
+import React, { useEffect, useState } from 'react';
 import classNames from 'classnames/bind';
 import { Link, NavLink } from 'react-router-dom';
 import { getNavigationLinks } from '~/services/navigationService';
@@ -43,8 +43,8 @@ function Navigation({ isFixed }) {
     const [openSubMenus, setOpenSubMenus] = useState({});
     const [openSubSubMenus, setOpenSubSubMenus] = useState({});
     
-    // List of titles to hide - using useMemo to prevent re-creation on every render
-    const hiddenMenuItems = useMemo(() => ['Gạo Hữu Cơ Liên Nhật', 'Cá Rô Đồng', 'Tôm Càng Xanh', 'Ốc Bươu'], []);
+    // List of titles to hide
+    const hiddenMenuItems = ['Gạo Hữu Cơ Liên Nhật', 'Cá Rô Đồng', 'Tôm Càng Xanh', 'Ốc Bươu'];
 
     useEffect(() => {
         const fetchNavigationLinks = async () => {
@@ -74,7 +74,7 @@ function Navigation({ isFixed }) {
         };
 
         fetchNavigationLinks();
-    }, [hiddenMenuItems]);
+    }, []);
 
     const toggleMenu = () => {
         setIsMenuOpen(!isMenuOpen);
@@ -138,17 +138,6 @@ function Navigation({ isFixed }) {
         }
     };
 
-    const handleLogoError = (e) => {
-        // Try public directory fallback first
-        if (e.target.src !== `${process.env.PUBLIC_URL}/thontrangliennhat-logo.png`) {
-            e.target.src = `${process.env.PUBLIC_URL}/thontrangliennhat-logo.png`;
-        } else {
-            // If both sources fail, hide the logo
-            e.target.style.display = 'none';
-            console.warn('Navigation logo could not be loaded from any source');
-        }
-    };
-
     if (error) {
         const errorMessage = error.response ? error.response.data.message : 'Network Error';
         return <PushNotification message={errorMessage} />;
@@ -170,7 +159,22 @@ function Navigation({ isFixed }) {
                         src={images.logo} 
                         alt="THÔN TRANG LIÊN NHẬT" 
                         className={cx('logo')} 
-                        onError={handleLogoError}
+                        onError={(e) => {
+                            console.error('Navigation: Assets logo failed, trying public directory');
+                            e.target.src = '/thontrangliennhat-logo.png';
+                            e.target.onerror = (e2) => {
+                                console.error('Navigation: Public logo failed, trying static media');
+                                e2.target.src = '/static/media/thontrangliennhat-logo.png';
+                                e2.target.onerror = (e3) => {
+                                    console.error('Navigation: Static media failed, trying API server');
+                                    e3.target.src = 'https://api.thontrangliennhat.com/images/thontrangliennhat-logo.png';
+                                    e3.target.onerror = () => {
+                                        console.error('Navigation: All logo sources failed, hiding logo');
+                                        e3.target.style.display = 'none';
+                                    };
+                                };
+                            };
+                        }}
                     />
                 </Link>
                     <div className={cx('company-name')}>
